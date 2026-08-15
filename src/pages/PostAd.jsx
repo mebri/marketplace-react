@@ -10,12 +10,20 @@ function PostAd() {
   const [description, setDescription] = useState("");
   const [image, setImage] = useState(null);
 
-  // Phone number
+  // Seller phone
   const [phone, setPhone] = useState("");
 
-  // Special fields for ምንአለሽ ተራ
+  // Condition
   const [condition, setCondition] = useState("");
+
+  // Material type for ምንአለሽ ተራ
   const [materialType, setMaterialType] = useState("");
+
+  // Electronics subcategory
+  const [subcategory, setSubcategory] = useState("");
+
+  // House / Rental type
+  const [type, setType] = useState("");
 
   const submitAd = async (e) => {
     e.preventDefault();
@@ -28,7 +36,10 @@ function PostAd() {
     try {
       let imageUrl = "";
 
-      // Upload image to Cloudinary
+      // =========================
+      // CLOUDINARY IMAGE UPLOAD
+      // =========================
+
       if (image) {
         const formData = new FormData();
 
@@ -58,12 +69,13 @@ function PostAd() {
         }
       }
 
-      // Save advertisement to Firestore
+      // =========================
+      // SAVE ADVERTISEMENT
+      // =========================
+
       await addDoc(collection(db, "ads"), {
         userId: auth.currentUser.uid,
         userEmail: auth.currentUser.email,
-
-        phone,
 
         title,
         price,
@@ -71,14 +83,22 @@ function PostAd() {
         category,
         description,
 
+        // Seller phone
+        phone,
+
+        // Image
         image: imageUrl,
 
-        // Special information
-        condition:
-          category === "ምንአለሽ ተራ"
-            ? condition
-            : "",
+        // Condition
+        condition,
 
+        // Electronics subcategory
+        subcategory,
+
+        // House / Rental type
+        type,
+
+        // ምንአለሽ ተራ material
         materialType:
           category === "ምንአለሽ ተራ"
             ? materialType
@@ -87,23 +107,46 @@ function PostAd() {
         createdAt: new Date(),
       });
 
-      alert("Advertisement posted successfully! 🎉");
+      alert(
+        "Advertisement posted successfully! 🎉"
+      );
 
-      // Clear form
+      // =========================
+      // CLEAR FORM
+      // =========================
+
       setTitle("");
       setPrice("");
       setCity("");
       setCategory("");
       setDescription("");
-      setImage(null);
       setPhone("");
+      setImage(null);
       setCondition("");
       setMaterialType("");
+      setSubcategory("");
+      setType("");
 
     } catch (error) {
       console.error(error);
       alert(error.message);
     }
+  };
+
+  // =========================
+  // CATEGORY CHANGE
+  // =========================
+
+  const handleCategoryChange = (e) => {
+    const newCategory = e.target.value;
+
+    setCategory(newCategory);
+
+    // Clear dependent fields
+    setCondition("");
+    setMaterialType("");
+    setSubcategory("");
+    setType("");
   };
 
   return (
@@ -116,7 +159,10 @@ function PostAd() {
         onSubmit={submitAd}
       >
 
-        {/* Title */}
+        {/* =========================
+            TITLE
+        ========================= */}
+
         <input
           type="text"
           placeholder="Advertisement Title"
@@ -127,12 +173,13 @@ function PostAd() {
           required
         />
 
-        {/* Category */}
+        {/* =========================
+            CATEGORY
+        ========================= */}
+
         <select
           value={category}
-          onChange={(e) =>
-            setCategory(e.target.value)
-          }
+          onChange={handleCategoryChange}
           required
         >
           <option value="">
@@ -168,10 +215,104 @@ function PostAd() {
           </option>
         </select>
 
-        {/* Special fields */}
+        {/* =========================
+            CARS
+        ========================= */}
+
+        {category === "Cars" && (
+          <select
+            value={condition}
+            onChange={(e) =>
+              setCondition(e.target.value)
+            }
+            required
+          >
+            <option value="">
+              Select Car Condition
+            </option>
+
+            <option value="New">
+              New Car
+            </option>
+
+            <option value="Used">
+              Used Car
+            </option>
+          </select>
+        )}
+
+        {/* =========================
+            ELECTRONICS
+        ========================= */}
+
+        {category === "Electronics" && (
+          <>
+            {/* Electronics type */}
+
+            <select
+              value={subcategory}
+              onChange={(e) =>
+                setSubcategory(e.target.value)
+              }
+              required
+            >
+              <option value="">
+                Select Electronics Type
+              </option>
+
+              <option value="Phones">
+                📱 Phones
+              </option>
+
+              <option value="Computers">
+                💻 Computers & Laptops
+              </option>
+
+              <option value="TVs">
+                📺 TVs
+              </option>
+
+              <option value="Audio">
+                🎧 Audio & Accessories
+              </option>
+
+              <option value="Other">
+                🔌 Other Electronics
+              </option>
+            </select>
+
+            {/* New / Used */}
+
+            <select
+              value={condition}
+              onChange={(e) =>
+                setCondition(e.target.value)
+              }
+              required
+            >
+              <option value="">
+                Select Condition
+              </option>
+
+              <option value="New">
+                New
+              </option>
+
+              <option value="Used">
+                Used
+              </option>
+            </select>
+          </>
+        )}
+
+        {/* =========================
+            ምንአለሽ ተራ
+        ========================= */}
+
         {category === "ምንአለሽ ተራ" && (
           <>
             {/* Condition */}
+
             <select
               value={condition}
               onChange={(e) =>
@@ -196,7 +337,8 @@ function PostAd() {
               </option>
             </select>
 
-            {/* Material Type */}
+            {/* Material */}
+
             <select
               value={materialType}
               onChange={(e) =>
@@ -235,7 +377,122 @@ function PostAd() {
           </>
         )}
 
-        {/* Price */}
+        {/* =========================
+            BUILDING MATERIALS
+        ========================= */}
+
+        {category === "Building Materials" && (
+          <select
+            value={condition}
+            onChange={(e) =>
+              setCondition(e.target.value)
+            }
+            required
+          >
+            <option value="">
+              Select Condition
+            </option>
+
+            <option value="New">
+              New Building Materials
+            </option>
+
+            <option value="Used">
+              Used Building Materials
+            </option>
+          </select>
+        )}
+
+        {/* =========================
+            SPARE PARTS
+        ========================= */}
+
+        {category === "Spare Parts" && (
+          <select
+            value={condition}
+            onChange={(e) =>
+              setCondition(e.target.value)
+            }
+            required
+          >
+            <option value="">
+              Select Condition
+            </option>
+
+            <option value="New">
+              New Spare Parts
+            </option>
+
+            <option value="Used">
+              Used Spare Parts
+            </option>
+          </select>
+        )}
+
+        {/* =========================
+            HOUSES
+        ========================= */}
+
+        {category === "Houses" && (
+          <select
+            value={type}
+            onChange={(e) =>
+              setType(e.target.value)
+            }
+            required
+          >
+            <option value="">
+              Select House Type
+            </option>
+
+            <option value="sale">
+              🏠 House for Sale
+            </option>
+
+            <option value="rent">
+              🏠 House for Rent
+            </option>
+          </select>
+        )}
+
+        {/* =========================
+            RENTALS
+        ========================= */}
+
+        {category === "Rentals" && (
+          <select
+            value={type}
+            onChange={(e) =>
+              setType(e.target.value)
+            }
+            required
+          >
+            <option value="">
+              Select Rental Type
+            </option>
+
+            <option value="apartment">
+              🏢 Apartment
+            </option>
+
+            <option value="house">
+              🏠 House
+            </option>
+
+            <option value="shop">
+              🏪 Shop
+            </option>
+
+            <option value="office">
+              🏢 Office
+            </option>
+          </select>
+        )}
+
+        {/* =========================
+            PRICE
+        ========================= */}
+
         <input
           type="number"
           placeholder="Price (ETB)"
@@ -246,7 +503,10 @@ function PostAd() {
           required
         />
 
-        {/* City */}
+        {/* =========================
+            CITY
+        ========================= */}
+
         <input
           type="text"
           placeholder="City"
@@ -257,7 +517,10 @@ function PostAd() {
           required
         />
 
-        {/* Phone */}
+        {/* =========================
+            PHONE
+        ========================= */}
+
         <input
           type="tel"
           placeholder="Phone Number (+251...)"
@@ -268,7 +531,10 @@ function PostAd() {
           required
         />
 
-        {/* Description */}
+        {/* =========================
+            DESCRIPTION
+        ========================= */}
+
         <textarea
           placeholder="Description"
           rows="5"
@@ -279,7 +545,10 @@ function PostAd() {
           required
         />
 
-        {/* Image */}
+        {/* =========================
+            IMAGE
+        ========================= */}
+
         <input
           type="file"
           accept="image/*"
@@ -288,7 +557,10 @@ function PostAd() {
           }
         />
 
-        {/* Submit */}
+        {/* =========================
+            SUBMIT
+        ========================= */}
+
         <button type="submit">
           Publish Advertisement
         </button>

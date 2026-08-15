@@ -39,7 +39,7 @@ function AdDetails() {
 
         setAd(adData);
 
-        // Check if advertisement is already saved
+        // Check favorite
         if (auth.currentUser) {
           const favoriteRef = doc(
             db,
@@ -158,7 +158,9 @@ function AdDetails() {
     if (imageList.length === 0) return;
 
     setCurrentImage((current) =>
-      current === imageList.length - 1 ? 0 : current + 1
+      current === imageList.length - 1
+        ? 0
+        : current + 1
     );
   };
 
@@ -166,9 +168,22 @@ function AdDetails() {
     if (imageList.length === 0) return;
 
     setCurrentImage((current) =>
-      current === 0 ? imageList.length - 1 : current - 1
+      current === 0
+        ? imageList.length - 1
+        : current - 1
     );
   };
+
+  // =========================
+  // PHONE
+  // =========================
+
+  const phoneNumber = ad.phone || "";
+
+  const whatsappNumber = phoneNumber.replace(
+    /\D/g,
+    ""
+  );
 
   return (
     <div className="details-page">
@@ -204,7 +219,8 @@ function AdDetails() {
                 </button>
 
                 <div className="image-counter">
-                  {currentImage + 1} / {imageList.length}
+                  {currentImage + 1} /{" "}
+                  {imageList.length}
                 </div>
               </>
             )}
@@ -234,7 +250,9 @@ function AdDetails() {
                   ? "thumbnail active-thumbnail"
                   : "thumbnail"
               }
-              onClick={() => setCurrentImage(index)}
+              onClick={() =>
+                setCurrentImage(index)
+              }
             />
           ))}
 
@@ -280,7 +298,8 @@ function AdDetails() {
         {/* City */}
 
         <p>
-          <strong>📍 City:</strong> {ad.city}
+          <strong>📍 City:</strong>{" "}
+          {ad.city}
         </p>
 
         {/* Condition */}
@@ -307,45 +326,45 @@ function AdDetails() {
           <strong>Description</strong>
         </p>
 
-        <p>
-          {ad.description}
-        </p>
+        <p>{ad.description}</p>
 
         <hr />
 
         {/* =========================
-            SELLER
+            SELLER INFORMATION
         ========================= */}
 
         <h3>Seller Information</h3>
 
-        <p>
-          📧 {ad.userEmail}
-        </p>
+        {/* PHONE */}
 
-        {ad.phone && (
-          <p>
-            📞 {ad.phone}
-          </p>
+        {phoneNumber && (
+          <a
+            href={`tel:${phoneNumber}`}
+            className="phone-link"
+          >
+            📞 Call Seller: {phoneNumber}
+          </a>
         )}
 
-        {/* Email */}
+        {/* EMAIL */}
 
-        <a
-          href={`mailto:${ad.userEmail}?subject=Regarding your advertisement: ${ad.title}`}
-          className="contact-btn"
-        >
-          📧 Contact Seller
-        </a>
-
-        {/* WhatsApp */}
-
-        {ad.phone && (
+        {ad.userEmail && (
           <a
-            href={`https://wa.me/${ad.phone.replace(
-              /\D/g,
-              ""
+            href={`mailto:${ad.userEmail}?subject=Regarding your advertisement: ${encodeURIComponent(
+              ad.title
             )}`}
+            className="contact-btn"
+          >
+            📧 Email Seller
+          </a>
+        )}
+
+        {/* WHATSAPP */}
+
+        {phoneNumber && (
+          <a
+            href={`https://wa.me/${whatsappNumber}`}
             target="_blank"
             rel="noopener noreferrer"
             className="whatsapp-btn"

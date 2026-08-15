@@ -917,4 +917,466 @@ nav a:hover {
 
 .empty-favorites h2 {
   margin-bottom: 15px;
+}.phone-link {
+  color: #1565c0;
+  font-size: 22px;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.phone-link:hover {
+  text-decoration: underline;
+}.phone-link {
+  display: block;
+  width: 100%;
+  padding: 15px 20px;
+  margin: 15px 0;
+  background: #1565c0;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.phone-link:hover {
+  background: #0d47a1;
+}
+
+.contact-btn {
+  display: block;
+  width: 100%;
+  padding: 15px 20px;
+  margin: 15px 0;
+  background: #1565c0;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 18px;
+  text-align: center;
+}
+
+.whatsapp-btn {
+  display: block;
+  width: 100%;
+  padding: 15px 20px;
+  margin: 15px 0;
+  background: #25d366;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.whatsapp-btn:hover {
+  background: #1da851;
+}/* =========================
+   HOME CATEGORIES
+========================= */
+
+.categories {
+  padding: 70px 20px;
+  background: #f5f7fb;
+  text-align: center;
+}
+
+.categories h2 {
+  font-size: 38px;
+  color: #1565c0;
+  margin-bottom: 45px;
+}
+
+.category-grid {
+  max-width: 1250px;
+  margin: auto;
+
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(260px, 1fr)
+  );
+
+  gap: 25px;
+}
+
+.category-card {
+  background: white;
+  border-radius: 16px;
+  padding: 30px 20px;
+
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+
+  transition: 0.3s;
+}
+
+.category-card:hover {
+  transform: translateY(-6px);
+
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+.category-icon {
+  font-size: 55px;
+  margin-bottom: 12px;
+}
+
+.category-card h3 {
+  color: #1565c0;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.category-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.category-option {
+  display: block;
+
+  padding: 11px 15px;
+
+  background: #f5f7fb;
+
+  color: #333;
+
+  text-decoration: none;
+
+  border-radius: 8px;
+
+  font-size: 16px;
+
+  transition: 0.3s;
+}
+
+.category-option:hover {
+  background: #1565c0;
+  color: white;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 600px) {
+
+  .categories {
+    padding: 50px 15px;
+  }
+
+  .categories h2 {
+    font-size: 30px;
+    margin-bottom: 30px;
+  }
+
+  .category-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .category-card {
+    padding: 25px 18px;
+  }
+
+  .category-icon {
+    font-size: 48px;
+  }
+
+  .category-card h3 {
+    font-size: 22px;
+  }
+
+  .category-option {
+    font-size: 17px;
+    padding: 13px;
+  }
+}/* =========================
+   NAVBAR
+========================= */
+
+.navbar {
+  width: 100%;
+  background: white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.nav-container {
+  max-width: 1400px;
+  margin: auto;
+  padding: 14px 25px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+}
+
+.nav-logo {
+  text-decoration: none;
+  color: #1565c0;
+  font-size: 26px;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.nav-links a,
+.logout-btn {
+  text-decoration: none;
+  color: #333;
+  font-size: 15px;
+  padding: 9px 12px;
+  border-radius: 7px;
+  transition: 0.2s;
+}
+
+.nav-links a:hover {
+  background: #f1f5f9;
+  color: #1565c0;
+}
+
+/* Login */
+
+.nav-login {
+  color: #1565c0 !important;
+  font-weight: bold;
+}
+
+/* Register */
+
+.nav-register {
+  background: #1565c0;
+  color: white !important;
+  font-weight: bold;
+}
+
+.nav-register:hover {
+  background: #0d47a1 !important;
+  color: white !important;
+}
+
+/* Post Ad */
+
+.post-ad-nav {
+  background: #1565c0;
+  color: white !important;
+  font-weight: bold;
+}
+
+.post-ad-nav:hover {
+  background: #0d47a1 !important;
+  color: white !important;
+}
+
+/* Logout */
+
+.logout-btn {
+  border: none;
+  background: #f5f5f5;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.logout-btn:hover {
+  background: #eeeeee;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 900px) {
+  .nav-container {
+    flex-direction: column;
+    padding: 15px;
+    gap: 12px;
+  }
+
+  .nav-links {
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .nav-links a,
+  .logout-btn {
+    font-size: 14px;
+    padding: 8px 10px;
+  }
+}/* =========================
+   NAVBAR
+========================= */
+
+.navbar {
+  width: 100%;
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.nav-container {
+  max-width: 1400px;
+  margin: auto;
+  padding: 12px 25px;
+
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+/* LOGO */
+
+.nav-logo {
+  color: #1565c0;
+  text-decoration: none;
+  font-size: 27px;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+/* MAIN LINKS */
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex: 1;
+}
+
+.nav-links a {
+  color: #333;
+  text-decoration: none;
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+.nav-links a:hover {
+  color: #1565c0;
+}
+
+/* USER AREA */
+
+.nav-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+/* LOGIN */
+
+.login-btn {
+  color: #1565c0;
+  text-decoration: none;
+  padding: 9px 14px;
+  font-weight: 600;
+}
+
+/* REGISTER */
+
+.register-btn {
+  background: #1565c0;
+  color: white;
+  text-decoration: none;
+  padding: 9px 16px;
+  border-radius: 7px;
+}
+
+/* DASHBOARD */
+
+.dashboard-btn,
+.myads-btn {
+  color: #1565c0;
+  text-decoration: none;
+  padding: 9px 10px;
+}
+
+/* POST AD */
+
+.post-btn {
+  background: #1565c0;
+  color: white;
+  text-decoration: none;
+  padding: 10px 15px;
+  border-radius: 7px;
+  font-weight: bold;
+}
+
+/* LOGOUT */
+
+.logout-btn {
+  background: #dc2626;
+  color: white;
+  border: none;
+  padding: 9px 14px;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+/* HOVER */
+
+.register-btn:hover,
+.post-btn:hover {
+  background: #0d47a1;
+}
+
+.logout-btn:hover {
+  background: #b91c1c;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 900px) {
+
+  .nav-container {
+    flex-wrap: wrap;
+    padding: 12px 15px;
+    gap: 12px;
+  }
+
+  .nav-logo {
+    font-size: 24px;
+  }
+
+  .nav-links {
+    order: 3;
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 5px;
+  }
+
+  .nav-user {
+    margin-left: auto;
+  }
+
+  .nav-links a {
+    font-size: 14px;
+  }
+
+  .login-btn,
+  .register-btn,
+  .dashboard-btn,
+  .myads-btn,
+  .post-btn,
+  .logout-btn {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
 }

@@ -1,87 +1,125 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
-import "./Navbar.css";
+import { useEffect, useState } from "react";
+import { auth } from "../firebase/firebase";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 
 function Navbar() {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [user, setUser] = useState(null);
 
-  const closeMenu = () => {
-    setMenuOpen(false);
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      (currentUser) => {
+        setUser(currentUser);
+      }
+    );
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      alert("Logged out successfully!");
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
   return (
-    <header className="header">
+    <nav className="navbar">
+      <div className="nav-container">
 
-      <div className="logo">
-        የኛ ገበያ
+        {/* LOGO */}
+
+        <Link to="/" className="nav-logo">
+          የኛ ገበያ
+        </Link>
+
+        {/* MAIN MENU */}
+
+        <div className="nav-links">
+          <Link to="/">Home</Link>
+
+          <Link to="/cars">Cars</Link>
+
+          <Link to="/houses">Houses</Link>
+
+          <Link to="/rentals">Rentals</Link>
+
+          <Link to="/spare-parts">
+            Spare Parts
+          </Link>
+
+          <Link to="/building-materials">
+            Building Materials
+          </Link>
+
+          <Link to="/search?category=Electronics">
+            Electronics
+          </Link>
+
+          <Link to="/search?category=ምንአለሽ%20ተራ">
+            ምንአለሽ ተራ
+          </Link>
+        </div>
+
+        {/* USER AREA */}
+
+        <div className="nav-user">
+
+          {!user ? (
+            <>
+              <Link
+                to="/login"
+                className="login-btn"
+              >
+                Login
+              </Link>
+
+              <Link
+                to="/register"
+                className="register-btn"
+              >
+                Register
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link
+                to="/dashboard"
+                className="dashboard-btn"
+              >
+                Dashboard
+              </Link>
+
+              <Link
+                to="/my-ads"
+                className="myads-btn"
+              >
+                My Ads
+              </Link>
+
+              <Link
+                to="/post-ad"
+                className="post-btn"
+              >
+                + Post Ad
+              </Link>
+
+              <button
+                onClick={handleLogout}
+                className="logout-btn"
+              >
+                Logout
+              </button>
+            </>
+          )}
+
+        </div>
+
       </div>
-
-      {/* Mobile menu button */}
-      <button
-        className="menu-toggle"
-        onClick={() => setMenuOpen(!menuOpen)}
-        aria-label="Toggle navigation"
-      >
-        ☰
-      </button>
-
-      <nav className={menuOpen ? "nav-open" : ""}>
-
-        <Link to="/" onClick={closeMenu}>
-          Home
-        </Link>
-
-        <Link to="/cars" onClick={closeMenu}>
-          🚗 Cars
-        </Link>
-
-        <Link to="/houses" onClick={closeMenu}>
-          🏠 Houses
-        </Link>
-
-        <Link to="/rentals" onClick={closeMenu}>
-          🏢 Rentals
-        </Link>
-
-        <Link to="/spare-parts" onClick={closeMenu}>
-          🔧 Spare Parts
-        </Link>
-
-        <Link to="/building-materials" onClick={closeMenu}>
-          🧱 Building Materials
-        </Link>
-
-        <Link to="/used-materials" onClick={closeMenu}>
-          🏪 ምንአለሽ ተራ
-        </Link>
-
-        <Link to="/post-ad" onClick={closeMenu}>
-          📢 Post Ad
-        </Link>
-
-        <Link to="/my-ads" onClick={closeMenu}>
-          📋 My Ads
-        </Link>
-
-        <Link to="/favorites" onClick={closeMenu}>
-          ❤️ Favorites
-        </Link>
-
-        <Link to="/dashboard" onClick={closeMenu}>
-          Dashboard
-        </Link>
-
-        <Link to="/contact" onClick={closeMenu}>
-          Contact
-        </Link>
-
-        <Link to="/login" onClick={closeMenu}>
-          Login
-        </Link>
-
-      </nav>
-
-    </header>
+    </nav>
   );
 }
 

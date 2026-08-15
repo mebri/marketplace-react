@@ -12,12 +12,27 @@ function Search() {
   const selectedCategory =
     searchParams.get("category") || "";
 
+  const selectedCondition =
+    searchParams.get("condition") || "";
+
+  const selectedSubcategory =
+    searchParams.get("subcategory") || "";
+
+  const selectedType =
+    searchParams.get("type") || "";
+
   const [ads, setAds] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadAds();
-  }, [searchText, selectedCategory]);
+  }, [
+    searchText,
+    selectedCategory,
+    selectedCondition,
+    selectedSubcategory,
+    selectedType,
+  ]);
 
   const loadAds = async () => {
     try {
@@ -34,6 +49,11 @@ function Search() {
         searchText.toLowerCase().trim();
 
       const filteredAds = allAds.filter((ad) => {
+
+        // =========================
+        // SEARCH
+        // =========================
+
         const matchesSearch =
           !searchLower ||
           ad.title
@@ -49,23 +69,65 @@ function Search() {
             ?.toLowerCase()
             .includes(searchLower);
 
+        // =========================
+        // CATEGORY
+        // =========================
+
         const matchesCategory =
           !selectedCategory ||
           ad.category === selectedCategory;
 
+        // =========================
+        // CONDITION
+        // =========================
+
+        const matchesCondition =
+          !selectedCondition ||
+          ad.condition?.toLowerCase() ===
+            selectedCondition.toLowerCase();
+
+        // =========================
+        // SUBCATEGORY
+        // =========================
+
+        const matchesSubcategory =
+          !selectedSubcategory ||
+          ad.subcategory?.toLowerCase() ===
+            selectedSubcategory.toLowerCase();
+
+        // =========================
+        // TYPE
+        // =========================
+
+        const matchesType =
+          !selectedType ||
+          ad.type?.toLowerCase() ===
+            selectedType.toLowerCase();
+
         return (
           matchesSearch &&
-          matchesCategory
+          matchesCategory &&
+          matchesCondition &&
+          matchesSubcategory &&
+          matchesType
         );
       });
 
       setAds(filteredAds);
+
     } catch (error) {
-      console.error(error);
+      console.error(
+        "Error loading advertisements:",
+        error
+      );
     }
 
     setLoading(false);
   };
+
+  // =========================
+  // LOADING
+  // =========================
 
   if (loading) {
     return (
@@ -75,8 +137,38 @@ function Search() {
     );
   }
 
+  // =========================
+  // TITLE
+  // =========================
+
+  let resultTitle = "All Advertisements";
+
+  if (searchText) {
+    resultTitle = `Search: "${searchText}"`;
+  }
+
+  if (selectedCategory) {
+    resultTitle += ` • ${selectedCategory}`;
+  }
+
+  if (selectedSubcategory) {
+    resultTitle += ` • ${selectedSubcategory}`;
+  }
+
+  if (selectedCondition) {
+    resultTitle += ` • ${selectedCondition}`;
+  }
+
+  if (selectedType) {
+    resultTitle += ` • ${selectedType}`;
+  }
+
   return (
     <div className="cars-page">
+
+      {/* =========================
+          HEADER
+      ========================= */}
 
       <h1>🔎 Search Results</h1>
 
@@ -87,21 +179,22 @@ function Search() {
           fontSize: "18px",
         }}
       >
-        {searchText
-          ? `Search: "${searchText}"`
-          : "All Advertisements"}
-
-        {selectedCategory &&
-          ` • ${selectedCategory}`}
+        {resultTitle}
       </p>
 
+      {/* =========================
+          NO RESULTS
+      ========================= */}
+
       {ads.length === 0 ? (
+
         <div
           style={{
             textAlign: "center",
             padding: "50px",
           }}
         >
+
           <h2>
             No advertisements found.
           </h2>
@@ -109,48 +202,74 @@ function Search() {
           <p>
             Try another search or category.
           </p>
+
         </div>
+
       ) : (
+
+        /* =========================
+           RESULTS
+        ========================= */
+
         <div className="cars-grid">
 
           {ads.map((ad) => (
+
             <div
               className="car-card"
               key={ad.id}
             >
 
-              {/* Image */}
+              {/* =========================
+                  IMAGE
+              ========================= */}
 
               {ad.image ? (
+
                 <img
                   src={ad.image}
                   alt={ad.title}
                 />
+
               ) : (
+
                 <div className="listing-image">
                   📷
                 </div>
+
               )}
 
-              {/* Information */}
+              {/* =========================
+                  INFORMATION
+              ========================= */}
 
               <div className="car-info">
+
+                {/* Category */}
 
                 <span className="category">
                   {ad.category}
                 </span>
 
+                {/* Title */}
+
                 <h3>
                   {ad.title}
                 </h3>
+
+                {/* Price */}
 
                 <h2>
                   ETB {ad.price}
                 </h2>
 
+                {/* City */}
+
                 <p>
                   📍 {ad.city}
                 </p>
+
+                {/* Condition */}
 
                 {ad.condition && (
                   <p>
@@ -159,6 +278,8 @@ function Search() {
                   </p>
                 )}
 
+                {/* Material */}
+
                 {ad.materialType && (
                   <p>
                     🧱 Material:{" "}
@@ -166,9 +287,31 @@ function Search() {
                   </p>
                 )}
 
+                {/* Subcategory */}
+
+                {ad.subcategory && (
+                  <p>
+                    📂 Category:{" "}
+                    {ad.subcategory}
+                  </p>
+                )}
+
+                {/* Type */}
+
+                {ad.type && (
+                  <p>
+                    🏷️ Type:{" "}
+                    {ad.type}
+                  </p>
+                )}
+
+                {/* Description */}
+
                 <p>
                   {ad.description}
                 </p>
+
+                {/* Details */}
 
                 <Link
                   to={`/ad/${ad.id}`}
@@ -177,6 +320,10 @@ function Search() {
                     style={{
                       background: "#2e7d32",
                       color: "white",
+                      border: "none",
+                      padding: "10px 18px",
+                      borderRadius: "6px",
+                      cursor: "pointer",
                     }}
                   >
                     View Details
@@ -186,9 +333,11 @@ function Search() {
               </div>
 
             </div>
+
           ))}
 
         </div>
+
       )}
 
     </div>
