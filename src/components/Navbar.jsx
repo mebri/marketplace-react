@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { auth } from "../firebase/firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
@@ -31,81 +30,88 @@ function Navbar() {
       <div className="nav-container">
 
         {/* LOGO */}
-
-        <Link to="/" className="nav-logo">
+        <a href="#/" className="nav-logo">
           የኛ ገበያ
-        </Link>
+        </a>
 
         {/* MAIN MENU */}
-
         <div className="nav-links">
-          <Link to="/">Home</Link>
 
-          <Link to="/cars">Cars</Link>
+          <a href="#/">
+            Home
+          </a>
 
-          <Link to="/houses">Houses</Link>
+          <a href="#/cars">
+            Cars
+          </a>
 
-          <Link to="/rentals">Rentals</Link>
+          <a href="#/houses">
+            Houses
+          </a>
 
-          <Link to="/spare-parts">
+          <a href="#/rentals">
+            Rentals
+          </a>
+
+          <a href="#/spare-parts">
             Spare Parts
-          </Link>
+          </a>
 
-          <Link to="/building-materials">
+          <a href="#/building-materials">
             Building Materials
-          </Link>
+          </a>
 
-          <Link to="/search?category=Electronics">
+          <a href="#/search?category=Electronics">
             Electronics
-          </Link>
+          </a>
 
-          <Link to="/search?category=ምንአለሽ%20ተራ">
+          <a href="#/search?category=ምንአለሽ%20ተራ">
             ምንአለሽ ተራ
-          </Link>
+          </a>
+
         </div>
 
         {/* USER AREA */}
-
         <div className="nav-user">
 
           {!user ? (
             <>
-              <Link
-                to="/login"
+              <a
+                href="#/login"
                 className="login-btn"
               >
                 Login
-              </Link>
+              </a>
 
-              <Link
-                to="/register"
+              <a
+                href="#/register"
                 className="register-btn"
               >
                 Register
-              </Link>
+              </a>
             </>
           ) : (
             <>
-              <Link
-                to="/dashboard"
+              <a
+                href="#/dashboard"
                 className="dashboard-btn"
               >
                 Dashboard
-              </Link>
+              </a>
 
-              <Link
-                to="/my-ads"
+              <a
+                href="#/my-ads"
                 className="myads-btn"
               >
                 My Ads
-              </Link>
+              </a>
 
-              <Link
-                to="/post-ad"
+              <a
+                href="#/post-ad"
                 className="post-btn"
               >
                 + Post Ad
-              </Link>
+              </a>
 
               <button
                 onClick={handleLogout}
