@@ -1,9 +1,20 @@
 import { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+} from "firebase/firestore";
+import {
+  Link,
+  useSearchParams,
+} from "react-router-dom";
 import { db } from "../firebase/firebase";
-import { Link } from "react-router-dom";
 
 function Houses() {
+  const [searchParams] = useSearchParams();
+
+  const selectedType =
+    searchParams.get("type") || "";
+
   const [houses, setHouses] = useState([]);
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("default");
@@ -15,40 +26,84 @@ function Houses() {
 
   const loadHouses = async () => {
     try {
-      const snapshot = await getDocs(collection(db, "ads"));
+      const snapshot = await getDocs(
+        collection(db, "ads")
+      );
 
       const houseAds = snapshot.docs
         .map((document) => ({
           id: document.id,
           ...document.data(),
         }))
-        .filter((ad) => ad.category === "Houses");
+        .filter(
+          (ad) => ad.category === "Houses"
+        );
 
       setHouses(houseAds);
     } catch (error) {
-      console.error("Error loading houses:", error);
+      console.error(
+        "Error loading houses:",
+        error
+      );
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
-  // Search houses
-  const filteredHouses = houses.filter((house) => {
-    const text = search.toLowerCase().trim();
+  // =========================
+  // TYPE FILTER
+  // =========================
 
-    if (!text) return true;
+  const typeFilteredHouses =
+    houses.filter((house) => {
+      if (!selectedType) {
+        return true;
+      }
 
-    return (
-      house.title?.toLowerCase().includes(text) ||
-      house.city?.toLowerCase().includes(text) ||
-      house.description?.toLowerCase().includes(text)
-    );
-  });
+      return (
+        house.type?.toLowerCase() ===
+        selectedType.toLowerCase()
+      );
+    });
 
-  // Sort houses by price
-  const sortedHouses = [...filteredHouses].sort((a, b) => {
-    const priceA = Number(a.price) || 0;
-    const priceB = Number(b.price) || 0;
+  // =========================
+  // SEARCH
+  // =========================
+
+  const filteredHouses =
+    typeFilteredHouses.filter((house) => {
+      const text =
+        search.toLowerCase().trim();
+
+      if (!text) {
+        return true;
+      }
+
+      return (
+        house.title
+          ?.toLowerCase()
+          .includes(text) ||
+        house.city
+          ?.toLowerCase()
+          .includes(text) ||
+        house.description
+          ?.toLowerCase()
+          .includes(text)
+      );
+    });
+
+  // =========================
+  // SORT
+  // =========================
+
+  const sortedHouses = [
+    ...filteredHouses,
+  ].sort((a, b) => {
+    const priceA =
+      Number(a.price) || 0;
+
+    const priceB =
+      Number(b.price) || 0;
 
     if (sort === "low") {
       return priceA - priceB;
@@ -61,10 +116,28 @@ function Houses() {
     return 0;
   });
 
+  // =========================
+  // PAGE TITLE
+  // =========================
+
+  let pageTitle = "🏠 Houses";
+
+  if (selectedType === "sale") {
+    pageTitle = "🏠 Houses for Sale";
+  }
+
+  if (selectedType === "rent") {
+    pageTitle = "🏠 Houses for Rent";
+  }
+
+  // =========================
+  // LOADING
+  // =========================
+
   if (loading) {
     return (
       <div className="cars-page">
-        <h1>Loading Houses...</h1>
+        <h1>🏠 Loading Houses...</h1>
       </div>
     );
   }
@@ -72,40 +145,29 @@ function Houses() {
   return (
     <div className="cars-page">
 
-      <h1>🏠 Houses for Sale</h1>
+      {/* TITLE */}
 
-      {/* Search and Sort */}
-      <div
-        style={{
-          display: "flex",
-          gap: "15px",
-          justifyContent: "center",
-          alignItems: "center",
-          flexWrap: "wrap",
-          marginBottom: "40px",
-        }}
-      >
+      <h1>{pageTitle}</h1>
+
+      {/* SEARCH + SORT */}
+
+      <div className="cars-controls">
+
         <input
           className="car-search"
           type="text"
-          placeholder="Search house, city, description..."
+          placeholder="🔎 Search house, city, description..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          style={{
-            margin: 0,
-          }}
+          onChange={(e) =>
+            setSearch(e.target.value)
+          }
         />
 
         <select
           value={sort}
-          onChange={(e) => setSort(e.target.value)}
-          style={{
-            padding: "15px",
-            fontSize: "17px",
-            border: "1px solid #ddd",
-            borderRadius: "10px",
-            outline: "none",
-          }}
+          onChange={(e) =>
+            setSort(e.target.value)
+          }
         >
           <option value="default">
             Sort by Price
@@ -119,41 +181,54 @@ function Houses() {
             Price: High → Low
           </option>
         </select>
+
       </div>
 
-      {/* Number of results */}
+      {/* RESULT COUNT */}
+
       <p
         style={{
           textAlign: "center",
           marginBottom: "30px",
           fontSize: "18px",
+          color: "#555",
         }}
       >
         {sortedHouses.length} house(s) found
       </p>
 
-      {/* Houses */}
+      {/* HOUSES */}
+
       <div className="cars-grid">
 
         {sortedHouses.length === 0 ? (
           <div
             style={{
-              textAlign: "center",
               width: "100%",
+              textAlign: "center",
+              padding: "50px 20px",
             }}
           >
             <h2>No houses found.</h2>
 
-            <p>
-              Try another search.
+            <p
+              style={{
+                marginTop: "10px",
+                color: "#777",
+              }}
+            >
+              Try another search or type.
             </p>
           </div>
         ) : (
           sortedHouses.map((house) => (
+            <div
+              className="car-card"
+              key={house.id}
+            >
 
-            <div className="car-card" key={house.id}>
+              {/* IMAGE */}
 
-              {/* House Image */}
               <div className="listing-image">
 
                 {house.image ? (
@@ -170,20 +245,30 @@ function Houses() {
 
               </div>
 
-              {/* House Information */}
+              {/* INFORMATION */}
+
               <div className="car-info">
 
                 <span className="category">
                   🏠 Houses
                 </span>
 
-                <h3>
-                  {house.title}
-                </h3>
+                <h3>{house.title}</h3>
 
                 <h2>
                   ETB {house.price}
                 </h2>
+
+                {house.type && (
+                  <p>
+                    🏷️{" "}
+                    {house.type === "sale"
+                      ? "For Sale"
+                      : house.type === "rent"
+                      ? "For Rent"
+                      : house.type}
+                  </p>
+                )}
 
                 <p>
                   📍 {house.city}
@@ -193,24 +278,53 @@ function Houses() {
                   {house.description}
                 </p>
 
-                {/* View Details */}
-                <Link to={`/ad/${house.id}`}>
+                {/* VIEW DETAILS */}
+
+                <Link
+                  to={`/ad/${house.id}`}
+                  style={{
+                    textDecoration: "none",
+                  }}
+                >
                   <button
                     style={{
+                      width: "100%",
+                      padding: "12px",
+                      marginTop: "10px",
+                      border: "none",
+                      borderRadius: "8px",
                       background: "#2e7d32",
                       color: "white",
-                      border: "none",
-                      padding: "12px",
-                      width: "100%",
-                      borderRadius: "8px",
-                      cursor: "pointer",
-                      marginTop: "10px",
                       fontSize: "16px",
+                      fontWeight: "600",
+                      cursor: "pointer",
                     }}
                   >
                     👁 View Details
                   </button>
                 </Link>
+
+                {/* CALL SELLER */}
+
+                {house.phone && (
+                  <a
+                    href={`tel:${house.phone}`}
+                    className="phone-link"
+                    style={{
+                      display: "block",
+                      textAlign: "center",
+                      marginTop: "10px",
+                      padding: "12px",
+                      background: "#1976d2",
+                      color: "white",
+                      borderRadius: "8px",
+                      textDecoration: "none",
+                      fontWeight: "600",
+                    }}
+                  >
+                    📞 Call Seller
+                  </a>
+                )}
 
               </div>
 
@@ -219,7 +333,6 @@ function Houses() {
         )}
 
       </div>
-
     </div>
   );
 }

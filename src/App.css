@@ -1379,4 +1379,104 @@ nav a:hover {
     padding: 8px 10px;
     font-size: 13px;
   }
+}/* =========================
+   CARS CONTROLS
+========================= */
+
+.cars-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-bottom: 40px;
+}
+
+.cars-controls select {
+  height: 52px;
+  padding: 0 16px;
+
+  background: white;
+
+  border: 1px solid #d7dce2;
+  border-radius: 12px;
+
+  font-size: 16px;
+  color: #333;
+
+  outline: none;
+
+  cursor: pointer;
+
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.cars-controls select:focus {
+  border-color: #1976d2;
+}/* =========================
+   HOME CATEGORY CARDS
+========================= */
+
+.home-category-card {
+  display: block;
+
+  background: white;
+
+  text-decoration: none;
+
+  color: #222;
+
+  padding: 25px 20px;
+
+  border-radius: 14px;
+
+  text-align: center;
+
+  box-shadow:
+    0 3px 12px rgba(0, 0, 0, 0.08);
+
+  transition: all 0.2s ease;
+}
+
+.home-category-card:hover {
+  transform: translateY(-5px);
+
+  box-shadow:
+    0 8px 22px rgba(0, 0, 0, 0.12);
+
+  border-color: #1976d2;
+}
+
+.home-category-icon {
+  font-size: 45px;
+
+  margin-bottom: 12px;
+}
+
+.home-category-card h3 {
+  font-size: 20px;
+
+  margin-bottom: 8px;
+
+  color: #222;
+}
+
+.home-category-card p {
+  color: #777;
+
+  font-size: 14px;
+
+  line-height: 1.5;
+
+  margin-bottom: 12px;
+}
+
+.category-view {
+  display: inline-block;
+
+  color: #1976d2;
+
+  font-size: 15px;
+
+  font-weight: 700;
 }

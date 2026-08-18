@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 function Categories() {
+  const [openCategory, setOpenCategory] = useState(null);
+
   const categories = [
     // =========================
     // CARS
@@ -10,11 +13,11 @@ function Categories() {
       title: "Cars",
       items: [
         {
-          name: "New Cars",
+          name: "🚗 New Cars",
           link: "/cars?condition=new",
         },
         {
-          name: "Used Cars",
+          name: "🚙 Used Cars",
           link: "/cars?condition=used",
         },
       ],
@@ -28,15 +31,15 @@ function Categories() {
       title: "ምንአለሽ ተራ",
       items: [
         {
-          name: "Used Materials",
+          name: "🧱 Used Materials",
           link: "/search?category=ምንአለሽ%20ተራ",
         },
         {
-          name: "Used Items",
+          name: "🏪 Used Items",
           link: "/search?category=ምንአለሽ%20ተራ",
         },
         {
-          name: "Other Second-Hand Goods",
+          name: "📦 Other Second-Hand Goods",
           link: "/search?category=ምንአለሽ%20ተራ",
         },
       ],
@@ -50,11 +53,11 @@ function Categories() {
       title: "Building Materials",
       items: [
         {
-          name: "New Building Materials",
+          name: "🧱 New Building Materials",
           link: "/building-materials?condition=new",
         },
         {
-          name: "Used Building Materials",
+          name: "🧱 Used Building Materials",
           link: "/building-materials?condition=used",
         },
       ],
@@ -68,11 +71,11 @@ function Categories() {
       title: "Spare Parts",
       items: [
         {
-          name: "New Spare Parts",
+          name: "🔧 New Spare Parts",
           link: "/spare-parts?condition=new",
         },
         {
-          name: "Used Spare Parts",
+          name: "🔩 Used Spare Parts",
           link: "/spare-parts?condition=used",
         },
       ],
@@ -93,7 +96,6 @@ function Categories() {
           name: "📱 Used Phones",
           link: "/search?category=Electronics&subcategory=Phones&condition=used",
         },
-
         {
           name: "💻 New Computers & Laptops",
           link: "/search?category=Electronics&subcategory=Computers&condition=new",
@@ -102,7 +104,6 @@ function Categories() {
           name: "💻 Used Computers & Laptops",
           link: "/search?category=Electronics&subcategory=Computers&condition=used",
         },
-
         {
           name: "📺 New TVs",
           link: "/search?category=Electronics&subcategory=TVs&condition=new",
@@ -111,12 +112,10 @@ function Categories() {
           name: "📺 Used TVs",
           link: "/search?category=Electronics&subcategory=TVs&condition=used",
         },
-
         {
           name: "🎧 Audio & Accessories",
           link: "/search?category=Electronics&subcategory=Audio",
         },
-
         {
           name: "🔌 Other Electronics",
           link: "/search?category=Electronics&subcategory=Other",
@@ -132,11 +131,11 @@ function Categories() {
       title: "Houses",
       items: [
         {
-          name: "Houses for Sale",
+          name: "🏠 Houses for Sale",
           link: "/houses?type=sale",
         },
         {
-          name: "Houses for Rent",
+          name: "🏠 Houses for Rent",
           link: "/houses?type=rent",
         },
       ],
@@ -150,24 +149,30 @@ function Categories() {
       title: "Rentals",
       items: [
         {
-          name: "Apartments",
+          name: "🏢 Apartments",
           link: "/rentals?type=apartment",
         },
         {
-          name: "Houses",
+          name: "🏠 Houses",
           link: "/rentals?type=house",
         },
         {
-          name: "Shops",
+          name: "🏪 Shops",
           link: "/rentals?type=shop",
         },
         {
-          name: "Offices",
+          name: "🏢 Offices",
           link: "/rentals?type=office",
         },
       ],
     },
   ];
+
+  const toggleCategory = (title) => {
+    setOpenCategory(
+      openCategory === title ? null : title
+    );
+  };
 
   return (
     <section className="categories">
@@ -176,37 +181,68 @@ function Categories() {
 
       <div className="category-grid">
 
-        {categories.map((category) => (
-          <div
-            className="category-card"
-            key={category.title}
-          >
+        {categories.map((category) => {
 
-            {/* Icon */}
-            <div className="category-icon">
-              {category.icon}
+          const isOpen =
+            openCategory === category.title;
+
+          return (
+            <div
+              className={`category-card ${
+                isOpen ? "category-open" : ""
+              }`}
+              key={category.title}
+            >
+
+              {/* =========================
+                  CATEGORY HEADER
+              ========================= */}
+
+              <button
+                type="button"
+                className="category-header"
+                onClick={() =>
+                  toggleCategory(category.title)
+                }
+              >
+
+                <div className="category-icon">
+                  {category.icon}
+                </div>
+
+                <h3>
+                  {category.title}
+                </h3>
+
+                <span className="category-arrow">
+                  {isOpen ? "▲" : "▼"}
+                </span>
+
+              </button>
+
+              {/* =========================
+                  SUBCATEGORIES
+              ========================= */}
+
+              {isOpen && (
+                <div className="category-options">
+
+                  {category.items.map((item) => (
+                    <Link
+                      key={item.name}
+                      to={item.link}
+                      className="category-option"
+                    >
+                      {item.name}
+                    </Link>
+                  ))}
+
+                </div>
+              )}
+
             </div>
-
-            {/* Category name */}
-            <h3>{category.title}</h3>
-
-            {/* Subcategories */}
-            <div className="category-options">
-
-              {category.items.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.link}
-                  className="category-option"
-                >
-                  {item.name}
-                </Link>
-              ))}
-
-            </div>
-
-          </div>
-        ))}
+          );
+        })}
 
       </div>
 

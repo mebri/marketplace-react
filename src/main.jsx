@@ -7,6 +7,7 @@ const redirect = sessionStorage.redirect;
 
 if (redirect) {
   delete sessionStorage.redirect;
+
   window.history.replaceState(
     null,
     null,
