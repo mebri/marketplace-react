@@ -1,5 +1,8 @@
 import { useState } from "react";
-import { collection, addDoc } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+} from "firebase/firestore";
 import { db, auth } from "../firebase/firebase";
 
 function PostAd() {
@@ -8,7 +11,9 @@ function PostAd() {
   const [city, setCity] = useState("");
   const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
-  const [image, setImage] = useState(null);
+
+  // Images
+  const [images, setImages] = useState([]);
 
   // Seller phone
   const [phone, setPhone] = useState("");
@@ -16,7 +21,7 @@ function PostAd() {
   // Condition
   const [condition, setCondition] = useState("");
 
-  // Material type for ምንአለሽ ተራ
+  // Material type
   const [materialType, setMaterialType] = useState("");
 
   // Electronics subcategory
@@ -25,26 +30,116 @@ function PostAd() {
   // House / Rental type
   const [type, setType] = useState("");
 
+  // Upload state
+  const [uploading, setUploading] = useState(false);
+
+  // =========================
+  // IMAGE SELECTION
+  // =========================
+
+  const handleImageChange = (e) => {
+    const selectedFiles = Array.from(
+      e.target.files || []
+    );
+
+    if (selectedFiles.length === 0) {
+      return;
+    }
+
+    // Maximum 10 images
+    if (selectedFiles.length > 10) {
+      alert("You can select a maximum of 10 images.");
+      e.target.value = "";
+      return;
+    }
+
+    // Check file types
+    const invalidFile = selectedFiles.find(
+      (file) => !file.type.startsWith("image/")
+    );
+
+    if (invalidFile) {
+      alert("Please select image files only.");
+      e.target.value = "";
+      return;
+    }
+
+    // Check file size
+    const tooLarge = selectedFiles.find(
+      (file) => file.size > 10 * 1024 * 1024
+    );
+
+    if (tooLarge) {
+      alert(
+        "Each image must be 10 MB or smaller."
+      );
+      e.target.value = "";
+      return;
+    }
+
+    setImages(selectedFiles);
+  };
+
+  // =========================
+  // REMOVE IMAGE
+  // =========================
+
+  const removeImage = (index) => {
+    setImages((currentImages) =>
+      currentImages.filter(
+        (_, imageIndex) => imageIndex !== index
+      )
+    );
+  };
+
+  // =========================
+  // SUBMIT AD
+  // =========================
+
   const submitAd = async (e) => {
     e.preventDefault();
 
     if (!auth.currentUser) {
-      alert("Please log in before posting an advertisement.");
+      alert(
+        "Please log in before posting an advertisement."
+      );
+      return;
+    }
+
+    if (images.length === 0) {
+      alert(
+        "Please select at least one image."
+      );
+      return;
+    }
+
+    if (images.length > 10) {
+      alert(
+        "You can upload a maximum of 10 images."
+      );
       return;
     }
 
     try {
-      let imageUrl = "";
+      setUploading(true);
 
       // =========================
-      // CLOUDINARY IMAGE UPLOAD
+      // CLOUDINARY UPLOAD
       // =========================
 
-      if (image) {
+      const imageUrls = [];
+
+      for (let i = 0; i < images.length; i++) {
+        const image = images[i];
+
         const formData = new FormData();
 
         formData.append("file", image);
-        formData.append("upload_preset", "yeegna_uploads");
+
+        formData.append(
+          "upload_preset",
+          "yeegna_uploads"
+        );
 
         const response = await fetch(
           "https://api.cloudinary.com/v1_1/lisqr7zn/image/upload",
@@ -56,56 +151,79 @@ function PostAd() {
 
         const data = await response.json();
 
-        console.log("Cloudinary Response:", data);
+        console.log(
+          `Cloudinary Image ${i + 1}:`,
+          data
+        );
 
-        if (response.ok && data.secure_url) {
-          imageUrl = data.secure_url;
-        } else {
-          alert(
-            "Cloudinary Error: " +
-              (data.error?.message || "Unknown error")
+        if (
+          !response.ok ||
+          !data.secure_url
+        ) {
+          throw new Error(
+            data.error?.message ||
+              `Failed to upload image ${i + 1}.`
           );
-          return;
         }
+
+        imageUrls.push(data.secure_url);
       }
 
       // =========================
-      // SAVE ADVERTISEMENT
+      // SAVE TO FIREBASE
       // =========================
 
-      await addDoc(collection(db, "ads"), {
-        userId: auth.currentUser.uid,
-        userEmail: auth.currentUser.email,
+      await addDoc(
+        collection(db, "ads"),
+        {
+          userId:
+            auth.currentUser.uid,
 
-        title,
-        price,
-        city,
-        category,
-        description,
+          userEmail:
+            auth.currentUser.email || "",
 
-        // Seller phone
-        phone,
+          title: title.trim(),
 
-        // Image
-        image: imageUrl,
+          price: price,
 
-        // Condition
-        condition,
+          city: city.trim(),
 
-        // Electronics subcategory
-        subcategory,
+          category,
 
-        // House / Rental type
-        type,
+          description:
+            description.trim(),
 
-        // ምንአለሽ ተራ material
-        materialType:
-          category === "ምንአለሽ ተራ"
-            ? materialType
-            : "",
+          // Seller phone
+          phone: phone.trim(),
 
-        createdAt: new Date(),
-      });
+          // Keep first image for
+          // compatibility with existing pages
+          image:
+            imageUrls.length > 0
+              ? imageUrls[0]
+              : "",
+
+          // New multiple-image field
+          images: imageUrls,
+
+          // Condition
+          condition,
+
+          // Electronics
+          subcategory,
+
+          // House / Rental
+          type,
+
+          // ምንአለሽ ተራ
+          materialType:
+            category === "ምንአለሽ ተራ"
+              ? materialType
+              : "",
+
+          createdAt: new Date(),
+        }
+      );
 
       alert(
         "Advertisement posted successfully! 🎉"
@@ -121,15 +239,35 @@ function PostAd() {
       setCategory("");
       setDescription("");
       setPhone("");
-      setImage(null);
+      setImages([]);
       setCondition("");
       setMaterialType("");
       setSubcategory("");
       setType("");
 
+      // Clear file input
+      const fileInput =
+        document.getElementById(
+          "ad-images"
+        );
+
+      if (fileInput) {
+        fileInput.value = "";
+      }
+
     } catch (error) {
-      console.error(error);
-      alert(error.message);
+      console.error(
+        "Post advertisement error:",
+        error
+      );
+
+      alert(
+        error.message ||
+          "Something went wrong while posting the advertisement."
+      );
+
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -152,7 +290,9 @@ function PostAd() {
   return (
     <div className="post-ad-page">
 
-      <h1>📢 Post Advertisement</h1>
+      <h1>
+        📢 Post Advertisement
+      </h1>
 
       <form
         className="post-form"
@@ -247,12 +387,12 @@ function PostAd() {
 
         {category === "Electronics" && (
           <>
-            {/* Electronics type */}
-
             <select
               value={subcategory}
               onChange={(e) =>
-                setSubcategory(e.target.value)
+                setSubcategory(
+                  e.target.value
+                )
               }
               required
             >
@@ -281,12 +421,12 @@ function PostAd() {
               </option>
             </select>
 
-            {/* New / Used */}
-
             <select
               value={condition}
               onChange={(e) =>
-                setCondition(e.target.value)
+                setCondition(
+                  e.target.value
+                )
               }
               required
             >
@@ -311,12 +451,12 @@ function PostAd() {
 
         {category === "ምንአለሽ ተራ" && (
           <>
-            {/* Condition */}
-
             <select
               value={condition}
               onChange={(e) =>
-                setCondition(e.target.value)
+                setCondition(
+                  e.target.value
+                )
               }
               required
             >
@@ -337,12 +477,12 @@ function PostAd() {
               </option>
             </select>
 
-            {/* Material */}
-
             <select
               value={materialType}
               onChange={(e) =>
-                setMaterialType(e.target.value)
+                setMaterialType(
+                  e.target.value
+                )
               }
               required
             >
@@ -540,32 +680,100 @@ function PostAd() {
           rows="5"
           value={description}
           onChange={(e) =>
-            setDescription(e.target.value)
+            setDescription(
+              e.target.value
+            )
           }
           required
         />
 
         {/* =========================
-            IMAGE
+            IMAGES
         ========================= */}
 
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) =>
-            setImage(e.target.files[0])
-          }
-        />
+        <div className="post-images-section">
+
+          <label htmlFor="ad-images">
+            🖼️ Upload Images
+          </label>
+
+          <p>
+            Select up to 10 images.
+            You can upload 1–10 images.
+          </p>
+
+          <input
+            id="ad-images"
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleImageChange}
+          />
+
+          {/* IMAGE PREVIEWS */}
+
+          {images.length > 0 && (
+            <div className="post-image-preview-grid">
+
+              {images.map(
+                (image, index) => (
+                  <div
+                    className="post-image-preview"
+                    key={`${image.name}-${index}`}
+                  >
+
+                    <img
+                      src={URL.createObjectURL(
+                        image
+                      )}
+                      alt={`Preview ${
+                        index + 1
+                      }`}
+                    />
+
+                    <span>
+                      {index + 1}
+                    </span>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        removeImage(
+                          index
+                        )
+                      }
+                    >
+                      ×
+                    </button>
+
+                  </div>
+                )
+              )}
+
+            </div>
+          )}
+
+          <p className="image-count">
+            {images.length} / 10 images selected
+          </p>
+
+        </div>
 
         {/* =========================
             SUBMIT
         ========================= */}
 
-        <button type="submit">
-          Publish Advertisement
+        <button
+          type="submit"
+          disabled={uploading}
+        >
+          {uploading
+            ? "⏳ Uploading images..."
+            : "📢 Publish Advertisement"}
         </button>
 
       </form>
+
     </div>
   );
 }

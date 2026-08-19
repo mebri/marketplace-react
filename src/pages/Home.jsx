@@ -28,6 +28,7 @@ function Home() {
         },
       ],
     },
+
     {
       id: "houses",
       icon: "🏠",
@@ -44,6 +45,7 @@ function Home() {
         },
       ],
     },
+
     {
       id: "rentals",
       icon: "🏢",
@@ -68,6 +70,7 @@ function Home() {
         },
       ],
     },
+
     {
       id: "spare-parts",
       icon: "🔧",
@@ -84,6 +87,7 @@ function Home() {
         },
       ],
     },
+
     {
       id: "building-materials",
       icon: "🧱",
@@ -100,6 +104,7 @@ function Home() {
         },
       ],
     },
+
     {
       id: "electronics",
       icon: "📱",
@@ -108,38 +113,47 @@ function Home() {
       options: [
         {
           name: "📱 New Phones",
-          link: "/search?category=Electronics&subcategory=Phones&condition=new",
+          link:
+            "/search?category=Electronics&subcategory=Phones&condition=new",
         },
         {
           name: "📱 Used Phones",
-          link: "/search?category=Electronics&subcategory=Phones&condition=used",
+          link:
+            "/search?category=Electronics&subcategory=Phones&condition=used",
         },
         {
           name: "💻 New Computers & Laptops",
-          link: "/search?category=Electronics&subcategory=Computers&condition=new",
+          link:
+            "/search?category=Electronics&subcategory=Computers&condition=new",
         },
         {
           name: "💻 Used Computers & Laptops",
-          link: "/search?category=Electronics&subcategory=Computers&condition=used",
+          link:
+            "/search?category=Electronics&subcategory=Computers&condition=used",
         },
         {
           name: "📺 New TVs",
-          link: "/search?category=Electronics&subcategory=TVs&condition=new",
+          link:
+            "/search?category=Electronics&subcategory=TVs&condition=new",
         },
         {
           name: "📺 Used TVs",
-          link: "/search?category=Electronics&subcategory=TVs&condition=used",
+          link:
+            "/search?category=Electronics&subcategory=TVs&condition=used",
         },
         {
           name: "🎧 Audio & Accessories",
-          link: "/search?category=Electronics&subcategory=Audio",
+          link:
+            "/search?category=Electronics&subcategory=Audio",
         },
         {
           name: "🔌 Other Electronics",
-          link: "/search?category=Electronics&subcategory=Other",
+          link:
+            "/search?category=Electronics&subcategory=Other",
         },
       ],
     },
+
     {
       id: "min-alish-tera",
       icon: "🏪",
@@ -148,22 +162,25 @@ function Home() {
       options: [
         {
           name: "🧱 Used Materials",
-          link: "/search?category=ምንአለሽ%20ተራ&subcategory=Materials",
+          link:
+            "/search?category=ምንአለሽ%20ተራ&subcategory=Materials",
         },
         {
           name: "📦 Used Items",
-          link: "/search?category=ምንአለሽ%20ተራ&subcategory=Items",
+          link:
+            "/search?category=ምንአለሽ%20ተራ&subcategory=Items",
         },
         {
           name: "♻️ Other Second-Hand Goods",
-          link: "/search?category=ምንአለሽ%20ተራ&subcategory=Other",
+          link:
+            "/search?category=ምንአለሽ%20ተራ&subcategory=Other",
         },
       ],
     },
   ];
 
   // =========================
-  // LOAD LATEST ADS
+  // LOAD ALL ADS
   // =========================
 
   useEffect(() => {
@@ -189,8 +206,14 @@ function Home() {
         return dateB - dateA;
       });
 
-      // Show latest 8
-      setLatestAds(ads.slice(0, 8));
+      // =====================================
+      // IMPORTANT:
+      // NO LIMIT
+      // Show ALL advertisements
+      // =====================================
+
+      setLatestAds(ads);
+
     } catch (error) {
       console.error(
         "Error loading latest advertisements:",
@@ -275,6 +298,7 @@ function Home() {
         <div className="home-category-grid">
 
           {categories.map((category) => {
+
             const isOpen =
               openCategory === category.id;
 
@@ -344,26 +368,8 @@ function Home() {
             );
           })}
 
-          {/* Search Card */}
 
-          <Link
-            to="/search"
-            className="home-card search-card"
-          >
-            <div className="home-card-icon">
-              🔎
-            </div>
-
-            <h3>Search</h3>
-
-            <p>
-              Find advertisements
-            </p>
-
-            <span>
-              Search →
-            </span>
-          </Link>
+          
 
         </div>
 
@@ -377,7 +383,9 @@ function Home() {
       <section className="latest-ads-section">
 
         <div className="latest-ads-header">
+
           <div>
+
             <h2>
               🆕 Latest Advertisements
             </h2>
@@ -385,6 +393,7 @@ function Home() {
             <p>
               Recently posted items on የኛ ገበያ
             </p>
+
           </div>
 
           <Link
@@ -393,19 +402,24 @@ function Home() {
           >
             View All →
           </Link>
+
         </div>
+
 
         {adsLoading ? (
 
           <div className="latest-ads-loading">
+
             <h3>
               Loading advertisements...
             </h3>
+
           </div>
 
         ) : latestAds.length === 0 ? (
 
           <div className="latest-ads-empty">
+
             <h3>
               No advertisements yet.
             </h3>
@@ -417,84 +431,126 @@ function Home() {
             <Link to="/post-ad">
               📢 Post Advertisement
             </Link>
+
           </div>
 
         ) : (
 
           <div className="latest-ads-grid">
 
-            {latestAds.map((ad) => (
+            {/* =====================================
+                ALL ADS — NO LIMIT
+                ===================================== */}
 
-              <div
-                className="latest-ad-card"
-                key={ad.id}
-              >
+            {latestAds.map((ad) => {
 
-                {/* IMAGE */}
+              /*
+               * Your Firestore has both:
+               *
+               * image
+               * images[]
+               *
+               * We support both.
+               */
 
-                <div className="latest-ad-image">
+              const adImage =
+                Array.isArray(ad.images) &&
+                ad.images.length > 0
+                  ? ad.images[0]
+                  : ad.image;
 
-                  {ad.image ? (
-                    <img
-                      src={ad.image}
-                      alt={ad.title}
-                      onError={(e) => {
-                        e.currentTarget.style.display =
-                          "none";
-                      }}
-                    />
-                  ) : (
-                    <div className="latest-no-image">
-                      📷
-                    </div>
-                  )}
+              return (
+
+                <div
+                  className="latest-ad-card"
+                  key={ad.id}
+                >
+
+                  {/* IMAGE */}
+
+                  <div className="latest-ad-image">
+
+                    {adImage ? (
+
+                      <img
+                        src={adImage}
+                        alt={
+                          ad.title ||
+                          "Advertisement"
+                        }
+                        loading="lazy"
+                        onError={(e) => {
+                          e.currentTarget.style.display =
+                            "none";
+
+                          const parent =
+                            e.currentTarget.parentElement;
+
+                          if (parent) {
+                            parent.innerHTML =
+                              '<div class="latest-no-image">📷</div>';
+                          }
+                        }}
+                      />
+
+                    ) : (
+
+                      <div className="latest-no-image">
+                        📷
+                      </div>
+
+                    )}
+
+                  </div>
+
+
+                  {/* INFORMATION */}
+
+                  <div className="latest-ad-info">
+
+                    <span>
+                      {ad.category ||
+                        "Advertisement"}
+                    </span>
+
+                    <h3>
+                      {ad.title ||
+                        "Untitled Advertisement"}
+                    </h3>
+
+                    <h4>
+                      ETB {ad.price || "0"}
+                    </h4>
+
+                    <p>
+                      📍 {ad.city || "Ethiopia"}
+                    </p>
+
+                    {ad.condition && (
+                      <p>
+                        🔄 {ad.condition}
+                      </p>
+                    )}
+
+                    {ad.subcategory && (
+                      <p>
+                        📂 {ad.subcategory}
+                      </p>
+                    )}
+
+                    <Link
+                      to={`/ad/${ad.id}`}
+                      className="latest-view-button"
+                    >
+                      👁 View Details
+                    </Link>
+
+                  </div>
 
                 </div>
 
-                {/* INFORMATION */}
-
-                <div className="latest-ad-info">
-
-                  <span>
-                    {ad.category}
-                  </span>
-
-                  <h3>
-                    {ad.title}
-                  </h3>
-
-                  <h4>
-                    ETB {ad.price}
-                  </h4>
-
-                  <p>
-                    📍 {ad.city}
-                  </p>
-
-                  {ad.condition && (
-                    <p>
-                      🔄 {ad.condition}
-                    </p>
-                  )}
-
-                  {ad.subcategory && (
-                    <p>
-                      📂 {ad.subcategory}
-                    </p>
-                  )}
-
-                  <Link
-                    to={`/ad/${ad.id}`}
-                    className="latest-view-button"
-                  >
-                    👁 View Details
-                  </Link>
-
-                </div>
-
-              </div>
-
-            ))}
+              );
+            })}
 
           </div>
 

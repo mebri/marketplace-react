@@ -1,99 +1,179 @@
 import { HashRouter, Routes, Route } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
+
 import Home from "./pages/Home";
 import Cars from "./pages/Cars";
 import Houses from "./pages/Houses";
 import Rentals from "./pages/Rentals";
 import SpareParts from "./pages/SpareParts";
 import BuildingMaterials from "./pages/BuildingMaterials";
+
 import PostAd from "./pages/PostAd";
+
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+
+import Dashboard from "./pages/Dashboard";
+import MyAds from "./pages/MyAds";
+
 import Contact from "./pages/Contact";
 import AdDetails from "./pages/AdDetails";
 import Search from "./pages/Search";
 
+import EditAd from "./pages/EditAd";
 function App() {
   return (
     <HashRouter>
+
       <Navbar />
 
       <Routes>
 
-        {/* Home */}
+        {/* =========================
+            HOME
+        ========================= */}
+
         <Route
           path="/"
           element={<Home />}
         />
 
-        {/* Cars */}
+
+        {/* =========================
+            CARS
+        ========================= */}
+
         <Route
           path="/cars"
           element={<Cars />}
         />
 
-        {/* Houses */}
+
+        {/* =========================
+            HOUSES
+        ========================= */}
+
         <Route
           path="/houses"
           element={<Houses />}
         />
 
-        {/* Rentals */}
+
+        {/* =========================
+            RENTALS
+        ========================= */}
+
         <Route
           path="/rentals"
           element={<Rentals />}
         />
 
-        {/* Spare Parts */}
+
+        {/* =========================
+            SPARE PARTS
+        ========================= */}
+
         <Route
           path="/spare-parts"
           element={<SpareParts />}
         />
 
-        {/* Building Materials */}
+
+        {/* =========================
+            BUILDING MATERIALS
+        ========================= */}
+
         <Route
           path="/building-materials"
           element={<BuildingMaterials />}
         />
 
-        {/* Search */}
+
+        {/* =========================
+            SEARCH
+        ========================= */}
+
         <Route
           path="/search"
           element={<Search />}
         />
 
-        {/* Advertisement Details */}
+
+        {/* =========================
+            AD DETAILS
+        ========================= */}
+
         <Route
           path="/ad/:id"
           element={<AdDetails />}
         />
 
-        {/* Post Advertisement */}
+
+        {/* =========================
+            POST ADVERTISEMENT
+        ========================= */}
+
         <Route
           path="/post-ad"
           element={<PostAd />}
         />
 
-        {/* Login */}
+
+        {/* =========================
+            LOGIN
+        ========================= */}
+
         <Route
           path="/login"
           element={<Login />}
         />
 
-        {/* Register */}
+
+        {/* =========================
+            REGISTER
+        ========================= */}
+
         <Route
           path="/register"
           element={<Register />}
         />
 
-        {/* Contact */}
+
+        {/* =========================
+            DASHBOARD
+        ========================= */}
+
+        <Route
+          path="/dashboard"
+          element={<Dashboard />}
+        />
+
+
+        {/* =========================
+            MY ADS
+        ========================= */}
+
+        <Route
+          path="/my-ads"
+          element={<MyAds />}
+        />
+
+
+        {/* =========================
+            CONTACT
+        ========================= */}
+
         <Route
           path="/contact"
           element={<Contact />}
         />
-
+<Route
+  path="/edit-ad/:id"
+  element={<EditAd />}
+/>
       </Routes>
+
     </HashRouter>
   );
 }

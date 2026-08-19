@@ -1,86 +1,427 @@
 import { useEffect, useState } from "react";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+} from "firebase/firestore";
+import {
+  onAuthStateChanged,
+  signOut,
+} from "firebase/auth";
+import {
+  Link,
+  useNavigate,
+} from "react-router-dom";
+
 import { auth, db } from "../firebase/firebase";
-import { Link } from "react-router-dom";
-import { onAuthStateChanged, signOut } from "firebase/auth";
 
 function Dashboard() {
-  const [totalAds, setTotalAds] = useState(0);
-  const [userEmail, setUserEmail] = useState("");
+  const [user, setUser] = useState(null);
+  const [ads, setAds] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (!user) return;
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      async (currentUser) => {
+        if (!currentUser) {
+          setUser(null);
+          setAds([]);
+          setLoading(false);
+          return;
+        }
 
-      setUserEmail(user.email);
+        setUser(currentUser);
 
-      const q = query(
-        collection(db, "ads"),
-        where("userId", "==", user.uid)
-      );
+        try {
+          const snapshot = await getDocs(
+            collection(db, "ads")
+          );
 
-      const snapshot = await getDocs(q);
+          const allAds = snapshot.docs.map((item) => ({
+            id: item.id,
+            ...item.data(),
+          }));
 
-      setTotalAds(snapshot.size);
-    });
+          const myAds = allAds.filter(
+            (ad) => ad.userId === currentUser.uid
+          );
+
+          // Newest advertisements first
+          myAds.sort((a, b) => {
+            const dateA = a.createdAt?.toDate
+              ? a.createdAt.toDate()
+              : new Date(0);
+
+            const dateB = b.createdAt?.toDate
+              ? b.createdAt.toDate()
+              : new Date(0);
+
+            return dateB - dateA;
+          });
+
+          setAds(myAds);
+        } catch (error) {
+          console.error(
+            "Dashboard error:",
+            error
+          );
+        }
+
+        setLoading(false);
+      }
+    );
 
     return () => unsubscribe();
   }, []);
 
   const logout = async () => {
-    await signOut(auth);
-    window.location.href = "/login";
+    try {
+      await signOut(auth);
+      navigate("/login");
+    } catch (error) {
+      console.error(error);
+      alert(error.message);
+    }
   };
 
+  if (loading) {
+    return (
+      <main className="dashboard-page">
+        <div className="dashboard-loading">
+          <div className="dashboard-spinner"></div>
+          <h2>Loading Dashboard...</h2>
+        </div>
+      </main>
+    );
+  }
+
+  if (!user) {
+    return (
+      <main className="dashboard-page">
+        <div className="login-required">
+          <div className="login-required-icon">
+            🔒
+          </div>
+
+          <h1>Login Required</h1>
+
+          <p>
+            Please login to access your dashboard.
+          </p>
+
+          <Link
+            to="/login"
+            className="dashboard-primary-btn"
+          >
+            Login
+          </Link>
+        </div>
+      </main>
+    );
+  }
+
+  // Count all uploaded images
+  const totalImages = ads.reduce(
+    (total, ad) => {
+      if (Array.isArray(ad.images)) {
+        return total + ad.images.length;
+      }
+
+      return ad.image
+        ? total + 1
+        : total;
+    },
+    0
+  );
+
+  // Count categories
+  const totalCategories = [
+    ...new Set(
+      ads
+        .map((ad) => ad.category)
+        .filter(Boolean)
+    ),
+  ].length;
+
   return (
-    <div className="dashboard">
+    <main className="dashboard-page">
 
-      <h1>Dashboard</h1>
+      {/* HEADER */}
 
-      <h3>Welcome</h3>
+      <section className="dashboard-header">
 
-      <p>{userEmail}</p>
+        <div>
+          <h1>👋 Dashboard</h1>
 
-      <div className="stats">
+          <p className="dashboard-welcome">
+            Welcome back!
+          </p>
 
-        <div className="stat-card">
-          <h2>{totalAds}</h2>
-          <p>My Ads</p>
+          <p className="dashboard-email">
+            {user.email}
+          </p>
         </div>
 
-        <div className="stat-card">
-          <h2>0</h2>
-          <p>Favorites</p>
+        <Link
+          to="/post-ad"
+          className="dashboard-post-btn"
+        >
+          ➕ Post New Ad
+        </Link>
+
+      </section>
+
+
+      {/* STAT CARDS */}
+
+      <section className="dashboard-stats">
+
+        <div className="dashboard-stat-card">
+
+          <div className="stat-icon">
+            📢
+          </div>
+
+          <div>
+            <h2>{ads.length}</h2>
+            <p>My Ads</p>
+          </div>
+
         </div>
 
-        <div className="stat-card">
-          <h2>0</h2>
-          <p>Views</p>
+
+        <div className="dashboard-stat-card">
+
+          <div className="stat-icon">
+            🖼️
+          </div>
+
+          <div>
+            <h2>{totalImages}</h2>
+            <p>My Images</p>
+          </div>
+
         </div>
 
-      </div>
 
-      <div className="dashboard-buttons">
+        <div className="dashboard-stat-card">
 
-        <Link to="/post-ad">
-          <button>➕ Post Advertisement</button>
+          <div className="stat-icon">
+            🏷️
+          </div>
+
+          <div>
+            <h2>{totalCategories}</h2>
+            <p>Categories</p>
+          </div>
+
+        </div>
+
+      </section>
+
+
+      {/* QUICK ACTIONS */}
+
+      <section className="dashboard-actions">
+
+        <Link
+          to="/post-ad"
+          className="dashboard-action post"
+        >
+          <span>➕</span>
+          <div>
+            <strong>Post Advertisement</strong>
+            <small>
+              Create a new listing
+            </small>
+          </div>
         </Link>
 
-        <Link to="/my-ads">
-          <button>📋 My Advertisements</button>
+
+        <Link
+          to="/my-ads"
+          className="dashboard-action"
+        >
+          <span>📋</span>
+          <div>
+            <strong>My Advertisements</strong>
+            <small>
+              Manage your listings
+            </small>
+          </div>
         </Link>
 
-        <Link to="/cars">
-          <button>🚗 Browse Cars</button>
+
+        <Link
+          to="/"
+          className="dashboard-action"
+        >
+          <span>🏠</span>
+          <div>
+            <strong>Home</strong>
+            <small>
+              Browse the marketplace
+            </small>
+          </div>
         </Link>
 
-        <button onClick={logout}>
-          🚪 Logout
+
+        <button
+          onClick={logout}
+          className="dashboard-action logout"
+        >
+          <span>🚪</span>
+          <div>
+            <strong>Logout</strong>
+            <small>
+              Sign out of your account
+            </small>
+          </div>
         </button>
 
-      </div>
+      </section>
 
-    </div>
+
+      {/* LATEST ADS */}
+
+      <section className="dashboard-ads-section">
+
+        <div className="dashboard-section-header">
+
+          <div>
+            <h2>
+              📢 My Latest Advertisements
+            </h2>
+
+            <p>
+              Your most recently posted items
+            </p>
+          </div>
+
+          {ads.length > 0 && (
+            <Link
+              to="/my-ads"
+              className="view-all-link"
+            >
+              View All →
+            </Link>
+          )}
+
+        </div>
+
+
+        {ads.length === 0 ? (
+
+          <div className="dashboard-empty">
+
+            <div className="empty-icon">
+              📭
+            </div>
+
+            <h3>
+              You have no advertisements yet
+            </h3>
+
+            <p>
+              Start selling by posting your first
+              advertisement.
+            </p>
+
+            <Link
+              to="/post-ad"
+              className="dashboard-primary-btn"
+            >
+              ➕ Post Your First Ad
+            </Link>
+
+          </div>
+
+        ) : (
+
+          <div className="dashboard-ads-grid">
+
+            {ads.slice(0, 6).map((ad) => (
+
+              <article
+                className="dashboard-ad-card"
+                key={ad.id}
+              >
+
+                {/* IMAGE */}
+
+                <div className="dashboard-ad-image">
+
+                  {ad.image ? (
+
+                    <img
+                      src={ad.image}
+                      alt={ad.title || "Advertisement"}
+                      onError={(e) => {
+                        e.currentTarget.style.display =
+                          "none";
+
+                        e.currentTarget.parentElement
+                          .classList.add(
+                            "image-error"
+                          );
+                      }}
+                    />
+
+                  ) : (
+
+                    <div className="dashboard-no-image">
+                      📷
+                      <span>No Image</span>
+                    </div>
+
+                  )}
+
+                </div>
+
+
+                {/* INFORMATION */}
+
+                <div className="dashboard-ad-info">
+
+                  <span className="dashboard-ad-category">
+                    {ad.category || "Other"}
+                  </span>
+
+                  <h3>
+                    {ad.title || "Untitled Advertisement"}
+                  </h3>
+
+                  <div className="dashboard-ad-price">
+                    ETB {ad.price || "0"}
+                  </div>
+
+                  <p className="dashboard-ad-city">
+                    📍 {ad.city || "Ethiopia"}
+                  </p>
+
+
+                  <Link
+                    to={`/ad/${ad.id}`}
+                    className="dashboard-view-btn"
+                  >
+                    👁 View Details
+                  </Link>
+
+                </div>
+
+              </article>
+
+            ))}
+
+          </div>
+
+        )}
+
+      </section>
+
+    </main>
   );
 }
 
