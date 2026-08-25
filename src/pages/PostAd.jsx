@@ -34,6 +34,26 @@ function PostAd() {
   const [uploading, setUploading] = useState(false);
 
   // =========================
+  // PRICE FORMAT
+  // =========================
+
+  const handlePriceChange = (e) => {
+    // Remove everything except numbers
+    const numbersOnly = e.target.value.replace(/\D/g, "");
+
+    if (!numbersOnly) {
+      setPrice("");
+      return;
+    }
+
+    // Add comma separators
+    const formattedPrice =
+      Number(numbersOnly).toLocaleString("en-US");
+
+    setPrice(formattedPrice);
+  };
+
+  // =========================
   // IMAGE SELECTION
   // =========================
 
@@ -48,31 +68,38 @@ function PostAd() {
 
     // Maximum 10 images
     if (selectedFiles.length > 10) {
-      alert("You can select a maximum of 10 images.");
+      alert(
+        "You can select a maximum of 10 images."
+      );
+
       e.target.value = "";
       return;
     }
 
     // Check file types
     const invalidFile = selectedFiles.find(
-      (file) => !file.type.startsWith("image/")
+      (file) =>
+        !file.type.startsWith("image/")
     );
 
     if (invalidFile) {
       alert("Please select image files only.");
+
       e.target.value = "";
       return;
     }
 
     // Check file size
     const tooLarge = selectedFiles.find(
-      (file) => file.size > 10 * 1024 * 1024
+      (file) =>
+        file.size > 10 * 1024 * 1024
     );
 
     if (tooLarge) {
       alert(
         "Each image must be 10 MB or smaller."
       );
+
       e.target.value = "";
       return;
     }
@@ -87,7 +114,8 @@ function PostAd() {
   const removeImage = (index) => {
     setImages((currentImages) =>
       currentImages.filter(
-        (_, imageIndex) => imageIndex !== index
+        (_, imageIndex) =>
+          imageIndex !== index
       )
     );
   };
@@ -103,6 +131,7 @@ function PostAd() {
       alert(
         "Please log in before posting an advertisement."
       );
+
       return;
     }
 
@@ -110,6 +139,7 @@ function PostAd() {
       alert(
         "Please select at least one image."
       );
+
       return;
     }
 
@@ -117,6 +147,21 @@ function PostAd() {
       alert(
         "You can upload a maximum of 10 images."
       );
+
+      return;
+    }
+
+    // Convert "1,000,000" back to 1000000
+    const numericPrice = Number(
+      price.replace(/,/g, "")
+    );
+
+    if (
+      !Number.isFinite(numericPrice) ||
+      numericPrice <= 0
+    ) {
+      alert("Please enter a valid price.");
+
       return;
     }
 
@@ -129,12 +174,19 @@ function PostAd() {
 
       const imageUrls = [];
 
-      for (let i = 0; i < images.length; i++) {
+      for (
+        let i = 0;
+        i < images.length;
+        i++
+      ) {
         const image = images[i];
 
         const formData = new FormData();
 
-        formData.append("file", image);
+        formData.append(
+          "file",
+          image
+        );
 
         formData.append(
           "upload_preset",
@@ -149,7 +201,8 @@ function PostAd() {
           }
         );
 
-        const data = await response.json();
+        const data =
+          await response.json();
 
         console.log(
           `Cloudinary Image ${i + 1}:`,
@@ -162,11 +215,15 @@ function PostAd() {
         ) {
           throw new Error(
             data.error?.message ||
-              `Failed to upload image ${i + 1}.`
+              `Failed to upload image ${
+                i + 1
+              }.`
           );
         }
 
-        imageUrls.push(data.secure_url);
+        imageUrls.push(
+          data.secure_url
+        );
       }
 
       // =========================
@@ -182,11 +239,15 @@ function PostAd() {
           userEmail:
             auth.currentUser.email || "",
 
-          title: title.trim(),
+          title:
+            title.trim(),
 
-          price: price,
+          // IMPORTANT:
+          // Save as NUMBER, not "1,000,000"
+          price: numericPrice,
 
-          city: city.trim(),
+          city:
+            city.trim(),
 
           category,
 
@@ -194,16 +255,17 @@ function PostAd() {
             description.trim(),
 
           // Seller phone
-          phone: phone.trim(),
+          phone:
+            phone.trim(),
 
           // Keep first image for
-          // compatibility with existing pages
+          // compatibility
           image:
             imageUrls.length > 0
               ? imageUrls[0]
               : "",
 
-          // New multiple-image field
+          // Multiple images
           images: imageUrls,
 
           // Condition
@@ -217,11 +279,13 @@ function PostAd() {
 
           // ምንአለሽ ተራ
           materialType:
-            category === "ምንአለሽ ተራ"
+            category ===
+            "ምንአለሽ ተራ"
               ? materialType
               : "",
 
-          createdAt: new Date(),
+          createdAt:
+            new Date(),
         }
       );
 
@@ -276,7 +340,8 @@ function PostAd() {
   // =========================
 
   const handleCategoryChange = (e) => {
-    const newCategory = e.target.value;
+    const newCategory =
+      e.target.value;
 
     setCategory(newCategory);
 
@@ -319,7 +384,9 @@ function PostAd() {
 
         <select
           value={category}
-          onChange={handleCategoryChange}
+          onChange={
+            handleCategoryChange
+          }
           required
         >
           <option value="">
@@ -363,7 +430,9 @@ function PostAd() {
           <select
             value={condition}
             onChange={(e) =>
-              setCondition(e.target.value)
+              setCondition(
+                e.target.value
+              )
             }
             required
           >
@@ -385,7 +454,8 @@ function PostAd() {
             ELECTRONICS
         ========================= */}
 
-        {category === "Electronics" && (
+        {category ===
+          "Electronics" && (
           <>
             <select
               value={subcategory}
@@ -449,7 +519,8 @@ function PostAd() {
             ምንአለሽ ተራ
         ========================= */}
 
-        {category === "ምንአለሽ ተራ" && (
+        {category ===
+          "ምንአለሽ ተራ" && (
           <>
             <select
               value={condition}
@@ -521,11 +592,14 @@ function PostAd() {
             BUILDING MATERIALS
         ========================= */}
 
-        {category === "Building Materials" && (
+        {category ===
+          "Building Materials" && (
           <select
             value={condition}
             onChange={(e) =>
-              setCondition(e.target.value)
+              setCondition(
+                e.target.value
+              )
             }
             required
           >
@@ -547,11 +621,14 @@ function PostAd() {
             SPARE PARTS
         ========================= */}
 
-        {category === "Spare Parts" && (
+        {category ===
+          "Spare Parts" && (
           <select
             value={condition}
             onChange={(e) =>
-              setCondition(e.target.value)
+              setCondition(
+                e.target.value
+              )
             }
             required
           >
@@ -577,7 +654,9 @@ function PostAd() {
           <select
             value={type}
             onChange={(e) =>
-              setType(e.target.value)
+              setType(
+                e.target.value
+              )
             }
             required
           >
@@ -599,11 +678,14 @@ function PostAd() {
             RENTALS
         ========================= */}
 
-        {category === "Rentals" && (
+        {category ===
+          "Rentals" && (
           <select
             value={type}
             onChange={(e) =>
-              setType(e.target.value)
+              setType(
+                e.target.value
+              )
             }
             required
           >
@@ -634,12 +716,11 @@ function PostAd() {
         ========================= */}
 
         <input
-          type="number"
+          type="text"
+          inputMode="numeric"
           placeholder="Price (ETB)"
           value={price}
-          onChange={(e) =>
-            setPrice(e.target.value)
-          }
+          onChange={handlePriceChange}
           required
         />
 
@@ -652,7 +733,9 @@ function PostAd() {
           placeholder="City"
           value={city}
           onChange={(e) =>
-            setCity(e.target.value)
+            setCity(
+              e.target.value
+            )
           }
           required
         />
@@ -666,7 +749,9 @@ function PostAd() {
           placeholder="Phone Number (+251...)"
           value={phone}
           onChange={(e) =>
-            setPhone(e.target.value)
+            setPhone(
+              e.target.value
+            )
           }
           required
         />
@@ -707,7 +792,9 @@ function PostAd() {
             type="file"
             accept="image/*"
             multiple
-            onChange={handleImageChange}
+            onChange={
+              handleImageChange
+            }
           />
 
           {/* IMAGE PREVIEWS */}
