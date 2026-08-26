@@ -1,9 +1,17 @@
 import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  onAuthStateChanged,
+  signOut,
+} from "firebase/auth";
+
 import { auth } from "../firebase/firebase";
-import { onAuthStateChanged, signOut } from "firebase/auth";
 
 function Navbar() {
   const [user, setUser] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(
@@ -19,113 +27,211 @@ function Navbar() {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      alert("Logged out successfully!");
+      setMenuOpen(false);
+      navigate("/");
     } catch (error) {
-      alert(error.message);
+      console.error("Logout error:", error);
     }
   };
 
+  const closeMenu = () => {
+    setMenuOpen(false);
+  };
+
+  /*
+   * This works both:
+   * localhost
+   * GitHub Pages /marketplace-react/
+   */
+  const logoPath = `${import.meta.env.BASE_URL}logo.png`;
+
   return (
-    <nav className="navbar">
-      <div className="nav-container">
+    <header className="navbar">
 
-        {/* LOGO */}
-        <a href="#/" className="nav-logo">
-          የኛ ገበያ
-        </a>
+      <div className="navbar-container">
 
-        {/* MAIN MENU */}
-        <div className="nav-links">
+        {/* =========================
+            LOGO
+        ========================= */}
 
-          <a href="#/">
+        <Link
+          to="/"
+          className="navbar-brand"
+          onClick={closeMenu}
+        >
+          <img
+            src={logoPath}
+            alt="YEGNA GEBEYA"
+            className="navbar-logo"
+          />
+        </Link>
+
+
+        {/* =========================
+            MOBILE MENU BUTTON
+        ========================= */}
+
+        <button
+          className="navbar-menu-button"
+          onClick={() =>
+            setMenuOpen(!menuOpen)
+          }
+          aria-label="Open menu"
+        >
+          {menuOpen ? "✕" : "☰"}
+        </button>
+
+
+        {/* =========================
+            NAVIGATION
+        ========================= */}
+
+        <nav
+          className={`navbar-nav ${
+            menuOpen
+              ? "navbar-nav-open"
+              : ""
+          }`}
+        >
+
+          <Link
+            to="/"
+            onClick={closeMenu}
+          >
             Home
-          </a>
+          </Link>
 
-          <a href="#/cars">
+          <Link
+            to="/cars"
+            onClick={closeMenu}
+          >
             Cars
-          </a>
+          </Link>
 
-          <a href="#/houses">
+          <Link
+            to="/houses"
+            onClick={closeMenu}
+          >
             Houses
-          </a>
+          </Link>
 
-          <a href="#/rentals">
+          <Link
+            to="/rentals"
+            onClick={closeMenu}
+          >
             Rentals
-          </a>
+          </Link>
 
-          <a href="#/spare-parts">
+          <Link
+            to="/spare-parts"
+            onClick={closeMenu}
+          >
             Spare Parts
-          </a>
+          </Link>
 
-          <a href="#/building-materials">
+          <Link
+            to="/building-materials"
+            onClick={closeMenu}
+          >
             Building Materials
-          </a>
+          </Link>
 
-          <a href="#/search?category=Electronics">
+          <Link
+            to="/search?category=Electronics"
+            onClick={closeMenu}
+          >
             Electronics
-          </a>
+          </Link>
 
-          <a href="#/search?category=ምንአለሽ%20ተራ">
+          <Link
+            to="/search?category=ምንአለሽ%20ተራ"
+            onClick={closeMenu}
+            className="amharic-nav-link"
+          >
             ምንአለሽ ተራ
-          </a>
+          </Link>
 
-        </div>
+        </nav>
 
-        {/* USER AREA */}
-        <div className="nav-user">
 
-          {!user ? (
+        {/* =========================
+            RIGHT SIDE
+        ========================= */}
+
+        <div
+          className={`navbar-actions ${
+            menuOpen
+              ? "navbar-actions-open"
+              : ""
+          }`}
+        >
+
+          {user ? (
             <>
-              <a
-                href="#/login"
-                className="login-btn"
-              >
-                Login
-              </a>
-
-              <a
-                href="#/register"
-                className="register-btn"
-              >
-                Register
-              </a>
-            </>
-          ) : (
-            <>
-              <a
-                href="#/dashboard"
-                className="dashboard-btn"
+              <Link
+                to="/dashboard"
+                className="navbar-dashboard"
+                onClick={closeMenu}
               >
                 Dashboard
-              </a>
+              </Link>
 
-              <a
-                href="#/my-ads"
-                className="myads-btn"
+              <Link
+                to="/my-ads"
+                className="navbar-my-ads"
+                onClick={closeMenu}
               >
                 My Ads
-              </a>
+              </Link>
 
-              <a
-                href="#/post-ad"
-                className="post-btn"
+              <Link
+                to="/post-ad"
+                className="navbar-post-ad"
+                onClick={closeMenu}
               >
                 + Post Ad
-              </a>
+              </Link>
 
               <button
+                className="navbar-logout"
                 onClick={handleLogout}
-                className="logout-btn"
               >
                 Logout
               </button>
+            </>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                className="navbar-login"
+                onClick={closeMenu}
+              >
+                Login
+              </Link>
+
+              <Link
+                to="/register"
+                className="navbar-register"
+                onClick={closeMenu}
+              >
+                Register
+              </Link>
+
+              <Link
+                to="/post-ad"
+                className="navbar-post-ad"
+                onClick={closeMenu}
+              >
+                + Post Ad
+              </Link>
             </>
           )}
 
         </div>
 
       </div>
-    </nav>
+
+    </header>
   );
 }
 

@@ -3097,4 +3097,440 @@ textarea {
   .view-all-link {
     white-space: nowrap;
   }
+}/* =====================================================
+   YEGNA GEBEYA NAVBAR
+   ===================================================== */
+
+.navbar {
+  width: 100%;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+
+/* =====================================================
+   NAVBAR CONTAINER
+   ===================================================== */
+
+.navbar-container {
+  width: 100%;
+  max-width: 1500px;
+  min-height: 72px;
+  margin: 0 auto;
+
+  padding: 7px 20px;
+
+  display: flex;
+  align-items: center;
+  gap: 18px;
+
+  box-sizing: border-box;
+}
+
+
+/* =====================================================
+   LOGO
+   ===================================================== */
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  text-decoration: none;
+  line-height: 0;
+}
+
+
+/*
+   The original logo is a large oval image.
+   This keeps it small enough for the navbar
+   without stretching it.
+*/
+
+.navbar-logo {
+  width: 125px;
+  height: 58px;
+
+  object-fit: contain;
+
+  display: block;
+
+  border-radius: 8px;
+
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+
+.navbar-logo:hover {
+  transform: scale(1.04);
+  opacity: 0.95;
+}
+
+
+/* =====================================================
+   NAVIGATION
+   ===================================================== */
+
+.navbar-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  flex: 1;
+
+  min-width: 0;
+}
+
+
+.navbar-nav a {
+  color: #111827;
+
+  text-decoration: none;
+
+  font-size: 14px;
+  font-weight: 500;
+
+  padding: 10px 9px;
+
+  border-radius: 7px;
+
+  white-space: nowrap;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+
+.navbar-nav a:hover {
+  color: #0066ff;
+  background: #f0f6ff;
+}
+
+
+.navbar-nav a.active {
+  color: #0066ff;
+}
+
+
+/* Amharic link */
+
+.amharic-nav-link {
+  font-size: 13px !important;
+}
+
+
+/* =====================================================
+   RIGHT SIDE BUTTONS
+   ===================================================== */
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  flex-shrink: 0;
+}
+
+
+.navbar-actions a,
+.navbar-actions button {
+  font-family: inherit;
+
+  text-decoration: none;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  border-radius: 7px;
+
+  padding: 9px 12px;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.15s ease,
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+
+.navbar-actions a:hover,
+.navbar-actions button:hover {
+  transform: translateY(-1px);
+}
+
+
+/* Dashboard */
+
+.navbar-dashboard {
+  color: #0066ff;
+  background: transparent;
+}
+
+
+.navbar-dashboard:hover {
+  background: #eef5ff;
+}
+
+
+/* My Ads */
+
+.navbar-my-ads {
+  color: #0066ff;
+  background: transparent;
+}
+
+
+.navbar-my-ads:hover {
+  background: #eef5ff;
+}
+
+
+/* Login */
+
+.navbar-login {
+  color: #0066ff;
+  background: transparent;
+}
+
+
+.navbar-login:hover {
+  background: #eef5ff;
+}
+
+
+/* Register */
+
+.navbar-register {
+  color: #ffffff !important;
+  background: #0066ff;
+}
+
+
+.navbar-register:hover {
+  background: #0052cc;
+}
+
+
+/* Post Advertisement */
+
+.navbar-post-ad {
+  color: #ffffff !important;
+  background: #218838;
+}
+
+
+.navbar-post-ad:hover {
+  background: #176b2c;
+}
+
+
+/* Logout */
+
+.navbar-logout {
+  color: #ffffff;
+  background: #e53935;
+
+  border: none;
+}
+
+
+.navbar-logout:hover {
+  background: #c62828;
+}
+
+
+/* =====================================================
+   MOBILE MENU BUTTON
+   ===================================================== */
+
+.navbar-menu-button {
+  display: none;
+
+  margin-left: auto;
+
+  width: 42px;
+  height: 42px;
+
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+
+  background: #ffffff;
+
+  font-size: 22px;
+
+  cursor: pointer;
+}
+
+
+/* =====================================================
+   TABLET
+   ===================================================== */
+
+@media (max-width: 1100px) {
+
+  .navbar-container {
+    gap: 10px;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .navbar-logo {
+    width: 105px;
+    height: 52px;
+  }
+
+  .navbar-nav {
+    gap: 0;
+  }
+
+  .navbar-nav a {
+    font-size: 12px;
+    padding: 8px 6px;
+  }
+
+  .navbar-actions {
+    gap: 4px;
+  }
+
+  .navbar-actions a,
+  .navbar-actions button {
+    font-size: 12px;
+    padding: 8px 9px;
+  }
+}
+
+
+/* =====================================================
+   MOBILE
+   ===================================================== */
+
+@media (max-width: 850px) {
+
+  .navbar-container {
+    min-height: 65px;
+    position: relative;
+  }
+
+  .navbar-logo {
+    width: 105px;
+    height: 50px;
+  }
+
+  .navbar-menu-button {
+    display: block;
+  }
+
+
+  /* Mobile navigation */
+
+  .navbar-nav {
+    display: none;
+
+    position: absolute;
+
+    top: 65px;
+    left: 0;
+    right: 0;
+
+    width: 100%;
+
+    background: #ffffff;
+
+    padding: 12px 18px 18px;
+
+    border-top: 1px solid #eeeeee;
+    border-bottom: 1px solid #dddddd;
+
+    box-shadow:
+      0 8px 20px rgba(0, 0, 0, 0.1);
+
+    flex-direction: column;
+    align-items: stretch;
+
+    gap: 3px;
+  }
+
+
+  .navbar-nav-open {
+    display: flex;
+  }
+
+
+  .navbar-nav a {
+    width: 100%;
+
+    box-sizing: border-box;
+
+    padding: 12px 14px;
+
+    font-size: 15px;
+  }
+
+
+  /* Right-side actions on mobile */
+
+  .navbar-actions {
+    display: none;
+
+    position: absolute;
+
+    top: 0;
+    right: 58px;
+
+    height: 65px;
+
+    align-items: center;
+  }
+
+
+  .navbar-actions-open {
+    display: flex;
+  }
+
+
+  .navbar-actions a,
+  .navbar-actions button {
+    font-size: 12px;
+    padding: 7px 9px;
+  }
+
+}
+
+
+/* =====================================================
+   SMALL PHONES
+   ===================================================== */
+
+@media (max-width: 550px) {
+
+  .navbar-container {
+    padding: 5px 10px;
+  }
+
+  .navbar-logo {
+    width: 95px;
+    height: 48px;
+  }
+
+  .navbar-actions-open {
+    display: none;
+  }
+
+  .navbar-nav {
+    top: 63px;
+  }
+
 }
