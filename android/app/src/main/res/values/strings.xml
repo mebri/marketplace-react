@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">የኛ ገበያ</string>
+    <string name="title_activity_main">የኛ ገበያ</string>
+    <string name="package_name">com.yegnagebeya.app</string>
+    <string name="custom_url_scheme">com.yegnagebeya.app</string>
+</resources>

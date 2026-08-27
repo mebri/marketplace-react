@@ -20,6 +20,10 @@ function Cars() {
   const [sort, setSort] = useState("default");
   const [loading, setLoading] = useState(true);
 
+  // =========================
+  // LOAD CARS
+  // =========================
+
   useEffect(() => {
     loadCars();
   }, []);
@@ -67,7 +71,7 @@ function Cars() {
     });
 
   // =========================
-  // SEARCH FILTER
+  // SEARCH
   // =========================
 
   const filteredCars =
@@ -92,29 +96,75 @@ function Cars() {
       );
     });
 
-  // =========================
-  // SORT
-  // =========================
+ 
+// =========================
+// SORT
+// =========================
 
-  const sortedCars = [
-    ...filteredCars,
-  ].sort((a, b) => {
+const getAdTime = (ad) => {
+  if (!ad.createdAt) return 0;
+
+  // Firestore Timestamp
+  if (
+    typeof ad.createdAt.toMillis === "function"
+  ) {
+    return ad.createdAt.toMillis();
+  }
+
+  // Firestore timestamp object
+  if (ad.createdAt.seconds) {
+    return ad.createdAt.seconds * 1000;
+  }
+
+  // JavaScript Date
+  if (ad.createdAt instanceof Date) {
+    return ad.createdAt.getTime();
+  }
+
+  // String / number
+  const date = new Date(
+    ad.createdAt
+  ).getTime();
+
+  return Number.isNaN(date) ? 0 : date;
+};
+
+const sortedCars = [...filteredCars].sort(
+  (a, b) => {
+
     const priceA =
       Number(a.price) || 0;
 
     const priceB =
       Number(b.price) || 0;
 
+    const timeA = getAdTime(a);
+    const timeB = getAdTime(b);
+
+    // Newest first
+    if (sort === "newest") {
+      return timeB - timeA;
+    }
+
+    // Oldest first
+    if (sort === "oldest") {
+      return timeA - timeB;
+    }
+
+    // Cheapest first
     if (sort === "low") {
       return priceA - priceB;
     }
 
+    // Most expensive first
     if (sort === "high") {
       return priceB - priceA;
     }
 
-    return 0;
-  });
+    // Default = newest first
+    return timeB - timeA;
+  }
+);
 
   // =========================
   // PAGE TITLE
@@ -122,11 +172,17 @@ function Cars() {
 
   let pageTitle = "🚗 Cars";
 
-  if (selectedCondition === "new") {
+  if (
+    selectedCondition.toLowerCase() ===
+    "new"
+  ) {
     pageTitle = "🚗 New Cars";
   }
 
-  if (selectedCondition === "used") {
+  if (
+    selectedCondition.toLowerCase() ===
+    "used"
+  ) {
     pageTitle = "🚙 Used Cars";
   }
 
@@ -145,11 +201,16 @@ function Cars() {
   return (
     <div className="cars-page">
 
-      {/* TITLE */}
+      {/* =========================
+          TITLE
+      ========================= */}
 
       <h1>{pageTitle}</h1>
 
-      {/* SEARCH + SORT */}
+
+      {/* =========================
+          SEARCH + SORT
+      ========================= */}
 
       <div className="cars-controls">
 
@@ -163,172 +224,223 @@ function Cars() {
           }
         />
 
-        <select
-          value={sort}
-          onChange={(e) =>
-            setSort(e.target.value)
-          }
-        >
-          <option value="default">
-            Sort by Price
-          </option>
+       <select
+  value={sort}
+  onChange={(e) =>
+    setSort(e.target.value)
+  }
+>
+  <option value="newest">
+    🕐 Newest → Oldest
+  </option>
 
-          <option value="low">
-            Price: Low → High
-          </option>
+  <option value="oldest">
+    🕐 Oldest → Newest
+  </option>
 
-          <option value="high">
-            Price: High → Low
-          </option>
-        </select>
+  <option value="low">
+    💰 Price: Low → High
+  </option>
+
+  <option value="high">
+    💰 Price: High → Low
+  </option>
+</select> 
 
       </div>
 
-      {/* RESULT COUNT */}
 
-      <p
-        style={{
-          textAlign: "center",
-          marginBottom: "30px",
-          fontSize: "18px",
-          color: "#555",
-        }}
-      >
+      {/* =========================
+          RESULT COUNT
+      ========================= */}
+
+      <p className="cars-result-count">
         {sortedCars.length} car(s) found
       </p>
 
-      {/* CARS */}
+
+      {/* =========================
+          CARS
+      ========================= */}
 
       <div className="cars-grid">
 
         {sortedCars.length === 0 ? (
-          <div
-            style={{
-              width: "100%",
-              textAlign: "center",
-              padding: "50px 20px",
-            }}
-          >
-            <h2>No cars found.</h2>
 
-            <p
-              style={{
-                marginTop: "10px",
-                color: "#777",
-              }}
-            >
+          <div className="cars-no-results">
+
+            <h2>
+              No cars found.
+            </h2>
+
+            <p>
               Try another search or condition.
             </p>
+
           </div>
+
         ) : (
-          sortedCars.map((car) => (
-            <div
-              className="car-card"
-              key={car.id}
-            >
 
-              {/* IMAGE */}
+          sortedCars.map((car) => {
 
-              <div className="listing-image">
+            // =========================
+            // GET FIRST IMAGE
+            // =========================
 
-                {car.image ? (
-                  <img
-                    src={car.image}
-                    alt={car.title}
-                    className="listing-photo"
-                  />
-                ) : (
-                  <div className="no-image">
-                    📷 No Image
-                  </div>
-                )}
+            const imageUrl =
+              Array.isArray(car.images) &&
+              car.images.length > 0
+                ? car.images[0]
+                : car.image;
 
-              </div>
+            // =========================
+            // SHORT DESCRIPTION
+            // =========================
 
-              {/* INFORMATION */}
+            const shortDescription =
+              car.description
+                ? car.description.length > 100
+                  ? `${car.description.substring(
+                      0,
+                      100
+                    )}...`
+                  : car.description
+                : "No description available.";
 
-              <div className="car-info">
+            return (
 
-                <span className="category">
-                  🚗 Cars
-                </span>
+              <div
+                className="car-card"
+                key={car.id}
+              >
 
-                <h3>{car.title}</h3>
-
-                <h2>
-                  ETB {car.price}
-                </h2>
-
-                {car.condition && (
-                  <p>
-                    🔄 Condition:{" "}
-                    {car.condition}
-                  </p>
-                )}
-
-                <p>
-                  📍 {car.city}
-                </p>
-
-                <p>
-                  {car.description}
-                </p>
-
-                {/* DETAILS */}
+                {/* =========================
+                    CLICKABLE IMAGE
+                ========================= */}
 
                 <Link
                   to={`/ad/${car.id}`}
-                  style={{
-                    textDecoration: "none",
-                  }}
+                  className="car-image-link"
                 >
-                  <button
-                    style={{
-                      width: "100%",
-                      padding: "12px",
-                      marginTop: "10px",
-                      border: "none",
-                      borderRadius: "8px",
-                      background: "#2e7d32",
-                      color: "white",
-                      fontSize: "16px",
-                      fontWeight: "600",
-                      cursor: "pointer",
-                    }}
-                  >
-                    👁 View Details
-                  </button>
+
+                  <div className="listing-image">
+
+                    {imageUrl ? (
+
+                      <img
+                        src={imageUrl}
+                        alt={
+                          car.title ||
+                          "Car"
+                        }
+                        className="listing-photo"
+                        loading="lazy"
+                      />
+
+                    ) : (
+
+                      <div className="no-image">
+                        📷 No Image
+                      </div>
+
+                    )}
+
+                  </div>
+
                 </Link>
 
-                {/* CALL */}
 
-                {car.phone && (
-                  <a
-                    href={`tel:${car.phone}`}
-                    className="phone-link"
-                    style={{
-                      display: "block",
-                      textAlign: "center",
-                      marginTop: "10px",
-                      padding: "12px",
-                      background: "#1976d2",
-                      color: "white",
-                      borderRadius: "8px",
-                      textDecoration: "none",
-                      fontWeight: "600",
-                    }}
+                {/* =========================
+                    INFORMATION
+                ========================= */}
+
+                <div className="car-info">
+
+                  <span className="category">
+                    🚗 Cars
+                  </span>
+
+
+                  <h3>
+                    {car.title ||
+                      "Untitled Car"}
+                  </h3>
+
+
+                  {/* PRICE */}
+
+                  <h2>
+                    ETB{" "}
+                    {Number(
+                      car.price || 0
+                    ).toLocaleString()}
+                  </h2>
+
+
+                  {/* CONDITION */}
+
+                  {car.condition && (
+                    <p>
+                      🔄 Condition:{" "}
+                      {car.condition}
+                    </p>
+                  )}
+
+
+                  {/* CITY */}
+
+                  {car.city && (
+                    <p>
+                      📍 {car.city}
+                    </p>
+                  )}
+
+
+                  {/* SHORT DESCRIPTION */}
+
+                  <p className="car-description">
+                    {shortDescription}
+                  </p>
+
+
+                  {/* =========================
+                      VIEW DETAILS
+                  ========================= */}
+
+                  <Link
+                    to={`/ad/${car.id}`}
+                    className="car-details-button"
                   >
-                    📞 Call Seller
-                  </a>
-                )}
+                    👁 View Details
+                  </Link>
+
+
+                  {/* =========================
+                      CALL SELLER
+                  ========================= */}
+
+                  {car.phone && (
+
+                    <a
+                      href={`tel:${car.phone}`}
+                      className="phone-link"
+                    >
+                      📞 Call Seller
+                    </a>
+
+                  )}
+
+                </div>
 
               </div>
 
-            </div>
-          ))
+            );
+          })
+
         )}
 
       </div>
+
     </div>
   );
 }

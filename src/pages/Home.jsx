@@ -7,16 +7,26 @@ import {
 import { db } from "../firebase/firebase";
 
 function Home() {
-  const [openCategory, setOpenCategory] = useState(null);
-  const [latestAds, setLatestAds] = useState([]);
-  const [adsLoading, setAdsLoading] = useState(true);
+  const [openCategory, setOpenCategory] =
+    useState(null);
+
+  const [latestAds, setLatestAds] =
+    useState([]);
+
+  const [adsLoading, setAdsLoading] =
+    useState(true);
+
+  // =========================
+  // CATEGORIES
+  // =========================
 
   const categories = [
     {
       id: "cars",
       icon: "🚗",
       title: "Cars",
-      description: "New and used cars",
+      description:
+        "New, used, electric cars and car rental",
       options: [
         {
           name: "🚗 New Cars",
@@ -26,6 +36,14 @@ function Home() {
           name: "🚙 Used Cars",
           link: "/cars?condition=used",
         },
+        {
+          name: "⚡ Electric Cars",
+          link: "/cars?condition=electric",
+        },
+        {
+          name: "🚘 Cars for Rent",
+          link: "/cars?condition=rent",
+        },
       ],
     },
 
@@ -33,7 +51,8 @@ function Home() {
       id: "houses",
       icon: "🏠",
       title: "Houses",
-      description: "Houses for sale and rent",
+      description:
+        "Houses for sale and rent",
       options: [
         {
           name: "🏠 Houses for Sale",
@@ -50,15 +69,12 @@ function Home() {
       id: "rentals",
       icon: "🏢",
       title: "Rentals",
-      description: "Apartments, houses, shops and offices",
+      description:
+        "Apartments, shops and offices",
       options: [
         {
           name: "🏢 Apartments",
           link: "/rentals?type=apartment",
-        },
-        {
-          name: "🏠 Houses",
-          link: "/rentals?type=house",
         },
         {
           name: "🏪 Shops",
@@ -71,45 +87,16 @@ function Home() {
       ],
     },
 
-    {
-      id: "spare-parts",
-      icon: "🔧",
-      title: "Spare Parts",
-      description: "New and used spare parts",
-      options: [
-        {
-          name: "🔧 New Spare Parts",
-          link: "/spare-parts?condition=new",
-        },
-        {
-          name: "🔧 Used Spare Parts",
-          link: "/spare-parts?condition=used",
-        },
-      ],
-    },
-
-    {
-      id: "building-materials",
-      icon: "🧱",
-      title: "Building Materials",
-      description: "New and used building materials",
-      options: [
-        {
-          name: "🧱 New Building Materials",
-          link: "/building-materials?condition=new",
-        },
-        {
-          name: "🧱 Used Building Materials",
-          link: "/building-materials?condition=used",
-        },
-      ],
-    },
+    // =========================
+    // ELECTRONICS
+    // =========================
 
     {
       id: "electronics",
       icon: "📱",
       title: "Electronics",
-      description: "Phones, computers, TVs and more",
+      description:
+        "Phones, computers, TVs and more",
       options: [
         {
           name: "📱 New Phones",
@@ -154,24 +141,112 @@ function Home() {
       ],
     },
 
+    // =========================
+    // FURNITURE
+    // =========================
+
+    {
+      id: "furniture",
+      icon: "🛋️",
+      title: "Furniture",
+      description:
+        "New and used furniture",
+      options: [
+        {
+          name: "🛋️ Sofas",
+          link:
+            "/search?category=Furniture&subcategory=Sofas",
+        },
+        {
+          name: "🛏️ Beds",
+          link:
+            "/search?category=Furniture&subcategory=Beds",
+        },
+        {
+          name: "🪑 Chairs & Tables",
+          link:
+            "/search?category=Furniture&subcategory=Chairs%20and%20Tables",
+        },
+        {
+          name: "🗄️ Cabinets",
+          link:
+            "/search?category=Furniture&subcategory=Cabinets",
+        },
+        {
+          name: "🪞 Other Furniture",
+          link:
+            "/search?category=Furniture&subcategory=Other",
+        },
+      ],
+    },
+
+    // =========================
+    // LABOR & SERVICES
+    // =========================
+
+    {
+      id: "labor",
+      icon: "👷",
+      title: "Labor & Services",
+      description:
+        "Find skilled workers and services",
+      options: [
+        {
+          name: "👷 Construction Worker",
+          link:
+            "/search?category=Labor%20%26%20Services&subcategory=Construction",
+        },
+        {
+          name: "⚡ Electrician",
+          link:
+            "/search?category=Labor%20%26%20Services&subcategory=Electrician",
+        },
+        {
+          name: "🚰 Plumber",
+          link:
+            "/search?category=Labor%20%26%20Services&subcategory=Plumber",
+        },
+        {
+          name: "🎨 Painter",
+          link:
+            "/search?category=Labor%20%26%20Services&subcategory=Painter",
+        },
+        {
+          name: "🧹 Cleaning",
+          link:
+            "/search?category=Labor%20%26%20Services&subcategory=Cleaning",
+        },
+        {
+          name: "🚚 Moving & Transport",
+          link:
+            "/search?category=Labor%20%26%20Services&subcategory=Moving",
+        },
+        {
+          name: "🔧 Other Services",
+          link:
+            "/search?category=Labor%20%26%20Services&subcategory=Other",
+        },
+      ],
+    },
+
+    // =========================
+    // ምንአለሽ ተራ
+    // =========================
+
     {
       id: "min-alish-tera",
       icon: "🏪",
       title: "ምንአለሽ ተራ",
-      description: "Used and second-hand items",
+      description:
+        "Used and second-hand items",
       options: [
-        {
-          name: "🧱 Used Materials",
-          link:
-            "/search?category=ምንአለሽ%20ተራ&subcategory=Materials",
-        },
         {
           name: "📦 Used Items",
           link:
             "/search?category=ምንአለሽ%20ተራ&subcategory=Items",
         },
         {
-          name: "♻️ Other Second-Hand Goods",
+          name: "♻️ Second-Hand Goods",
           link:
             "/search?category=ምንአለሽ%20ተራ&subcategory=Other",
         },
@@ -180,7 +255,7 @@ function Home() {
   ];
 
   // =========================
-  // LOAD ALL ADS
+  // LOAD ADS
   // =========================
 
   useEffect(() => {
@@ -193,27 +268,57 @@ function Home() {
         collection(db, "ads")
       );
 
-      const ads = snapshot.docs.map((document) => ({
-        id: document.id,
-        ...document.data(),
-      }));
+      const ads = snapshot.docs.map(
+        (document) => ({
+          id: document.id,
+          ...document.data(),
+        })
+      );
 
-      // Newest first
+      // =========================
+      // NEWEST FIRST
+      // =========================
+
       ads.sort((a, b) => {
-        const dateA = a.createdAt?.seconds || 0;
-        const dateB = b.createdAt?.seconds || 0;
+        const getTime = (ad) => {
+          if (!ad.createdAt) return 0;
 
-        return dateB - dateA;
+          // Firestore Timestamp
+          if (
+            typeof ad.createdAt.toMillis ===
+            "function"
+          ) {
+            return ad.createdAt.toMillis();
+          }
+
+          // Firestore timestamp object
+          if (ad.createdAt.seconds) {
+            return (
+              ad.createdAt.seconds * 1000
+            );
+          }
+
+          // JavaScript Date
+          if (
+            ad.createdAt instanceof Date
+          ) {
+            return ad.createdAt.getTime();
+          }
+
+          // String / number fallback
+          const date = new Date(
+            ad.createdAt
+          ).getTime();
+
+          return Number.isNaN(date)
+            ? 0
+            : date;
+        };
+
+        return getTime(b) - getTime(a);
       });
 
-      // =====================================
-      // IMPORTANT:
-      // NO LIMIT
-      // Show ALL advertisements
-      // =====================================
-
       setLatestAds(ads);
-
     } catch (error) {
       console.error(
         "Error loading latest advertisements:",
@@ -223,6 +328,10 @@ function Home() {
       setAdsLoading(false);
     }
   };
+
+  // =========================
+  // CATEGORY TOGGLE
+  // =========================
 
   const toggleCategory = (id) => {
     setOpenCategory(
@@ -246,28 +355,36 @@ function Home() {
         </h2>
 
         <p>
-          Find cars, houses, rentals, spare parts,
-          building materials and more anywhere in Ethiopia.
+          Find cars, houses, rentals,
+          electronics, furniture,
+          labor and more anywhere
+          in Ethiopia.
         </p>
 
         <div className="home-search">
 
           <input
             type="text"
-            placeholder="🔎 Search cars, houses, electronics and more..."
+            placeholder="🔎 Search cars, houses, furniture, labor and more..."
             onKeyDown={(e) => {
+
               if (e.key === "Enter") {
+
                 const value =
                   e.target.value.trim();
 
                 if (value) {
+
                   window.location.hash =
                     `/search?search=${encodeURIComponent(
                       value
                     )}`;
+
                 } else {
+
                   window.location.hash =
                     "/search";
+
                 }
               }
             }}
@@ -284,7 +401,6 @@ function Home() {
 
       </section>
 
-
       {/* =========================
           CATEGORIES
       ========================= */}
@@ -297,84 +413,91 @@ function Home() {
 
         <div className="home-category-grid">
 
-          {categories.map((category) => {
+          {categories.map(
+            (category) => {
 
-            const isOpen =
-              openCategory === category.id;
+              const isOpen =
+                openCategory ===
+                category.id;
 
-            return (
-              <div
-                key={category.id}
-                className="home-category-wrapper"
-              >
+              return (
 
                 <div
-                  className={`home-card ${
-                    isOpen
-                      ? "home-card-open"
-                      : ""
-                  }`}
-                  onClick={() =>
-                    toggleCategory(category.id)
-                  }
+                  key={category.id}
+                  className="home-category-wrapper"
                 >
 
-                  <div className="home-card-icon">
-                    {category.icon}
+                  <div
+                    className={`home-card ${
+                      isOpen
+                        ? "home-card-open"
+                        : ""
+                    }`}
+                    onClick={() =>
+                      toggleCategory(
+                        category.id
+                      )
+                    }
+                  >
+
+                    <div className="home-card-icon">
+                      {category.icon}
+                    </div>
+
+                    <h3>
+                      {category.title}
+                    </h3>
+
+                    <p>
+                      {category.description}
+                    </p>
+
+                    <span>
+                      {isOpen
+                        ? "Hide options ↑"
+                        : "Choose an option →"}
+                    </span>
+
                   </div>
 
-                  <h3>
-                    {category.title}
-                  </h3>
+                  {isOpen && (
 
-                  <p>
-                    {category.description}
-                  </p>
+                    <div className="category-options-panel">
 
-                  <span>
-                    {isOpen
-                      ? "Hide options ↑"
-                      : "Choose an option →"}
-                  </span>
+                      <h4>
+                        {category.title}
+                      </h4>
+
+                      {category.options.map(
+                        (option) => (
+
+                          <Link
+                            key={option.name}
+                            to={option.link}
+                            className="category-option-button"
+                            onClick={(e) =>
+                              e.stopPropagation()
+                            }
+                          >
+                            {option.name}
+                          </Link>
+
+                        )
+                      )}
+
+                    </div>
+
+                  )}
 
                 </div>
 
-                {isOpen && (
-                  <div className="category-options-panel">
-
-                    <h4>
-                      {category.title}
-                    </h4>
-
-                    {category.options.map(
-                      (option) => (
-                        <Link
-                          key={option.name}
-                          to={option.link}
-                          className="category-option-button"
-                          onClick={(e) =>
-                            e.stopPropagation()
-                          }
-                        >
-                          {option.name}
-                        </Link>
-                      )
-                    )}
-
-                  </div>
-                )}
-
-              </div>
-            );
-          })}
-
-
-          
+              );
+            }
+          )}
 
         </div>
 
       </section>
-
 
       {/* =========================
           LATEST ADS
@@ -405,6 +528,9 @@ function Home() {
 
         </div>
 
+        {/* =========================
+            LOADING
+        ========================= */}
 
         {adsLoading ? (
 
@@ -418,6 +544,10 @@ function Home() {
 
         ) : latestAds.length === 0 ? (
 
+          /* =========================
+             EMPTY
+          ========================= */
+
           <div className="latest-ads-empty">
 
             <h3>
@@ -425,7 +555,8 @@ function Home() {
             </h3>
 
             <p>
-              Be the first person to post an advertisement.
+              Be the first person to post
+              an advertisement.
             </p>
 
             <Link to="/post-ad">
@@ -436,28 +567,38 @@ function Home() {
 
         ) : (
 
-          <div className="latest-ads-grid">
+          /* =========================
+             ADS
+          ========================= */
 
-            {/* =====================================
-                ALL ADS — NO LIMIT
-                ===================================== */}
+          <div className="latest-ads-grid">
 
             {latestAds.map((ad) => {
 
-              /*
-               * Your Firestore has both:
-               *
-               * image
-               * images[]
-               *
-               * We support both.
-               */
+              // =========================
+              // FIRST IMAGE
+              // =========================
 
               const adImage =
                 Array.isArray(ad.images) &&
                 ad.images.length > 0
                   ? ad.images[0]
                   : ad.image;
+
+              // =========================
+              // SHORT DESCRIPTION
+              // =========================
+
+              const shortDescription =
+                ad.description
+                  ? ad.description.length >
+                    100
+                    ? `${ad.description.substring(
+                        0,
+                        100
+                      )}...`
+                    : ad.description
+                  : "No description available.";
 
               return (
 
@@ -466,49 +607,56 @@ function Home() {
                   key={ad.id}
                 >
 
-                  {/* IMAGE */}
+                  {/* =========================
+                      CLICKABLE IMAGE
+                  ========================= */}
 
-                  <div className="latest-ad-image">
+                  <Link
+                    to={`/ad/${ad.id}`}
+                    className="latest-ad-image-link"
+                    aria-label={`View ${
+                      ad.title ||
+                      "Advertisement"
+                    }`}
+                  >
 
-                    {adImage ? (
+                    <div className="latest-ad-image">
 
-                      <img
-                        src={adImage}
-                        alt={
-                          ad.title ||
-                          "Advertisement"
-                        }
-                        loading="lazy"
-                        onError={(e) => {
-                          e.currentTarget.style.display =
-                            "none";
+                      {adImage ? (
 
-                          const parent =
-                            e.currentTarget.parentElement;
-
-                          if (parent) {
-                            parent.innerHTML =
-                              '<div class="latest-no-image">📷</div>';
+                        <img
+                          src={adImage}
+                          alt={
+                            ad.title ||
+                            "Advertisement"
                           }
-                        }}
-                      />
+                          loading="lazy"
+                          className="latest-ad-photo"
+                          onError={(e) => {
+                            e.currentTarget.style.display =
+                              "none";
+                          }}
+                        />
 
-                    ) : (
+                      ) : (
 
-                      <div className="latest-no-image">
-                        📷
-                      </div>
+                        <div className="latest-no-image">
+                          📷 No Image
+                        </div>
 
-                    )}
+                      )}
 
-                  </div>
+                    </div>
 
+                  </Link>
 
-                  {/* INFORMATION */}
+                  {/* =========================
+                      INFORMATION
+                  ========================= */}
 
                   <div className="latest-ad-info">
 
-                    <span>
+                    <span className="latest-ad-category">
                       {ad.category ||
                         "Advertisement"}
                     </span>
@@ -519,24 +667,56 @@ function Home() {
                     </h3>
 
                     <h4>
-                      ETB {ad.price || "0"}
+                      ETB{" "}
+                      {Number(
+                        ad.price || 0
+                      ).toLocaleString()}
                     </h4>
 
-                    <p>
-                      📍 {ad.city || "Ethiopia"}
-                    </p>
+                    {ad.city && (
+                      <p>
+                        📍 {ad.city}
+                      </p>
+                    )}
 
                     {ad.condition && (
                       <p>
-                        🔄 {ad.condition}
+                        🔄{" "}
+                        {ad.condition}
                       </p>
                     )}
 
                     {ad.subcategory && (
                       <p>
-                        📂 {ad.subcategory}
+                        📂{" "}
+                        {ad.subcategory}
                       </p>
                     )}
+
+                    {/* SHORT DESCRIPTION */}
+
+                    <p className="latest-ad-description">
+                      {shortDescription}
+                    </p>
+
+                    {/* IMAGE COUNT */}
+
+                    {Array.isArray(
+                      ad.images
+                    ) &&
+                      ad.images.length >
+                        1 && (
+
+                        <p className="image-count">
+                          🖼️{" "}
+                          {ad.images.length} images
+                        </p>
+
+                      )}
+
+                    {/* =========================
+                        VIEW DETAILS
+                    ========================= */}
 
                     <Link
                       to={`/ad/${ad.id}`}

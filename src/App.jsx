@@ -1,5 +1,8 @@
-import { HashRouter, Routes, Route } from "react-router-dom";
-import "./App.css";
+import {
+  HashRouter,
+  Routes,
+  Route,
+} from "react-router-dom";
 
 import Navbar from "./components/Navbar";
 
@@ -10,7 +13,11 @@ import Rentals from "./pages/Rentals";
 import SpareParts from "./pages/SpareParts";
 import BuildingMaterials from "./pages/BuildingMaterials";
 
+import Search from "./pages/Search";
+import AdDetails from "./pages/AdDetails";
+
 import PostAd from "./pages/PostAd";
+import EditAd from "./pages/EditAd";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -19,10 +26,10 @@ import Dashboard from "./pages/Dashboard";
 import MyAds from "./pages/MyAds";
 
 import Contact from "./pages/Contact";
-import AdDetails from "./pages/AdDetails";
-import Search from "./pages/Search";
 
-import EditAd from "./pages/EditAd";
+import Profile from "./pages/Profile";
+import UserProfile from "./pages/UserProfile";
+
 function App() {
   return (
     <HashRouter>
@@ -31,148 +38,97 @@ function App() {
 
       <Routes>
 
-        {/* =========================
-            HOME
-        ========================= */}
-
         <Route
           path="/"
           element={<Home />}
         />
-
-
-        {/* =========================
-            CARS
-        ========================= */}
 
         <Route
           path="/cars"
           element={<Cars />}
         />
 
-
-        {/* =========================
-            HOUSES
-        ========================= */}
-
         <Route
           path="/houses"
           element={<Houses />}
         />
-
-
-        {/* =========================
-            RENTALS
-        ========================= */}
 
         <Route
           path="/rentals"
           element={<Rentals />}
         />
 
-
-        {/* =========================
-            SPARE PARTS
-        ========================= */}
-
         <Route
           path="/spare-parts"
           element={<SpareParts />}
         />
 
-
-        {/* =========================
-            BUILDING MATERIALS
-        ========================= */}
-
         <Route
           path="/building-materials"
-          element={<BuildingMaterials />}
+          element={
+            <BuildingMaterials />
+          }
         />
-
-
-        {/* =========================
-            SEARCH
-        ========================= */}
 
         <Route
           path="/search"
           element={<Search />}
         />
 
-
-        {/* =========================
-            AD DETAILS
-        ========================= */}
-
         <Route
           path="/ad/:id"
           element={<AdDetails />}
         />
-
-
-        {/* =========================
-            POST ADVERTISEMENT
-        ========================= */}
 
         <Route
           path="/post-ad"
           element={<PostAd />}
         />
 
-
-        {/* =========================
-            LOGIN
-        ========================= */}
-
         <Route
-          path="/login"
-          element={<Login />}
+          path="/edit-ad/:id"
+          element={<EditAd />}
         />
-
-
-        {/* =========================
-            REGISTER
-        ========================= */}
-
-        <Route
-          path="/register"
-          element={<Register />}
-        />
-
-
-        {/* =========================
-            DASHBOARD
-        ========================= */}
 
         <Route
           path="/dashboard"
           element={<Dashboard />}
         />
 
-
-        {/* =========================
-            MY ADS
-        ========================= */}
-
         <Route
           path="/my-ads"
           element={<MyAds />}
         />
 
+        {/* ACCOUNT */}
 
-        {/* =========================
-            CONTACT
-        ========================= */}
+        <Route
+          path="/login"
+          element={<Login />}
+        />
+
+        <Route
+          path="/register"
+          element={<Register />}
+        />
+
+        <Route
+          path="/profile"
+          element={<Profile />}
+        />
+
+        {/* PUBLIC USER PROFILE */}
+
+        <Route
+          path="/user/:uid"
+          element={<UserProfile />}
+        />
 
         <Route
           path="/contact"
           element={<Contact />}
         />
-<Route
-  path="/edit-ad/:id"
-  element={<EditAd />}
-/>
+
       </Routes>
 
     </HashRouter>

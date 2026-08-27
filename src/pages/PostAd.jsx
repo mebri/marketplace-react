@@ -10,48 +10,37 @@ function PostAd() {
   const [price, setPrice] = useState("");
   const [city, setCity] = useState("");
   const [category, setCategory] = useState("");
-  const [description, setDescription] = useState("");
+  const [description, setDescription] =
+    useState("");
 
   // Images
   const [images, setImages] = useState([]);
 
-  // Seller phone
+  // Phone
   const [phone, setPhone] = useState("");
 
   // Condition
-  const [condition, setCondition] = useState("");
+  const [condition, setCondition] =
+    useState("");
 
-  // Material type
-  const [materialType, setMaterialType] = useState("");
+  // Electronics
+  const [subcategory, setSubcategory] =
+    useState("");
 
-  // Electronics subcategory
-  const [subcategory, setSubcategory] = useState("");
-
-  // House / Rental type
+  // Houses / Rentals
   const [type, setType] = useState("");
 
-  // Upload state
-  const [uploading, setUploading] = useState(false);
+  // Furniture
+  const [furnitureType, setFurnitureType] =
+    useState("");
 
-  // =========================
-  // PRICE FORMAT
-  // =========================
+  // Labor
+  const [laborType, setLaborType] =
+    useState("");
 
-  const handlePriceChange = (e) => {
-    // Remove everything except numbers
-    const numbersOnly = e.target.value.replace(/\D/g, "");
-
-    if (!numbersOnly) {
-      setPrice("");
-      return;
-    }
-
-    // Add comma separators
-    const formattedPrice =
-      Number(numbersOnly).toLocaleString("en-US");
-
-    setPrice(formattedPrice);
-  };
+  // Upload
+  const [uploading, setUploading] =
+    useState(false);
 
   // =========================
   // IMAGE SELECTION
@@ -66,7 +55,6 @@ function PostAd() {
       return;
     }
 
-    // Maximum 10 images
     if (selectedFiles.length > 10) {
       alert(
         "You can select a maximum of 10 images."
@@ -76,24 +64,27 @@ function PostAd() {
       return;
     }
 
-    // Check file types
-    const invalidFile = selectedFiles.find(
-      (file) =>
-        !file.type.startsWith("image/")
-    );
+    const invalidFile =
+      selectedFiles.find(
+        (file) =>
+          !file.type.startsWith("image/")
+      );
 
     if (invalidFile) {
-      alert("Please select image files only.");
+      alert(
+        "Please select image files only."
+      );
 
       e.target.value = "";
       return;
     }
 
-    // Check file size
-    const tooLarge = selectedFiles.find(
-      (file) =>
-        file.size > 10 * 1024 * 1024
-    );
+    const tooLarge =
+      selectedFiles.find(
+        (file) =>
+          file.size >
+          10 * 1024 * 1024
+      );
 
     if (tooLarge) {
       alert(
@@ -121,7 +112,24 @@ function PostAd() {
   };
 
   // =========================
-  // SUBMIT AD
+  // CATEGORY CHANGE
+  // =========================
+
+  const handleCategoryChange = (e) => {
+    const newCategory =
+      e.target.value;
+
+    setCategory(newCategory);
+
+    setCondition("");
+    setSubcategory("");
+    setType("");
+    setFurnitureType("");
+    setLaborType("");
+  };
+
+  // =========================
+  // SUBMIT
   // =========================
 
   const submitAd = async (e) => {
@@ -151,25 +159,11 @@ function PostAd() {
       return;
     }
 
-    // Convert "1,000,000" back to 1000000
-    const numericPrice = Number(
-      price.replace(/,/g, "")
-    );
-
-    if (
-      !Number.isFinite(numericPrice) ||
-      numericPrice <= 0
-    ) {
-      alert("Please enter a valid price.");
-
-      return;
-    }
-
     try {
       setUploading(true);
 
       // =========================
-      // CLOUDINARY UPLOAD
+      // CLOUDINARY
       // =========================
 
       const imageUrls = [];
@@ -181,7 +175,8 @@ function PostAd() {
       ) {
         const image = images[i];
 
-        const formData = new FormData();
+        const formData =
+          new FormData();
 
         formData.append(
           "file",
@@ -193,21 +188,17 @@ function PostAd() {
           "yeegna_uploads"
         );
 
-        const response = await fetch(
-          "https://api.cloudinary.com/v1_1/lisqr7zn/image/upload",
-          {
-            method: "POST",
-            body: formData,
-          }
-        );
+        const response =
+          await fetch(
+            "https://api.cloudinary.com/v1_1/lisqr7zn/image/upload",
+            {
+              method: "POST",
+              body: formData,
+            }
+          );
 
         const data =
           await response.json();
-
-        console.log(
-          `Cloudinary Image ${i + 1}:`,
-          data
-        );
 
         if (
           !response.ok ||
@@ -227,7 +218,7 @@ function PostAd() {
       }
 
       // =========================
-      // SAVE TO FIREBASE
+      // FIREBASE
       // =========================
 
       await addDoc(
@@ -237,14 +228,14 @@ function PostAd() {
             auth.currentUser.uid,
 
           userEmail:
-            auth.currentUser.email || "",
+            auth.currentUser.email ||
+            "",
 
           title:
             title.trim(),
 
-          // IMPORTANT:
-          // Save as NUMBER, not "1,000,000"
-          price: numericPrice,
+          price:
+            price,
 
           city:
             city.trim(),
@@ -254,19 +245,18 @@ function PostAd() {
           description:
             description.trim(),
 
-          // Seller phone
           phone:
             phone.trim(),
 
-          // Keep first image for
-          // compatibility
+          // First image
           image:
             imageUrls.length > 0
               ? imageUrls[0]
               : "",
 
-          // Multiple images
-          images: imageUrls,
+          // All images
+          images:
+            imageUrls,
 
           // Condition
           condition,
@@ -274,14 +264,20 @@ function PostAd() {
           // Electronics
           subcategory,
 
-          // House / Rental
+          // Houses / Rentals
           type,
 
-          // ምንአለሽ ተራ
-          materialType:
+          // Furniture
+          furnitureType:
+            category === "Furniture"
+              ? furnitureType
+              : "",
+
+          // Labor
+          laborType:
             category ===
-            "ምንአለሽ ተራ"
-              ? materialType
+            "Labor & Services"
+              ? laborType
               : "",
 
           createdAt:
@@ -305,11 +301,11 @@ function PostAd() {
       setPhone("");
       setImages([]);
       setCondition("");
-      setMaterialType("");
       setSubcategory("");
       setType("");
+      setFurnitureType("");
+      setLaborType("");
 
-      // Clear file input
       const fileInput =
         document.getElementById(
           "ad-images"
@@ -335,23 +331,6 @@ function PostAd() {
     }
   };
 
-  // =========================
-  // CATEGORY CHANGE
-  // =========================
-
-  const handleCategoryChange = (e) => {
-    const newCategory =
-      e.target.value;
-
-    setCategory(newCategory);
-
-    // Clear dependent fields
-    setCondition("");
-    setMaterialType("");
-    setSubcategory("");
-    setType("");
-  };
-
   return (
     <div className="post-ad-page">
 
@@ -364,23 +343,21 @@ function PostAd() {
         onSubmit={submitAd}
       >
 
-        {/* =========================
-            TITLE
-        ========================= */}
+        {/* TITLE */}
 
         <input
           type="text"
           placeholder="Advertisement Title"
           value={title}
           onChange={(e) =>
-            setTitle(e.target.value)
+            setTitle(
+              e.target.value
+            )
           }
           required
         />
 
-        {/* =========================
-            CATEGORY
-        ========================= */}
+        {/* CATEGORY */}
 
         <select
           value={category}
@@ -389,6 +366,7 @@ function PostAd() {
           }
           required
         >
+
           <option value="">
             Select Category
           </option>
@@ -405,21 +383,22 @@ function PostAd() {
             🏢 Rentals
           </option>
 
-          <option value="Spare Parts">
-            🔧 Spare Parts
-          </option>
-
-          <option value="Building Materials">
-            🧱 Building Materials
-          </option>
-
           <option value="Electronics">
             📱 Electronics
+          </option>
+
+          <option value="Furniture">
+            🛋️ Furniture
+          </option>
+
+          <option value="Labor & Services">
+            👷 Labor & Services
           </option>
 
           <option value="ምንአለሽ ተራ">
             🏪 ምንአለሽ ተራ
           </option>
+
         </select>
 
         {/* =========================
@@ -436,17 +415,27 @@ function PostAd() {
             }
             required
           >
+
             <option value="">
-              Select Car Condition
+              Select Car Type
             </option>
 
             <option value="New">
-              New Car
+              🚗 New Car
             </option>
 
             <option value="Used">
-              Used Car
+              🚙 Used Car
             </option>
+
+            <option value="Electric">
+              ⚡ Electric Car
+            </option>
+
+            <option value="Rent">
+              🚘 Car for Rent
+            </option>
+
           </select>
         )}
 
@@ -466,6 +455,7 @@ function PostAd() {
               }
               required
             >
+
               <option value="">
                 Select Electronics Type
               </option>
@@ -489,6 +479,7 @@ function PostAd() {
               <option value="Other">
                 🔌 Other Electronics
               </option>
+
             </select>
 
             <select
@@ -500,6 +491,7 @@ function PostAd() {
               }
               required
             >
+
               <option value="">
                 Select Condition
               </option>
@@ -511,17 +503,55 @@ function PostAd() {
               <option value="Used">
                 Used
               </option>
+
             </select>
           </>
         )}
 
         {/* =========================
-            ምንአለሽ ተራ
+            FURNITURE
         ========================= */}
 
         {category ===
-          "ምንአለሽ ተራ" && (
+          "Furniture" && (
           <>
+
+            <select
+              value={furnitureType}
+              onChange={(e) =>
+                setFurnitureType(
+                  e.target.value
+                )
+              }
+              required
+            >
+
+              <option value="">
+                Select Furniture Type
+              </option>
+
+              <option value="Sofas">
+                🛋️ Sofas
+              </option>
+
+              <option value="Beds">
+                🛏️ Beds
+              </option>
+
+              <option value="Chairs and Tables">
+                🪑 Chairs & Tables
+              </option>
+
+              <option value="Cabinets">
+                🗄️ Cabinets
+              </option>
+
+              <option value="Other">
+                🪞 Other Furniture
+              </option>
+
+            </select>
+
             <select
               value={condition}
               onChange={(e) =>
@@ -531,98 +561,81 @@ function PostAd() {
               }
               required
             >
+
               <option value="">
                 Select Condition
               </option>
 
+              <option value="New">
+                New Furniture
+              </option>
+
               <option value="Used">
-                Used
+                Used Furniture
               </option>
 
-              <option value="Like New">
-                Like New
-              </option>
-
-              <option value="Refurbished">
-                Refurbished
-              </option>
             </select>
 
-            <select
-              value={materialType}
-              onChange={(e) =>
-                setMaterialType(
-                  e.target.value
-                )
-              }
-              required
-            >
-              <option value="">
-                Select Material Type
-              </option>
-
-              <option value="Metal">
-                🔩 Metal
-              </option>
-
-              <option value="Wood">
-                🪵 Wood
-              </option>
-
-              <option value="Doors and Windows">
-                🚪 Doors & Windows
-              </option>
-
-              <option value="Machinery">
-                ⚙️ Machinery
-              </option>
-
-              <option value="Construction Materials">
-                🧱 Construction Materials
-              </option>
-
-              <option value="Other">
-                📦 Other
-              </option>
-            </select>
           </>
         )}
 
         {/* =========================
-            BUILDING MATERIALS
+            LABOR & SERVICES
         ========================= */}
 
         {category ===
-          "Building Materials" && (
+          "Labor & Services" && (
           <select
-            value={condition}
+            value={laborType}
             onChange={(e) =>
-              setCondition(
+              setLaborType(
                 e.target.value
               )
             }
             required
           >
+
             <option value="">
-              Select Condition
+              Select Service
             </option>
 
-            <option value="New">
-              New Building Materials
+            <option value="Construction">
+              👷 Construction Worker
             </option>
 
-            <option value="Used">
-              Used Building Materials
+            <option value="Electrician">
+              ⚡ Electrician
             </option>
+
+            <option value="Plumber">
+              🚰 Plumber
+            </option>
+
+            <option value="Painter">
+              🎨 Painter
+            </option>
+
+            <option value="Cleaning">
+              🧹 Cleaning
+            </option>
+
+            <option value="Moving">
+              🚚 Moving & Transport
+            </option>
+
+            <option value="Other">
+              🔧 Other Services
+            </option>
+
           </select>
         )}
 
         {/* =========================
-            SPARE PARTS
+            ምንአለሽ ተራ
         ========================= */}
 
         {category ===
-          "Spare Parts" && (
+          "ምንአለሽ ተራ" && (
           <select
             value={condition}
             onChange={(e) =>
@@ -632,17 +645,23 @@ function PostAd() {
             }
             required
           >
+
             <option value="">
               Select Condition
             </option>
 
-            <option value="New">
-              New Spare Parts
+            <option value="Used">
+              Used
             </option>
 
-            <option value="Used">
-              Used Spare Parts
+            <option value="Like New">
+              Like New
             </option>
+
+            <option value="Refurbished">
+              Refurbished
+            </option>
+
           </select>
         )}
 
@@ -650,7 +669,8 @@ function PostAd() {
             HOUSES
         ========================= */}
 
-        {category === "Houses" && (
+        {category ===
+          "Houses" && (
           <select
             value={type}
             onChange={(e) =>
@@ -660,6 +680,7 @@ function PostAd() {
             }
             required
           >
+
             <option value="">
               Select House Type
             </option>
@@ -671,6 +692,7 @@ function PostAd() {
             <option value="rent">
               🏠 House for Rent
             </option>
+
           </select>
         )}
 
@@ -689,16 +711,13 @@ function PostAd() {
             }
             required
           >
+
             <option value="">
               Select Rental Type
             </option>
 
             <option value="apartment">
               🏢 Apartment
-            </option>
-
-            <option value="house">
-              🏠 House
             </option>
 
             <option value="shop">
@@ -708,6 +727,7 @@ function PostAd() {
             <option value="office">
               🏢 Office
             </option>
+
           </select>
         )}
 
@@ -720,13 +740,25 @@ function PostAd() {
           inputMode="numeric"
           placeholder="Price (ETB)"
           value={price}
-          onChange={handlePriceChange}
+          onChange={(e) => {
+
+            const value =
+              e.target.value.replace(
+                /,/g,
+                ""
+              );
+
+            if (
+              /^\d*$/.test(value)
+            ) {
+              setPrice(value);
+            }
+
+          }}
           required
         />
 
-        {/* =========================
-            CITY
-        ========================= */}
+        {/* CITY */}
 
         <input
           type="text"
@@ -740,9 +772,7 @@ function PostAd() {
           required
         />
 
-        {/* =========================
-            PHONE
-        ========================= */}
+        {/* PHONE */}
 
         <input
           type="tel"
@@ -756,9 +786,7 @@ function PostAd() {
           required
         />
 
-        {/* =========================
-            DESCRIPTION
-        ========================= */}
+        {/* DESCRIPTION */}
 
         <textarea
           placeholder="Description"
@@ -784,7 +812,6 @@ function PostAd() {
 
           <p>
             Select up to 10 images.
-            You can upload 1–10 images.
           </p>
 
           <input
@@ -797,13 +824,14 @@ function PostAd() {
             }
           />
 
-          {/* IMAGE PREVIEWS */}
+          {/* PREVIEWS */}
 
           {images.length > 0 && (
             <div className="post-image-preview-grid">
 
               {images.map(
                 (image, index) => (
+
                   <div
                     className="post-image-preview"
                     key={`${image.name}-${index}`}
@@ -834,6 +862,7 @@ function PostAd() {
                     </button>
 
                   </div>
+
                 )
               )}
 
@@ -854,9 +883,11 @@ function PostAd() {
           type="submit"
           disabled={uploading}
         >
+
           {uploading
             ? "⏳ Uploading images..."
             : "📢 Publish Advertisement"}
+
         </button>
 
       </form>

@@ -24,26 +24,45 @@ function Navbar() {
     return () => unsubscribe();
   }, []);
 
+  // =========================
+  // LOGOUT
+  // =========================
+
   const handleLogout = async () => {
     try {
       await signOut(auth);
+
       setMenuOpen(false);
+
       navigate("/");
     } catch (error) {
-      console.error("Logout error:", error);
+      console.error(
+        "Logout error:",
+        error
+      );
     }
   };
+
+  // =========================
+  // CLOSE MENU
+  // =========================
 
   const closeMenu = () => {
     setMenuOpen(false);
   };
 
   /*
-   * This works both:
+   * Works on:
+   *
    * localhost
-   * GitHub Pages /marketplace-react/
+   * GitHub Pages
+   *
+   * Example:
+   * /marketplace-react/logo.png
    */
-  const logoPath = `${import.meta.env.BASE_URL}logo.png`;
+
+  const logoPath =
+    `${import.meta.env.BASE_URL}logo.png`;
 
   return (
     <header className="navbar">
@@ -72,11 +91,15 @@ function Navbar() {
         ========================= */}
 
         <button
+          type="button"
           className="navbar-menu-button"
           onClick={() =>
-            setMenuOpen(!menuOpen)
+            setMenuOpen(
+              (current) => !current
+            )
           }
-          aria-label="Open menu"
+          aria-label="Open navigation menu"
+          aria-expanded={menuOpen}
         >
           {menuOpen ? "✕" : "☰"}
         </button>
@@ -94,6 +117,8 @@ function Navbar() {
           }`}
         >
 
+          {/* HOME */}
+
           <Link
             to="/"
             onClick={closeMenu}
@@ -101,61 +126,72 @@ function Navbar() {
             Home
           </Link>
 
+
+          {/* CARS */}
+
           <Link
             to="/cars"
             onClick={closeMenu}
           >
-            Cars
+            🚗 Cars
           </Link>
 
-          <Link
-            to="/houses"
-            onClick={closeMenu}
-          >
-            Houses
-          </Link>
 
-          <Link
-            to="/rentals"
-            onClick={closeMenu}
-          >
-            Rentals
-          </Link>
-
-          <Link
-            to="/spare-parts"
-            onClick={closeMenu}
-          >
-            Spare Parts
-          </Link>
-
-          <Link
-            to="/building-materials"
-            onClick={closeMenu}
-          >
-            Building Materials
-          </Link>
+          {/* ELECTRONICS */}
 
           <Link
             to="/search?category=Electronics"
             onClick={closeMenu}
           >
-            Electronics
+            📱 Electronics
           </Link>
+
+
+          {/* FURNITURE */}
+
+          <Link
+            to="/search?category=Furniture"
+            onClick={closeMenu}
+          >
+            🛋️ Furniture
+          </Link>
+
+
+          {/* HOME */}
+
+          <Link
+            to="/search?category=Home"
+            onClick={closeMenu}
+          >
+            🏠 Home
+          </Link>
+
+
+          {/* LABOR & SERVICES */}
+
+          <Link
+            to="/search?category=Labor%20%26%20Services"
+            onClick={closeMenu}
+          >
+            🛠️ Labor & Services
+          </Link>
+
+
+          {/* ምንአለሽ ተራ */}
 
           <Link
             to="/search?category=ምንአለሽ%20ተራ"
             onClick={closeMenu}
             className="amharic-nav-link"
           >
-            ምንአለሽ ተራ
+            🏪 ምንአለሽ ተራ
           </Link>
 
         </nav>
 
 
         {/* =========================
-            RIGHT SIDE
+            RIGHT SIDE ACTIONS
         ========================= */}
 
         <div
@@ -168,6 +204,9 @@ function Navbar() {
 
           {user ? (
             <>
+
+              {/* DASHBOARD */}
+
               <Link
                 to="/dashboard"
                 className="navbar-dashboard"
@@ -175,6 +214,9 @@ function Navbar() {
               >
                 Dashboard
               </Link>
+
+
+              {/* MY ADS */}
 
               <Link
                 to="/my-ads"
@@ -184,6 +226,9 @@ function Navbar() {
                 My Ads
               </Link>
 
+
+              {/* POST AD */}
+
               <Link
                 to="/post-ad"
                 className="navbar-post-ad"
@@ -192,15 +237,23 @@ function Navbar() {
                 + Post Ad
               </Link>
 
+
+              {/* LOGOUT */}
+
               <button
+                type="button"
                 className="navbar-logout"
                 onClick={handleLogout}
               >
                 Logout
               </button>
+
             </>
           ) : (
             <>
+
+              {/* LOGIN */}
+
               <Link
                 to="/login"
                 className="navbar-login"
@@ -208,6 +261,9 @@ function Navbar() {
               >
                 Login
               </Link>
+
+
+              {/* REGISTER */}
 
               <Link
                 to="/register"
@@ -217,6 +273,9 @@ function Navbar() {
                 Register
               </Link>
 
+
+              {/* POST AD */}
+
               <Link
                 to="/post-ad"
                 className="navbar-post-ad"
@@ -224,6 +283,7 @@ function Navbar() {
               >
                 + Post Ad
               </Link>
+
             </>
           )}
 

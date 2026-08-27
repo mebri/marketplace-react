@@ -20,7 +20,7 @@ function Footer() {
         <div className="footer-section">
           <h3>Contact</h3>
           <p>📧 info@yenagebeya.com</p>
-          <p>📞 +251 900 000 000</p>
+          <p>📞 +251 911680790</p>
           <p>📍 Addis Ababa, Ethiopia</p>
         </div>
 
