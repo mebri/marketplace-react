@@ -10,15 +10,22 @@ import {
 import { db } from "../firebase/firebase";
 
 function Cars() {
-  const [searchParams] = useSearchParams();
+  const [searchParams] =
+    useSearchParams();
 
   const selectedCondition =
     searchParams.get("condition") || "";
 
   const [cars, setCars] = useState([]);
-  const [search, setSearch] = useState("");
-  const [sort, setSort] = useState("default");
-  const [loading, setLoading] = useState(true);
+  const [search, setSearch] =
+    useState("");
+
+  // Default = newest first
+  const [sort, setSort] =
+    useState("newest");
+
+  const [loading, setLoading] =
+    useState(true);
 
   // =========================
   // LOAD CARS
@@ -30,28 +37,78 @@ function Cars() {
 
   const loadCars = async () => {
     try {
-      const snapshot = await getDocs(
-        collection(db, "ads")
-      );
-
-      const carAds = snapshot.docs
-        .map((document) => ({
-          id: document.id,
-          ...document.data(),
-        }))
-        .filter(
-          (ad) => ad.category === "Cars"
+      const snapshot =
+        await getDocs(
+          collection(db, "ads")
         );
 
+      const carAds =
+        snapshot.docs
+          .map((document) => ({
+            id: document.id,
+            ...document.data(),
+          }))
+          .filter(
+            (ad) =>
+              ad.category === "Cars"
+          );
+
       setCars(carAds);
+
     } catch (error) {
       console.error(
         "Error loading cars:",
         error
       );
+
     } finally {
       setLoading(false);
     }
+  };
+
+  // =========================
+  // GET POSTING TIME
+  // =========================
+
+  const getAdTime = (ad) => {
+    if (!ad.createdAt) {
+      return 0;
+    }
+
+    // Firestore Timestamp
+    if (
+      typeof ad.createdAt.toMillis ===
+      "function"
+    ) {
+      return ad.createdAt.toMillis();
+    }
+
+    // Firestore timestamp object
+    if (
+      ad.createdAt.seconds
+    ) {
+      return (
+        ad.createdAt.seconds *
+        1000
+      );
+    }
+
+    // JavaScript Date
+    if (
+      ad.createdAt instanceof Date
+    ) {
+      return ad.createdAt.getTime();
+    }
+
+    // String / number
+    const date =
+      new Date(
+        ad.createdAt
+      ).getTime();
+
+    return Number.isNaN(date)
+      ? 0
+      : date;
   };
 
   // =========================
@@ -60,77 +117,59 @@ function Cars() {
 
   const conditionFilteredCars =
     cars.filter((car) => {
+
       if (!selectedCondition) {
         return true;
       }
 
       return (
-        car.condition?.toLowerCase() ===
-        selectedCondition.toLowerCase()
+        car.condition
+          ?.toLowerCase() ===
+        selectedCondition
+          .toLowerCase()
       );
     });
 
   // =========================
-  // SEARCH
+  // SEARCH FILTER
   // =========================
 
   const filteredCars =
-    conditionFilteredCars.filter((car) => {
-      const text =
-        search.toLowerCase().trim();
+    conditionFilteredCars.filter(
+      (car) => {
 
-      if (!text) {
-        return true;
+        const text =
+          search
+            .toLowerCase()
+            .trim();
+
+        if (!text) {
+          return true;
+        }
+
+        return (
+          car.title
+            ?.toLowerCase()
+            .includes(text) ||
+
+          car.city
+            ?.toLowerCase()
+            .includes(text) ||
+
+          car.description
+            ?.toLowerCase()
+            .includes(text)
+        );
       }
+    );
 
-      return (
-        car.title
-          ?.toLowerCase()
-          .includes(text) ||
-        car.city
-          ?.toLowerCase()
-          .includes(text) ||
-        car.description
-          ?.toLowerCase()
-          .includes(text)
-      );
-    });
+  // =========================
+  // SORT
+  // =========================
 
- 
-// =========================
-// SORT
-// =========================
-
-const getAdTime = (ad) => {
-  if (!ad.createdAt) return 0;
-
-  // Firestore Timestamp
-  if (
-    typeof ad.createdAt.toMillis === "function"
-  ) {
-    return ad.createdAt.toMillis();
-  }
-
-  // Firestore timestamp object
-  if (ad.createdAt.seconds) {
-    return ad.createdAt.seconds * 1000;
-  }
-
-  // JavaScript Date
-  if (ad.createdAt instanceof Date) {
-    return ad.createdAt.getTime();
-  }
-
-  // String / number
-  const date = new Date(
-    ad.createdAt
-  ).getTime();
-
-  return Number.isNaN(date) ? 0 : date;
-};
-
-const sortedCars = [...filteredCars].sort(
-  (a, b) => {
+  const sortedCars = [
+    ...filteredCars,
+  ].sort((a, b) => {
 
     const priceA =
       Number(a.price) || 0;
@@ -138,8 +177,11 @@ const sortedCars = [...filteredCars].sort(
     const priceB =
       Number(b.price) || 0;
 
-    const timeA = getAdTime(a);
-    const timeB = getAdTime(b);
+    const timeA =
+      getAdTime(a);
+
+    const timeB =
+      getAdTime(b);
 
     // Newest first
     if (sort === "newest") {
@@ -161,10 +203,9 @@ const sortedCars = [...filteredCars].sort(
       return priceB - priceA;
     }
 
-    // Default = newest first
+    // Default
     return timeB - timeA;
-  }
-);
+  });
 
   // =========================
   // PAGE TITLE
@@ -173,17 +214,35 @@ const sortedCars = [...filteredCars].sort(
   let pageTitle = "🚗 Cars";
 
   if (
-    selectedCondition.toLowerCase() ===
+    selectedCondition ===
     "new"
   ) {
-    pageTitle = "🚗 New Cars";
+    pageTitle =
+      "🚗 New Cars";
   }
 
   if (
-    selectedCondition.toLowerCase() ===
+    selectedCondition ===
     "used"
   ) {
-    pageTitle = "🚙 Used Cars";
+    pageTitle =
+      "🚙 Used Cars";
+  }
+
+  if (
+    selectedCondition ===
+    "electric"
+  ) {
+    pageTitle =
+      "⚡ Electric Cars";
+  }
+
+  if (
+    selectedCondition ===
+    "rent"
+  ) {
+    pageTitle =
+      "🚘 Cars for Rent";
   }
 
   // =========================
@@ -193,7 +252,9 @@ const sortedCars = [...filteredCars].sort(
   if (loading) {
     return (
       <div className="cars-page">
-        <h1>Loading Cars...</h1>
+        <h1>
+          Loading Cars...
+        </h1>
       </div>
     );
   }
@@ -205,8 +266,9 @@ const sortedCars = [...filteredCars].sort(
           TITLE
       ========================= */}
 
-      <h1>{pageTitle}</h1>
-
+      <h1>
+        {pageTitle}
+      </h1>
 
       {/* =========================
           SEARCH + SORT
@@ -220,44 +282,60 @@ const sortedCars = [...filteredCars].sort(
           placeholder="🔎 Search car, city, description..."
           value={search}
           onChange={(e) =>
-            setSearch(e.target.value)
+            setSearch(
+              e.target.value
+            )
           }
         />
 
-       <select
-  value={sort}
-  onChange={(e) =>
-    setSort(e.target.value)
-  }
->
-  <option value="newest">
-    🕐 Newest → Oldest
-  </option>
+        <select
+          value={sort}
+          onChange={(e) =>
+            setSort(
+              e.target.value
+            )
+          }
+        >
 
-  <option value="oldest">
-    🕐 Oldest → Newest
-  </option>
+          <option value="newest">
+            🕐 Newest → Oldest
+          </option>
 
-  <option value="low">
-    💰 Price: Low → High
-  </option>
+          <option value="oldest">
+            🕐 Oldest → Newest
+          </option>
 
-  <option value="high">
-    💰 Price: High → Low
-  </option>
-</select> 
+          <option value="low">
+            💰 Price: Low → High
+          </option>
+
+          <option value="high">
+            💰 Price: High → Low
+          </option>
+
+        </select>
 
       </div>
-
 
       {/* =========================
           RESULT COUNT
       ========================= */}
 
-      <p className="cars-result-count">
-        {sortedCars.length} car(s) found
+      <p
+        style={{
+          textAlign:
+            "center",
+          marginBottom:
+            "30px",
+          fontSize:
+            "18px",
+          color:
+            "#555",
+        }}
+      >
+        {sortedCars.length}{" "}
+        car(s) found
       </p>
-
 
       {/* =========================
           CARS
@@ -265,177 +343,232 @@ const sortedCars = [...filteredCars].sort(
 
       <div className="cars-grid">
 
-        {sortedCars.length === 0 ? (
+        {sortedCars.length ===
+        0 ? (
 
-          <div className="cars-no-results">
+          <div
+            style={{
+              width:
+                "100%",
+              textAlign:
+                "center",
+              padding:
+                "50px 20px",
+            }}
+          >
 
             <h2>
               No cars found.
             </h2>
 
-            <p>
-              Try another search or condition.
+            <p
+              style={{
+                marginTop:
+                  "10px",
+                color:
+                  "#777",
+              }}
+            >
+              Try another
+              search or
+              condition.
             </p>
 
           </div>
 
         ) : (
 
-          sortedCars.map((car) => {
+          sortedCars.map(
+            (car) => {
 
-            // =========================
-            // GET FIRST IMAGE
-            // =========================
+              // =========================
+              // IMAGE
+              // =========================
 
-            const imageUrl =
-              Array.isArray(car.images) &&
-              car.images.length > 0
-                ? car.images[0]
-                : car.image;
+              const imageUrl =
+                Array.isArray(
+                  car.images
+                ) &&
+                car.images.length >
+                  0
+                  ? car.images[0]
+                  : car.image;
 
-            // =========================
-            // SHORT DESCRIPTION
-            // =========================
+              // =========================
+              // SHORT DESCRIPTION
+              // =========================
 
-            const shortDescription =
-              car.description
-                ? car.description.length > 100
-                  ? `${car.description.substring(
-                      0,
-                      100
-                    )}...`
-                  : car.description
-                : "No description available.";
+              const shortDescription =
+                car.description
+                  ? car.description
+                      .length >
+                    100
+                    ? `${car.description.substring(
+                        0,
+                        100
+                      )}...`
+                    : car.description
+                  : "No description available.";
 
-            return (
+              return (
 
-              <div
-                className="car-card"
-                key={car.id}
-              >
-
-                {/* =========================
-                    CLICKABLE IMAGE
-                ========================= */}
-
-                <Link
-                  to={`/ad/${car.id}`}
-                  className="car-image-link"
+                <div
+                  className="car-card"
+                  key={car.id}
                 >
 
-                  <div className="listing-image">
+                  {/* =========================
+                      CLICKABLE IMAGE
+                  ========================= */}
 
-                    {imageUrl ? (
+                  <Link
+                    to={`/ad/${car.id}`}
+                    className="car-image-link"
+                    aria-label={`View ${
+                      car.title ||
+                      "Car"
+                    }`}
+                  >
 
-                      <img
-                        src={imageUrl}
-                        alt={
-                          car.title ||
-                          "Car"
+                    <div className="listing-image">
+
+                      {imageUrl ? (
+
+                        <img
+                          src={imageUrl}
+                          alt={
+                            car.title ||
+                            "Car"
+                          }
+                          className="listing-photo"
+                          loading="lazy"
+                          onError={(
+                            e
+                          ) => {
+                            e.currentTarget.style.display =
+                              "none";
+                          }}
+                        />
+
+                      ) : (
+
+                        <div className="no-image">
+                          📷 No Image
+                        </div>
+
+                      )}
+
+                    </div>
+
+                  </Link>
+
+                  {/* =========================
+                      INFORMATION
+                  ========================= */}
+
+                  <div className="car-info">
+
+                    {/* CATEGORY */}
+
+                    <span className="category">
+                      🚗 Cars
+                    </span>
+
+                    {/* TITLE */}
+
+                    <h3>
+                      {car.title ||
+                        "Untitled Car"}
+                    </h3>
+
+                    {/* PRICE */}
+
+                    <h2>
+                      ETB{" "}
+                      {Number(
+                        car.price ||
+                          0
+                      ).toLocaleString()}
+                    </h2>
+
+                    {/* CONDITION */}
+
+                    {car.condition && (
+                      <p>
+                        🔄 Condition:{" "}
+                        {
+                          car.condition
                         }
-                        className="listing-photo"
-                        loading="lazy"
-                      />
+                      </p>
+                    )}
 
-                    ) : (
+                    {/* CITY */}
 
-                      <div className="no-image">
-                        📷 No Image
-                      </div>
+                    {car.city && (
+                      <p>
+                        📍{" "}
+                        {car.city}
+                      </p>
+                    )}
+
+                    {/* SHORT DESCRIPTION */}
+
+                    <p className="car-description">
+                      {shortDescription}
+                    </p>
+
+                    {/* IMAGE COUNT */}
+
+                    {Array.isArray(
+                      car.images
+                    ) &&
+                      car.images.length >
+                        1 && (
+
+                        <p className="image-count">
+                          🖼️{" "}
+                          {
+                            car.images
+                              .length
+                          }{" "}
+                          images
+                        </p>
+
+                      )}
+
+                    {/* =========================
+                        VIEW DETAILS
+                    ========================= */}
+
+                    <Link
+                      to={`/ad/${car.id}`}
+                      className="car-details-link"
+                    >
+                      👁 View Details
+                    </Link>
+
+                    {/* =========================
+                        CALL SELLER
+                    ========================= */}
+
+                    {car.phone && (
+
+                      <a
+                        href={`tel:${car.phone}`}
+                        className="phone-link"
+                      >
+                        📞 Call Seller
+                      </a>
 
                     )}
 
                   </div>
 
-                </Link>
-
-
-                {/* =========================
-                    INFORMATION
-                ========================= */}
-
-                <div className="car-info">
-
-                  <span className="category">
-                    🚗 Cars
-                  </span>
-
-
-                  <h3>
-                    {car.title ||
-                      "Untitled Car"}
-                  </h3>
-
-
-                  {/* PRICE */}
-
-                  <h2>
-                    ETB{" "}
-                    {Number(
-                      car.price || 0
-                    ).toLocaleString()}
-                  </h2>
-
-
-                  {/* CONDITION */}
-
-                  {car.condition && (
-                    <p>
-                      🔄 Condition:{" "}
-                      {car.condition}
-                    </p>
-                  )}
-
-
-                  {/* CITY */}
-
-                  {car.city && (
-                    <p>
-                      📍 {car.city}
-                    </p>
-                  )}
-
-
-                  {/* SHORT DESCRIPTION */}
-
-                  <p className="car-description">
-                    {shortDescription}
-                  </p>
-
-
-                  {/* =========================
-                      VIEW DETAILS
-                  ========================= */}
-
-                  <Link
-                    to={`/ad/${car.id}`}
-                    className="car-details-button"
-                  >
-                    👁 View Details
-                  </Link>
-
-
-                  {/* =========================
-                      CALL SELLER
-                  ========================= */}
-
-                  {car.phone && (
-
-                    <a
-                      href={`tel:${car.phone}`}
-                      className="phone-link"
-                    >
-                      📞 Call Seller
-                    </a>
-
-                  )}
-
                 </div>
 
-              </div>
-
-            );
-          })
+              );
+            }
+          )
 
         )}
 
