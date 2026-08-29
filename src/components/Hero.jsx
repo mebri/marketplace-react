@@ -10,10 +10,22 @@ function Hero() {
   const handleSearch = (e) => {
     e.preventDefault();
 
+    const params = new URLSearchParams();
+
+    if (search.trim()) {
+      params.set("search", search.trim());
+    }
+
+    if (category) {
+      params.set("category", category);
+    }
+
+    const query = params.toString();
+
     navigate(
-      `/search?search=${encodeURIComponent(
-        search
-      )}&category=${encodeURIComponent(category)}`
+      query
+        ? `/search?${query}`
+        : "/search"
     );
   };
 
@@ -22,6 +34,10 @@ function Hero() {
 
       <div className="hero-content">
 
+        {/* =========================
+            TITLE
+        ========================= */}
+
         <h1>የኛ ገበያ</h1>
 
         <h2>
@@ -29,24 +45,34 @@ function Hero() {
         </h2>
 
         <p>
-          Find cars, houses, rentals, spare parts,
-          building materials and more anywhere in
+          Find cars, houses, rentals,
+          electronics, furniture,
+          labor and more anywhere in
           Ethiopia.
         </p>
+
+        {/* =========================
+            SEARCH
+        ========================= */}
 
         <form
           className="search-box"
           onSubmit={handleSearch}
         >
 
+          {/* SEARCH TEXT */}
+
           <input
             type="text"
-            placeholder="Search cars, houses, spare parts..."
+            placeholder="Search cars, houses, electronics, furniture..."
             value={search}
             onChange={(e) =>
               setSearch(e.target.value)
             }
           />
+
+
+          {/* CATEGORY */}
 
           <select
             value={category}
@@ -54,6 +80,7 @@ function Hero() {
               setCategory(e.target.value)
             }
           >
+
             <option value="">
               All Categories
             </option>
@@ -62,24 +89,20 @@ function Hero() {
               🚗 Cars
             </option>
 
-            <option value="Houses">
-              🏠 Houses
-            </option>
-
-            <option value="Rentals">
-              🏢 Rentals
-            </option>
-
-            <option value="Spare Parts">
-              🔧 Spare Parts
-            </option>
-
-            <option value="Building Materials">
-              🧱 Building Materials
-            </option>
-
             <option value="Electronics">
               📱 Electronics
+            </option>
+
+            <option value="Furniture">
+              🛋️ Furniture
+            </option>
+
+            <option value="Home">
+              🏠 Home
+            </option>
+
+            <option value="Labor & Services">
+              🛠️ Labor & Services
             </option>
 
             <option value="ምንአለሽ ተራ">
@@ -87,6 +110,9 @@ function Hero() {
             </option>
 
           </select>
+
+
+          {/* SEARCH BUTTON */}
 
           <button type="submit">
             🔎 Search

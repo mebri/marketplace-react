@@ -4,14 +4,20 @@ import {
   Route,
 } from "react-router-dom";
 
+// =========================
+// COMPONENTS
+// =========================
+
 import Navbar from "./components/Navbar";
+
+// =========================
+// PAGES
+// =========================
 
 import Home from "./pages/Home";
 import Cars from "./pages/Cars";
 import Houses from "./pages/Houses";
 import Rentals from "./pages/Rentals";
-import SpareParts from "./pages/SpareParts";
-import BuildingMaterials from "./pages/BuildingMaterials";
 
 import Search from "./pages/Search";
 import AdDetails from "./pages/AdDetails";
@@ -34,95 +40,164 @@ function App() {
   return (
     <HashRouter>
 
+      {/* =========================
+          NAVBAR
+      ========================= */}
+
       <Navbar />
 
+      {/* =========================
+          ROUTES
+      ========================= */}
+
       <Routes>
+
+        {/* HOME */}
 
         <Route
           path="/"
           element={<Home />}
         />
 
+
+        {/* =========================
+            CARS
+        ========================= */}
+
         <Route
           path="/cars"
           element={<Cars />}
         />
+
+
+        {/* =========================
+            HOUSES
+        ========================= */}
 
         <Route
           path="/houses"
           element={<Houses />}
         />
 
+
+        {/* =========================
+            RENTALS
+        ========================= */}
+
         <Route
           path="/rentals"
           element={<Rentals />}
         />
 
-        <Route
-          path="/spare-parts"
-          element={<SpareParts />}
-        />
 
-        <Route
-          path="/building-materials"
-          element={
-            <BuildingMaterials />
-          }
-        />
+        {/* =========================
+            SEARCH
+            Used for:
+            Electronics
+            Furniture
+            Labor & Services
+            ምንአለሽ ተራ
+        ========================= */}
 
         <Route
           path="/search"
           element={<Search />}
         />
 
+
+        {/* =========================
+            AD DETAILS
+        ========================= */}
+
         <Route
           path="/ad/:id"
           element={<AdDetails />}
         />
+
+
+        {/* =========================
+            POST AD
+        ========================= */}
 
         <Route
           path="/post-ad"
           element={<PostAd />}
         />
 
+
+        {/* =========================
+            EDIT AD
+        ========================= */}
+
         <Route
           path="/edit-ad/:id"
           element={<EditAd />}
         />
+
+
+        {/* =========================
+            DASHBOARD
+        ========================= */}
 
         <Route
           path="/dashboard"
           element={<Dashboard />}
         />
 
+
+        {/* =========================
+            MY ADS
+        ========================= */}
+
         <Route
           path="/my-ads"
           element={<MyAds />}
         />
 
-        {/* ACCOUNT */}
+
+        {/* =========================
+            LOGIN
+        ========================= */}
 
         <Route
           path="/login"
           element={<Login />}
         />
 
+
+        {/* =========================
+            REGISTER
+        ========================= */}
+
         <Route
           path="/register"
           element={<Register />}
         />
+
+
+        {/* =========================
+            PROFILE
+        ========================= */}
 
         <Route
           path="/profile"
           element={<Profile />}
         />
 
-        {/* PUBLIC USER PROFILE */}
+
+        {/* =========================
+            PUBLIC USER PROFILE
+        ========================= */}
 
         <Route
           path="/user/:uid"
           element={<UserProfile />}
         />
+
+
+        {/* =========================
+            CONTACT
+        ========================= */}
 
         <Route
           path="/contact"
