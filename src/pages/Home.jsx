@@ -280,42 +280,10 @@ function Home() {
       // =========================
 
       ads.sort((a, b) => {
-        const getTime = (ad) => {
-          if (!ad.createdAt) return 0;
-
-          // Firestore Timestamp
-          if (
-            typeof ad.createdAt.toMillis ===
-            "function"
-          ) {
-            return ad.createdAt.toMillis();
-          }
-
-          // Firestore timestamp object
-          if (ad.createdAt.seconds) {
-            return (
-              ad.createdAt.seconds * 1000
-            );
-          }
-
-          // JavaScript Date
-          if (
-            ad.createdAt instanceof Date
-          ) {
-            return ad.createdAt.getTime();
-          }
-
-          // String / number fallback
-          const date = new Date(
-            ad.createdAt
-          ).getTime();
-
-          return Number.isNaN(date)
-            ? 0
-            : date;
-        };
-
-        return getTime(b) - getTime(a);
+        return (
+          getAdTime(b) -
+          getAdTime(a)
+        );
       });
 
       setLatestAds(ads);
@@ -330,12 +298,166 @@ function Home() {
   };
 
   // =========================
+  // GET AD TIME
+  // =========================
+
+  const getAdTime = (ad) => {
+    if (!ad?.createdAt) {
+      return 0;
+    }
+
+    // Firestore Timestamp
+    if (
+      typeof ad.createdAt.toMillis ===
+      "function"
+    ) {
+      return ad.createdAt.toMillis();
+    }
+
+    // Firestore timestamp object
+    if (
+      typeof ad.createdAt === "object" &&
+      ad.createdAt.seconds
+    ) {
+      return (
+        ad.createdAt.seconds * 1000
+      );
+    }
+
+    // JavaScript Date
+    if (
+      ad.createdAt instanceof Date
+    ) {
+      return ad.createdAt.getTime();
+    }
+
+    // String / number fallback
+    const date = new Date(
+      ad.createdAt
+    ).getTime();
+
+    return Number.isNaN(date)
+      ? 0
+      : date;
+  };
+
+  // =========================
+  // DISPLAY POST TIME
+  // =========================
+
+  const getPostedTime = (createdAt) => {
+    if (!createdAt) {
+      return "";
+    }
+
+    let postedDate;
+
+    // Firestore Timestamp
+    if (
+      typeof createdAt.toDate ===
+      "function"
+    ) {
+      postedDate =
+        createdAt.toDate();
+    }
+
+    // Firestore timestamp object
+    else if (createdAt.seconds) {
+      postedDate = new Date(
+        createdAt.seconds * 1000
+      );
+    }
+
+    // JavaScript Date
+    else if (
+      createdAt instanceof Date
+    ) {
+      postedDate = createdAt;
+    }
+
+    // String / number
+    else {
+      postedDate = new Date(
+        createdAt
+      );
+    }
+
+    if (
+      Number.isNaN(
+        postedDate.getTime()
+      )
+    ) {
+      return "";
+    }
+
+    const now = new Date();
+
+    const difference =
+      now.getTime() -
+      postedDate.getTime();
+
+    const seconds = Math.floor(
+      difference / 1000
+    );
+
+    const minutes = Math.floor(
+      seconds / 60
+    );
+
+    const hours = Math.floor(
+      minutes / 60
+    );
+
+    const days = Math.floor(
+      hours / 24
+    );
+
+    // Future timestamp
+    if (difference < 0) {
+      return "Just now";
+    }
+
+    if (seconds < 60) {
+      return "Just now";
+    }
+
+    if (minutes < 60) {
+      return `${minutes} minute${
+        minutes === 1 ? "" : "s"
+      } ago`;
+    }
+
+    if (hours < 24) {
+      return `${hours} hour${
+        hours === 1 ? "" : "s"
+      } ago`;
+    }
+
+    if (days < 7) {
+      return `${days} day${
+        days === 1 ? "" : "s"
+      } ago`;
+    }
+
+    return postedDate.toLocaleDateString(
+      "en-GB",
+      {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      }
+    );
+  };
+
+  // =========================
   // CATEGORY TOGGLE
   // =========================
 
   const toggleCategory = (id) => {
     setOpenCategory(
-      openCategory === id ? null : id
+      openCategory === id
+        ? null
+        : id
     );
   };
 
@@ -360,6 +482,8 @@ function Home() {
           labor and more anywhere
           in Ethiopia.
         </p>
+
+        {/* SEARCH */}
 
         <div className="home-search">
 
@@ -387,6 +511,7 @@ function Home() {
 
                 }
               }
+
             }}
           />
 
@@ -427,6 +552,8 @@ function Home() {
                   className="home-category-wrapper"
                 >
 
+                  {/* CATEGORY CARD */}
+
                   <div
                     className={`home-card ${
                       isOpen
@@ -460,6 +587,8 @@ function Home() {
 
                   </div>
 
+                  {/* OPTIONS */}
+
                   {isOpen && (
 
                     <div className="category-options-panel">
@@ -472,14 +601,20 @@ function Home() {
                         (option) => (
 
                           <Link
-                            key={option.name}
-                            to={option.link}
+                            key={
+                              option.name
+                            }
+                            to={
+                              option.link
+                            }
                             className="category-option-button"
                             onClick={(e) =>
                               e.stopPropagation()
                             }
                           >
-                            {option.name}
+                            {
+                              option.name
+                            }
                           </Link>
 
                         )
@@ -492,6 +627,7 @@ function Home() {
                 </div>
 
               );
+
             }
           )}
 
@@ -580,7 +716,9 @@ function Home() {
               // =========================
 
               const adImage =
-                Array.isArray(ad.images) &&
+                Array.isArray(
+                  ad.images
+                ) &&
                 ad.images.length > 0
                   ? ad.images[0]
                   : ad.image;
@@ -599,6 +737,15 @@ function Home() {
                       )}...`
                     : ad.description
                   : "No description available.";
+
+              // =========================
+              // POST TIME
+              // =========================
+
+              const postedTime =
+                getPostedTime(
+                  ad.createdAt
+                );
 
               return (
 
@@ -673,11 +820,24 @@ function Home() {
                       ).toLocaleString()}
                     </h4>
 
+                    {/* POSTED TIME */}
+
+                    {postedTime && (
+                      <p className="latest-ad-posted-time">
+                        🕒 Posted{" "}
+                        {postedTime}
+                      </p>
+                    )}
+
+                    {/* CITY */}
+
                     {ad.city && (
                       <p>
                         📍 {ad.city}
                       </p>
                     )}
+
+                    {/* CONDITION */}
 
                     {ad.condition && (
                       <p>
@@ -685,6 +845,8 @@ function Home() {
                         {ad.condition}
                       </p>
                     )}
+
+                    {/* SUBCATEGORY */}
 
                     {ad.subcategory && (
                       <p>
@@ -714,9 +876,7 @@ function Home() {
 
                       )}
 
-                    {/* =========================
-                        VIEW DETAILS
-                    ========================= */}
+                    {/* VIEW DETAILS */}
 
                     <Link
                       to={`/ad/${ad.id}`}
@@ -730,6 +890,7 @@ function Home() {
                 </div>
 
               );
+
             })}
 
           </div>

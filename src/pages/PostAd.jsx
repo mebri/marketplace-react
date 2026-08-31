@@ -2,6 +2,7 @@ import { useState } from "react";
 import {
   collection,
   addDoc,
+  serverTimestamp,
 } from "firebase/firestore";
 import { db, auth } from "../firebase/firebase";
 
@@ -10,8 +11,7 @@ function PostAd() {
   const [price, setPrice] = useState("");
   const [city, setCity] = useState("");
   const [category, setCategory] = useState("");
-  const [description, setDescription] =
-    useState("");
+  const [description, setDescription] = useState("");
 
   // Images
   const [images, setImages] = useState([]);
@@ -20,27 +20,22 @@ function PostAd() {
   const [phone, setPhone] = useState("");
 
   // Condition
-  const [condition, setCondition] =
-    useState("");
+  const [condition, setCondition] = useState("");
 
   // Electronics
-  const [subcategory, setSubcategory] =
-    useState("");
+  const [subcategory, setSubcategory] = useState("");
 
   // Houses / Rentals
   const [type, setType] = useState("");
 
   // Furniture
-  const [furnitureType, setFurnitureType] =
-    useState("");
+  const [furnitureType, setFurnitureType] = useState("");
 
   // Labor
-  const [laborType, setLaborType] =
-    useState("");
+  const [laborType, setLaborType] = useState("");
 
   // Upload
-  const [uploading, setUploading] =
-    useState(false);
+  const [uploading, setUploading] = useState(false);
 
   // =========================
   // IMAGE SELECTION
@@ -64,11 +59,10 @@ function PostAd() {
       return;
     }
 
-    const invalidFile =
-      selectedFiles.find(
-        (file) =>
-          !file.type.startsWith("image/")
-      );
+    const invalidFile = selectedFiles.find(
+      (file) =>
+        !file.type.startsWith("image/")
+    );
 
     if (invalidFile) {
       alert(
@@ -79,12 +73,10 @@ function PostAd() {
       return;
     }
 
-    const tooLarge =
-      selectedFiles.find(
-        (file) =>
-          file.size >
-          10 * 1024 * 1024
-      );
+    const tooLarge = selectedFiles.find(
+      (file) =>
+        file.size > 10 * 1024 * 1024
+    );
 
     if (tooLarge) {
       alert(
@@ -116,8 +108,7 @@ function PostAd() {
   // =========================
 
   const handleCategoryChange = (e) => {
-    const newCategory =
-      e.target.value;
+    const newCategory = e.target.value;
 
     setCategory(newCategory);
 
@@ -129,7 +120,7 @@ function PostAd() {
   };
 
   // =========================
-  // SUBMIT
+  // SUBMIT ADVERTISEMENT
   // =========================
 
   const submitAd = async (e) => {
@@ -139,7 +130,6 @@ function PostAd() {
       alert(
         "Please log in before posting an advertisement."
       );
-
       return;
     }
 
@@ -147,7 +137,6 @@ function PostAd() {
       alert(
         "Please select at least one image."
       );
-
       return;
     }
 
@@ -155,7 +144,6 @@ function PostAd() {
       alert(
         "You can upload a maximum of 10 images."
       );
-
       return;
     }
 
@@ -163,7 +151,7 @@ function PostAd() {
       setUploading(true);
 
       // =========================
-      // CLOUDINARY
+      // CLOUDINARY UPLOAD
       // =========================
 
       const imageUrls = [];
@@ -175,8 +163,7 @@ function PostAd() {
       ) {
         const image = images[i];
 
-        const formData =
-          new FormData();
+        const formData = new FormData();
 
         formData.append(
           "file",
@@ -188,17 +175,15 @@ function PostAd() {
           "yeegna_uploads"
         );
 
-        const response =
-          await fetch(
-            "https://api.cloudinary.com/v1_1/lisqr7zn/image/upload",
-            {
-              method: "POST",
-              body: formData,
-            }
-          );
+        const response = await fetch(
+          "https://api.cloudinary.com/v1_1/lisqr7zn/image/upload",
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
 
-        const data =
-          await response.json();
+        const data = await response.json();
 
         if (
           !response.ok ||
@@ -218,35 +203,31 @@ function PostAd() {
       }
 
       // =========================
-      // FIREBASE
+      // SAVE TO FIRESTORE
       // =========================
 
       await addDoc(
         collection(db, "ads"),
         {
-          userId:
-            auth.currentUser.uid,
+          // User
+          userId: auth.currentUser.uid,
 
           userEmail:
-            auth.currentUser.email ||
-            "",
+            auth.currentUser.email || "",
 
-          title:
-            title.trim(),
+          // Advertisement
+          title: title.trim(),
 
-          price:
-            price,
+          price,
 
-          city:
-            city.trim(),
+          city: city.trim(),
 
           category,
 
           description:
             description.trim(),
 
-          phone:
-            phone.trim(),
+          phone: phone.trim(),
 
           // First image
           image:
@@ -255,33 +236,33 @@ function PostAd() {
               : "",
 
           // All images
-          images:
-            imageUrls,
+          images: imageUrls,
 
-          // Condition
+          // Category details
           condition,
 
-          // Electronics
           subcategory,
 
-          // Houses / Rentals
           type,
 
-          // Furniture
           furnitureType:
             category === "Furniture"
               ? furnitureType
               : "",
 
-          // Labor
           laborType:
             category ===
             "Labor & Services"
               ? laborType
               : "",
 
+          // =========================
+          // AUTOMATIC POST TIME
+          // Firebase server sets this time
+          // =========================
+
           createdAt:
-            new Date(),
+            serverTimestamp(),
         }
       );
 
@@ -299,7 +280,9 @@ function PostAd() {
       setCategory("");
       setDescription("");
       setPhone("");
+
       setImages([]);
+
       setCondition("");
       setSubcategory("");
       setType("");
@@ -350,9 +333,7 @@ function PostAd() {
           placeholder="Advertisement Title"
           value={title}
           onChange={(e) =>
-            setTitle(
-              e.target.value
-            )
+            setTitle(e.target.value)
           }
           required
         />
@@ -366,7 +347,6 @@ function PostAd() {
           }
           required
         >
-
           <option value="">
             Select Category
           </option>
@@ -398,7 +378,6 @@ function PostAd() {
           <option value="ምንአለሽ ተራ">
             🏪 ምንአለሽ ተራ
           </option>
-
         </select>
 
         {/* =========================
@@ -409,13 +388,10 @@ function PostAd() {
           <select
             value={condition}
             onChange={(e) =>
-              setCondition(
-                e.target.value
-              )
+              setCondition(e.target.value)
             }
             required
           >
-
             <option value="">
               Select Car Type
             </option>
@@ -435,7 +411,6 @@ function PostAd() {
             <option value="Rent">
               🚘 Car for Rent
             </option>
-
           </select>
         )}
 
@@ -443,8 +418,7 @@ function PostAd() {
             ELECTRONICS
         ========================= */}
 
-        {category ===
-          "Electronics" && (
+        {category === "Electronics" && (
           <>
             <select
               value={subcategory}
@@ -455,7 +429,6 @@ function PostAd() {
               }
               required
             >
-
               <option value="">
                 Select Electronics Type
               </option>
@@ -479,7 +452,6 @@ function PostAd() {
               <option value="Other">
                 🔌 Other Electronics
               </option>
-
             </select>
 
             <select
@@ -491,7 +463,6 @@ function PostAd() {
               }
               required
             >
-
               <option value="">
                 Select Condition
               </option>
@@ -503,7 +474,6 @@ function PostAd() {
               <option value="Used">
                 Used
               </option>
-
             </select>
           </>
         )}
@@ -512,10 +482,8 @@ function PostAd() {
             FURNITURE
         ========================= */}
 
-        {category ===
-          "Furniture" && (
+        {category === "Furniture" && (
           <>
-
             <select
               value={furnitureType}
               onChange={(e) =>
@@ -525,7 +493,6 @@ function PostAd() {
               }
               required
             >
-
               <option value="">
                 Select Furniture Type
               </option>
@@ -549,7 +516,6 @@ function PostAd() {
               <option value="Other">
                 🪞 Other Furniture
               </option>
-
             </select>
 
             <select
@@ -561,7 +527,6 @@ function PostAd() {
               }
               required
             >
-
               <option value="">
                 Select Condition
               </option>
@@ -573,9 +538,7 @@ function PostAd() {
               <option value="Used">
                 Used Furniture
               </option>
-
             </select>
-
           </>
         )}
 
@@ -594,7 +557,6 @@ function PostAd() {
             }
             required
           >
-
             <option value="">
               Select Service
             </option>
@@ -626,7 +588,6 @@ function PostAd() {
             <option value="Other">
               🔧 Other Services
             </option>
-
           </select>
         )}
 
@@ -645,7 +606,6 @@ function PostAd() {
             }
             required
           >
-
             <option value="">
               Select Condition
             </option>
@@ -661,7 +621,6 @@ function PostAd() {
             <option value="Refurbished">
               Refurbished
             </option>
-
           </select>
         )}
 
@@ -669,18 +628,14 @@ function PostAd() {
             HOUSES
         ========================= */}
 
-        {category ===
-          "Houses" && (
+        {category === "Houses" && (
           <select
             value={type}
             onChange={(e) =>
-              setType(
-                e.target.value
-              )
+              setType(e.target.value)
             }
             required
           >
-
             <option value="">
               Select House Type
             </option>
@@ -692,7 +647,6 @@ function PostAd() {
             <option value="rent">
               🏠 House for Rent
             </option>
-
           </select>
         )}
 
@@ -700,18 +654,14 @@ function PostAd() {
             RENTALS
         ========================= */}
 
-        {category ===
-          "Rentals" && (
+        {category === "Rentals" && (
           <select
             value={type}
             onChange={(e) =>
-              setType(
-                e.target.value
-              )
+              setType(e.target.value)
             }
             required
           >
-
             <option value="">
               Select Rental Type
             </option>
@@ -727,13 +677,10 @@ function PostAd() {
             <option value="office">
               🏢 Office
             </option>
-
           </select>
         )}
 
-        {/* =========================
-            PRICE
-        ========================= */}
+        {/* PRICE */}
 
         <input
           type="text"
@@ -741,19 +688,15 @@ function PostAd() {
           placeholder="Price (ETB)"
           value={price}
           onChange={(e) => {
-
             const value =
               e.target.value.replace(
                 /,/g,
                 ""
               );
 
-            if (
-              /^\d*$/.test(value)
-            ) {
+            if (/^\d*$/.test(value)) {
               setPrice(value);
             }
-
           }}
           required
         />
@@ -765,9 +708,7 @@ function PostAd() {
           placeholder="City"
           value={city}
           onChange={(e) =>
-            setCity(
-              e.target.value
-            )
+            setCity(e.target.value)
           }
           required
         />
@@ -779,9 +720,7 @@ function PostAd() {
           placeholder="Phone Number (+251...)"
           value={phone}
           onChange={(e) =>
-            setPhone(
-              e.target.value
-            )
+            setPhone(e.target.value)
           }
           required
         />
@@ -824,7 +763,7 @@ function PostAd() {
             }
           />
 
-          {/* PREVIEWS */}
+          {/* IMAGE PREVIEWS */}
 
           {images.length > 0 && (
             <div className="post-image-preview-grid">
@@ -853,9 +792,7 @@ function PostAd() {
                     <button
                       type="button"
                       onClick={() =>
-                        removeImage(
-                          index
-                        )
+                        removeImage(index)
                       }
                     >
                       ×
@@ -875,19 +812,15 @@ function PostAd() {
 
         </div>
 
-        {/* =========================
-            SUBMIT
-        ========================= */}
+        {/* SUBMIT */}
 
         <button
           type="submit"
           disabled={uploading}
         >
-
           {uploading
             ? "⏳ Uploading images..."
             : "📢 Publish Advertisement"}
-
         </button>
 
       </form>

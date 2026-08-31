@@ -4385,4 +4385,17 @@ textarea {
       column;
   }
 
+}/* =========================================
+   POSTED TIME
+========================================= */
+
+.posted-time {
+  color: #6b7280;
+  font-size: 15px;
+  margin: 8px 0 15px;
+}.latest-ad-posted-time {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 8px 0;
+  font-weight: 500;
 }

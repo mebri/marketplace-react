@@ -26,6 +26,10 @@ function AdDetails() {
     loadAd();
   }, [id]);
 
+  // =========================
+  // LOAD ADVERTISEMENT
+  // =========================
+
   const loadAd = async () => {
     try {
       const docRef = doc(db, "ads", id);
@@ -49,9 +53,12 @@ function AdDetails() {
             id
           );
 
-          const favoriteSnap = await getDoc(favoriteRef);
+          const favoriteSnap =
+            await getDoc(favoriteRef);
 
-          setIsFavorite(favoriteSnap.exists());
+          setIsFavorite(
+            favoriteSnap.exists()
+          );
         }
       }
 
@@ -68,7 +75,9 @@ function AdDetails() {
 
   const toggleFavorite = async () => {
     if (!auth.currentUser) {
-      alert("Please log in to save advertisements.");
+      alert(
+        "Please log in to save advertisements."
+      );
       return;
     }
 
@@ -90,7 +99,9 @@ function AdDetails() {
 
         setIsFavorite(false);
 
-        alert("Advertisement removed from favorites.");
+        alert(
+          "Advertisement removed from favorites."
+        );
       } else {
         await setDoc(favoriteRef, {
           adId: id,
@@ -103,13 +114,16 @@ function AdDetails() {
           phone: ad.phone || "",
           userEmail: ad.userEmail || "",
           condition: ad.condition || "",
-          materialType: ad.materialType || "",
+          materialType:
+            ad.materialType || "",
           savedAt: new Date(),
         });
 
         setIsFavorite(true);
 
-        alert("Advertisement saved to favorites! ❤️");
+        alert(
+          "Advertisement saved to favorites! ❤️"
+        );
       }
     } catch (error) {
       console.error(error);
@@ -138,17 +152,133 @@ function AdDetails() {
   if (!ad) {
     return (
       <div className="details-page">
-        <h2>Advertisement not found.</h2>
+        <h2>
+          Advertisement not found.
+        </h2>
       </div>
     );
   }
+
+  // =========================
+  // POST TIME
+  // =========================
+
+  const getPostedTime = () => {
+    if (!ad.createdAt) {
+      return "";
+    }
+
+    let postedDate;
+
+    // Firebase Timestamp
+    if (
+      typeof ad.createdAt.toDate ===
+      "function"
+    ) {
+      postedDate =
+        ad.createdAt.toDate();
+    }
+
+    // Old JavaScript Date
+    else if (
+      ad.createdAt instanceof Date
+    ) {
+      postedDate = ad.createdAt;
+    }
+
+    // Firestore seconds format
+    else if (ad.createdAt.seconds) {
+      postedDate = new Date(
+        ad.createdAt.seconds * 1000
+      );
+    }
+
+    // Other date formats
+    else {
+      postedDate = new Date(
+        ad.createdAt
+      );
+    }
+
+    // Invalid date
+    if (
+      Number.isNaN(
+        postedDate.getTime()
+      )
+    ) {
+      return "";
+    }
+
+    const now = new Date();
+
+    const difference =
+      now.getTime() -
+      postedDate.getTime();
+
+    const seconds =
+      Math.floor(
+        difference / 1000
+      );
+
+    const minutes =
+      Math.floor(
+        seconds / 60
+      );
+
+    const hours =
+      Math.floor(
+        minutes / 60
+      );
+
+    const days =
+      Math.floor(
+        hours / 24
+      );
+
+    // Just now
+    if (seconds < 60) {
+      return "Just now";
+    }
+
+    // Minutes
+    if (minutes < 60) {
+      return `${minutes} minute${
+        minutes === 1 ? "" : "s"
+      } ago`;
+    }
+
+    // Hours
+    if (hours < 24) {
+      return `${hours} hour${
+        hours === 1 ? "" : "s"
+      } ago`;
+    }
+
+    // Days
+    if (days < 7) {
+      return `${days} day${
+        days === 1 ? "" : "s"
+      } ago`;
+    }
+
+    // Older advertisements
+    return postedDate.toLocaleDateString(
+      "en-GB",
+      {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      }
+    );
+  };
 
   // =========================
   // IMAGES
   // =========================
 
   const imageList =
-    ad.images && ad.images.length > 0
+    ad.images &&
+    ad.images.length > 0
       ? ad.images
       : ad.image
       ? [ad.image]
@@ -178,12 +308,14 @@ function AdDetails() {
   // PHONE
   // =========================
 
-  const phoneNumber = ad.phone || "";
+  const phoneNumber =
+    ad.phone || "";
 
-  const whatsappNumber = phoneNumber.replace(
-    /\D/g,
-    ""
-  );
+  const whatsappNumber =
+    phoneNumber.replace(
+      /\D/g,
+      ""
+    );
 
   return (
     <div className="details-page">
@@ -197,7 +329,9 @@ function AdDetails() {
         {imageList.length > 0 ? (
           <>
             <img
-              src={imageList[currentImage]}
+              src={
+                imageList[currentImage]
+              }
               alt={ad.title}
               className="details-photo"
             />
@@ -205,14 +339,20 @@ function AdDetails() {
             {imageList.length > 1 && (
               <>
                 <button
-                  className="gallery-button gallery-prev"
+                  className="
+                    gallery-button
+                    gallery-prev
+                  "
                   onClick={previousImage}
                 >
                   ❮
                 </button>
 
                 <button
-                  className="gallery-button gallery-next"
+                  className="
+                    gallery-button
+                    gallery-next
+                  "
                   onClick={nextImage}
                 >
                   ❯
@@ -240,21 +380,25 @@ function AdDetails() {
       {imageList.length > 1 && (
         <div className="image-thumbnails">
 
-          {imageList.map((image, index) => (
-            <img
-              key={index}
-              src={image}
-              alt={`${ad.title} ${index + 1}`}
-              className={
-                index === currentImage
-                  ? "thumbnail active-thumbnail"
-                  : "thumbnail"
-              }
-              onClick={() =>
-                setCurrentImage(index)
-              }
-            />
-          ))}
+          {imageList.map(
+            (image, index) => (
+              <img
+                key={index}
+                src={image}
+                alt={`${ad.title} ${
+                  index + 1
+                }`}
+                className={
+                  index === currentImage
+                    ? "thumbnail active-thumbnail"
+                    : "thumbnail"
+                }
+                onClick={() =>
+                  setCurrentImage(index)
+                }
+              />
+            )
+          )}
 
         </div>
       )}
@@ -265,23 +409,32 @@ function AdDetails() {
 
       <div className="details-info">
 
-        {/* Category */}
+        {/* POST TIME - FIRST */}
+
+        {getPostedTime() && (
+          <p className="posted-time">
+            🕒 Posted{" "}
+            {getPostedTime()}
+          </p>
+        )}
+
+        {/* CATEGORY */}
 
         <span className="details-category">
           {ad.category}
         </span>
 
-        {/* Title */}
+        {/* TITLE */}
 
         <h1>{ad.title}</h1>
 
-        {/* Price */}
+        {/* PRICE */}
 
         <h2>
           ETB {ad.price}
         </h2>
 
-        {/* Favorite */}
+        {/* FAVORITE */}
 
         <button
           onClick={toggleFavorite}
@@ -295,38 +448,92 @@ function AdDetails() {
             : "🤍 Save Advertisement"}
         </button>
 
-        {/* City */}
+        {/* CITY */}
 
         <p>
-          <strong>📍 City:</strong>{" "}
+          <strong>
+            📍 City:
+          </strong>{" "}
           {ad.city}
         </p>
 
-        {/* Condition */}
+        {/* CONDITION */}
 
         {ad.condition && (
           <p>
-            <strong>🔄 Condition:</strong>{" "}
+            <strong>
+              🔄 Condition:
+            </strong>{" "}
             {ad.condition}
           </p>
         )}
 
-        {/* Material */}
+        {/* TYPE */}
+
+        {ad.type && (
+          <p>
+            <strong>
+              🏷️ Type:
+            </strong>{" "}
+            {ad.type}
+          </p>
+        )}
+
+        {/* SUBCATEGORY */}
+
+        {ad.subcategory && (
+          <p>
+            <strong>
+              📦 Category Type:
+            </strong>{" "}
+            {ad.subcategory}
+          </p>
+        )}
+
+        {/* FURNITURE TYPE */}
+
+        {ad.furnitureType && (
+          <p>
+            <strong>
+              🛋️ Furniture Type:
+            </strong>{" "}
+            {ad.furnitureType}
+          </p>
+        )}
+
+        {/* LABOR TYPE */}
+
+        {ad.laborType && (
+          <p>
+            <strong>
+              👷 Service:
+            </strong>{" "}
+            {ad.laborType}
+          </p>
+        )}
+
+        {/* MATERIAL */}
 
         {ad.materialType && (
           <p>
-            <strong>🧱 Material Type:</strong>{" "}
+            <strong>
+              🧱 Material Type:
+            </strong>{" "}
             {ad.materialType}
           </p>
         )}
 
-        {/* Description */}
+        {/* DESCRIPTION */}
 
         <p>
-          <strong>Description</strong>
+          <strong>
+            Description
+          </strong>
         </p>
 
-        <p>{ad.description}</p>
+        <p>
+          {ad.description}
+        </p>
 
         <hr />
 
@@ -334,7 +541,9 @@ function AdDetails() {
             SELLER INFORMATION
         ========================= */}
 
-        <h3>Seller Information</h3>
+        <h3>
+          Seller Information
+        </h3>
 
         {/* PHONE */}
 
@@ -343,7 +552,8 @@ function AdDetails() {
             href={`tel:${phoneNumber}`}
             className="phone-link"
           >
-            📞 Call Seller: {phoneNumber}
+            📞 Call Seller:{" "}
+            {phoneNumber}
           </a>
         )}
 
@@ -351,7 +561,9 @@ function AdDetails() {
 
         {ad.userEmail && (
           <a
-            href={`mailto:${ad.userEmail}?subject=Regarding your advertisement: ${encodeURIComponent(
+            href={`mailto:${
+              ad.userEmail
+            }?subject=Regarding your advertisement: ${encodeURIComponent(
               ad.title
             )}`}
             className="contact-btn"
