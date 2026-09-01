@@ -1502,4 +1502,26 @@ nav a:hover {
   height: 220px;
   object-fit: cover;
   display: block;
+}.dashboard-ad-image-link {
+  display: block;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.dashboard-ad-image-link:hover img {
+  transform: scale(1.03);
+}
+
+.dashboard-ad-image img {
+  transition: 0.3s ease;
+  cursor: pointer;
+}
+
+.dashboard-ad-title-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.dashboard-ad-title-link:hover h3 {
+  color: #1769d1;
 }

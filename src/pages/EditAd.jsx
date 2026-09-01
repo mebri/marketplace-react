@@ -548,14 +548,28 @@ function EditAd() {
                 </label>
 
                 <input
-                  type="number"
-                  value={price}
-                  onChange={(e) =>
-                    setPrice(e.target.value)
-                  }
-                  placeholder="Enter price"
-                  required
-                />
+  type="text"
+  inputMode="numeric"
+  placeholder="Price (ETB)"
+  value={
+    price
+      ? Number(
+          String(price).replace(/,/g, "")
+        ).toLocaleString()
+      : ""
+  }
+  onChange={(e) => {
+    const value = e.target.value.replace(
+      /,/g,
+      ""
+    );
+
+    if (/^\d*$/.test(value)) {
+      setPrice(value);
+    }
+  }}
+  required
+/>
 
               </div>
 

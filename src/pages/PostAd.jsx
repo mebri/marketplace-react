@@ -4,6 +4,7 @@ import {
   addDoc,
   serverTimestamp,
 } from "firebase/firestore";
+
 import { db, auth } from "../firebase/firebase";
 
 function PostAd() {
@@ -13,28 +14,30 @@ function PostAd() {
   const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
 
-  // Images
+  // =========================
+  // CONTACT INFORMATION
+  // =========================
+
+  const [phone, setPhone] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
+  const [telegram, setTelegram] = useState("");
+
+  // =========================
+  // IMAGES
+  // =========================
+
   const [images, setImages] = useState([]);
 
-  // Phone
-  const [phone, setPhone] = useState("");
+  // =========================
+  // CATEGORY OPTIONS
+  // =========================
 
-  // Condition
   const [condition, setCondition] = useState("");
-
-  // Electronics
   const [subcategory, setSubcategory] = useState("");
-
-  // Houses / Rentals
   const [type, setType] = useState("");
-
-  // Furniture
   const [furnitureType, setFurnitureType] = useState("");
-
-  // Labor
   const [laborType, setLaborType] = useState("");
 
-  // Upload
   const [uploading, setUploading] = useState(false);
 
   // =========================
@@ -120,6 +123,16 @@ function PostAd() {
   };
 
   // =========================
+  // FORMAT PRICE
+  // =========================
+
+  const formatPrice = (value) => {
+    if (!value) return "";
+
+    return Number(value).toLocaleString();
+  };
+
+  // =========================
   // SUBMIT ADVERTISEMENT
   // =========================
 
@@ -183,7 +196,8 @@ function PostAd() {
           }
         );
 
-        const data = await response.json();
+        const data =
+          await response.json();
 
         if (
           !response.ok ||
@@ -209,36 +223,54 @@ function PostAd() {
       await addDoc(
         collection(db, "ads"),
         {
-          // User
-          userId: auth.currentUser.uid,
+          // USER
+
+          userId:
+            auth.currentUser.uid,
 
           userEmail:
-            auth.currentUser.email || "",
+            auth.currentUser.email ||
+            "",
 
-          // Advertisement
-          title: title.trim(),
+          // AD INFORMATION
 
-          price,
+          title:
+            title.trim(),
 
-          city: city.trim(),
+          price:
+            price.replace(/,/g, ""),
+
+          city:
+            city.trim(),
 
           category,
 
           description:
             description.trim(),
 
-          phone: phone.trim(),
+          // CONTACT INFORMATION
 
-          // First image
+          phone:
+            phone.trim(),
+
+          whatsapp:
+            whatsapp.trim(),
+
+          telegram:
+            telegram.trim(),
+
+          // IMAGES
+
           image:
             imageUrls.length > 0
               ? imageUrls[0]
               : "",
 
-          // All images
-          images: imageUrls,
+          images:
+            imageUrls,
 
-          // Category details
+          // CATEGORY DETAILS
+
           condition,
 
           subcategory,
@@ -257,8 +289,7 @@ function PostAd() {
               : "",
 
           // =========================
-          // AUTOMATIC POST TIME
-          // Firebase server sets this time
+          // AUTOMATIC SERVER TIME
           // =========================
 
           createdAt:
@@ -279,7 +310,10 @@ function PostAd() {
       setCity("");
       setCategory("");
       setDescription("");
+
       setPhone("");
+      setWhatsapp("");
+      setTelegram("");
 
       setImages([]);
 
@@ -326,7 +360,9 @@ function PostAd() {
         onSubmit={submitAd}
       >
 
-        {/* TITLE */}
+        {/* =========================
+            TITLE
+        ========================= */}
 
         <input
           type="text"
@@ -338,15 +374,16 @@ function PostAd() {
           required
         />
 
-        {/* CATEGORY */}
+        {/* =========================
+            CATEGORY
+        ========================= */}
 
         <select
           value={category}
-          onChange={
-            handleCategoryChange
-          }
+          onChange={handleCategoryChange}
           required
         >
+
           <option value="">
             Select Category
           </option>
@@ -378,6 +415,7 @@ function PostAd() {
           <option value="ምንአለሽ ተራ">
             🏪 ምንአለሽ ተራ
           </option>
+
         </select>
 
         {/* =========================
@@ -385,6 +423,7 @@ function PostAd() {
         ========================= */}
 
         {category === "Cars" && (
+
           <select
             value={condition}
             onChange={(e) =>
@@ -392,6 +431,7 @@ function PostAd() {
             }
             required
           >
+
             <option value="">
               Select Car Type
             </option>
@@ -411,6 +451,7 @@ function PostAd() {
             <option value="Rent">
               🚘 Car for Rent
             </option>
+
           </select>
         )}
 
@@ -420,6 +461,7 @@ function PostAd() {
 
         {category === "Electronics" && (
           <>
+
             <select
               value={subcategory}
               onChange={(e) =>
@@ -429,6 +471,7 @@ function PostAd() {
               }
               required
             >
+
               <option value="">
                 Select Electronics Type
               </option>
@@ -452,17 +495,17 @@ function PostAd() {
               <option value="Other">
                 🔌 Other Electronics
               </option>
+
             </select>
 
             <select
               value={condition}
               onChange={(e) =>
-                setCondition(
-                  e.target.value
-                )
+                setCondition(e.target.value)
               }
               required
             >
+
               <option value="">
                 Select Condition
               </option>
@@ -474,7 +517,9 @@ function PostAd() {
               <option value="Used">
                 Used
               </option>
+
             </select>
+
           </>
         )}
 
@@ -484,6 +529,7 @@ function PostAd() {
 
         {category === "Furniture" && (
           <>
+
             <select
               value={furnitureType}
               onChange={(e) =>
@@ -493,6 +539,7 @@ function PostAd() {
               }
               required
             >
+
               <option value="">
                 Select Furniture Type
               </option>
@@ -516,17 +563,17 @@ function PostAd() {
               <option value="Other">
                 🪞 Other Furniture
               </option>
+
             </select>
 
             <select
               value={condition}
               onChange={(e) =>
-                setCondition(
-                  e.target.value
-                )
+                setCondition(e.target.value)
               }
               required
             >
+
               <option value="">
                 Select Condition
               </option>
@@ -538,7 +585,9 @@ function PostAd() {
               <option value="Used">
                 Used Furniture
               </option>
+
             </select>
+
           </>
         )}
 
@@ -548,15 +597,15 @@ function PostAd() {
 
         {category ===
           "Labor & Services" && (
+
           <select
             value={laborType}
             onChange={(e) =>
-              setLaborType(
-                e.target.value
-              )
+              setLaborType(e.target.value)
             }
             required
           >
+
             <option value="">
               Select Service
             </option>
@@ -588,6 +637,7 @@ function PostAd() {
             <option value="Other">
               🔧 Other Services
             </option>
+
           </select>
         )}
 
@@ -597,15 +647,15 @@ function PostAd() {
 
         {category ===
           "ምንአለሽ ተራ" && (
+
           <select
             value={condition}
             onChange={(e) =>
-              setCondition(
-                e.target.value
-              )
+              setCondition(e.target.value)
             }
             required
           >
+
             <option value="">
               Select Condition
             </option>
@@ -621,6 +671,7 @@ function PostAd() {
             <option value="Refurbished">
               Refurbished
             </option>
+
           </select>
         )}
 
@@ -629,6 +680,7 @@ function PostAd() {
         ========================= */}
 
         {category === "Houses" && (
+
           <select
             value={type}
             onChange={(e) =>
@@ -636,6 +688,7 @@ function PostAd() {
             }
             required
           >
+
             <option value="">
               Select House Type
             </option>
@@ -647,6 +700,7 @@ function PostAd() {
             <option value="rent">
               🏠 House for Rent
             </option>
+
           </select>
         )}
 
@@ -655,6 +709,7 @@ function PostAd() {
         ========================= */}
 
         {category === "Rentals" && (
+
           <select
             value={type}
             onChange={(e) =>
@@ -662,6 +717,7 @@ function PostAd() {
             }
             required
           >
+
             <option value="">
               Select Rental Type
             </option>
@@ -677,17 +733,21 @@ function PostAd() {
             <option value="office">
               🏢 Office
             </option>
+
           </select>
         )}
 
-        {/* PRICE */}
+        {/* =========================
+            PRICE
+        ========================= */}
 
         <input
           type="text"
           inputMode="numeric"
           placeholder="Price (ETB)"
-          value={price}
+          value={formatPrice(price)}
           onChange={(e) => {
+
             const value =
               e.target.value.replace(
                 /,/g,
@@ -697,11 +757,14 @@ function PostAd() {
             if (/^\d*$/.test(value)) {
               setPrice(value);
             }
+
           }}
           required
         />
 
-        {/* CITY */}
+        {/* =========================
+            CITY
+        ========================= */}
 
         <input
           type="text"
@@ -713,11 +776,17 @@ function PostAd() {
           required
         />
 
-        {/* PHONE */}
+        {/* =========================
+            CONTACT INFORMATION
+        ========================= */}
+
+        <h3 className="contact-section-title">
+          📞 Seller Contact Information
+        </h3>
 
         <input
           type="tel"
-          placeholder="Phone Number (+251...)"
+          placeholder="📞 Phone Number (+251...)"
           value={phone}
           onChange={(e) =>
             setPhone(e.target.value)
@@ -725,16 +794,34 @@ function PostAd() {
           required
         />
 
-        {/* DESCRIPTION */}
+        <input
+          type="tel"
+          placeholder="💬 WhatsApp Number (+251...)"
+          value={whatsapp}
+          onChange={(e) =>
+            setWhatsapp(e.target.value)
+          }
+        />
+
+        <input
+          type="text"
+          placeholder="✈️ Telegram Username or Phone Number"
+          value={telegram}
+          onChange={(e) =>
+            setTelegram(e.target.value)
+          }
+        />
+
+        {/* =========================
+            DESCRIPTION
+        ========================= */}
 
         <textarea
           placeholder="Description"
           rows="5"
           value={description}
           onChange={(e) =>
-            setDescription(
-              e.target.value
-            )
+            setDescription(e.target.value)
           }
           required
         />
@@ -751,6 +838,7 @@ function PostAd() {
 
           <p>
             Select up to 10 images.
+            Each image must be 10 MB or smaller.
           </p>
 
           <input
@@ -758,14 +846,13 @@ function PostAd() {
             type="file"
             accept="image/*"
             multiple
-            onChange={
-              handleImageChange
-            }
+            onChange={handleImageChange}
           />
 
           {/* IMAGE PREVIEWS */}
 
           {images.length > 0 && (
+
             <div className="post-image-preview-grid">
 
               {images.map(
@@ -812,15 +899,19 @@ function PostAd() {
 
         </div>
 
-        {/* SUBMIT */}
+        {/* =========================
+            SUBMIT
+        ========================= */}
 
         <button
           type="submit"
           disabled={uploading}
         >
+
           {uploading
             ? "⏳ Uploading images..."
             : "📢 Publish Advertisement"}
+
         </button>
 
       </form>

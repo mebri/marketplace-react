@@ -4398,4 +4398,52 @@ textarea {
   color: #6b7280;
   margin: 8px 0;
   font-weight: 500;
+}.telegram-btn {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+
+  background: #229ed9;
+  color: white;
+
+  text-decoration: none;
+  text-align: center;
+
+  padding: 14px;
+
+  border-radius: 8px;
+
+  font-size: 16px;
+  font-weight: bold;
+
+  transition: 0.3s;
+}
+
+.telegram-btn:hover {
+  background: #168ac2;
+  transform: translateY(-2px);
+}.telegram-btn {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+
+  background: #229ed9;
+  color: white;
+
+  text-decoration: none;
+  text-align: center;
+
+  padding: 14px;
+
+  border-radius: 8px;
+
+  font-size: 16px;
+  font-weight: bold;
+
+  transition: 0.3s;
+}
+
+.telegram-btn:hover {
+  background: #168ac2;
+  transform: translateY(-2px);
 }
