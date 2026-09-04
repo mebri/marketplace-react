@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+
 import {
   Link,
   useNavigate,
@@ -13,7 +14,7 @@ import {
 import {
   doc,
   getDoc,
-  updateDoc,
+  setDoc,
   collection,
   getDocs,
   query,
@@ -29,7 +30,8 @@ function Profile() {
   const [profile, setProfile] =
     useState(null);
 
-  const [ads, setAds] = useState([]);
+  const [ads, setAds] =
+    useState([]);
 
   const [name, setName] =
     useState("");
@@ -46,7 +48,109 @@ function Profile() {
   const [saving, setSaving] =
     useState(false);
 
+  // =========================
+  // GET TIME
+  // =========================
+
+  const getTime = (createdAt) => {
+    if (!createdAt) return 0;
+
+    if (
+      typeof createdAt.toMillis ===
+      "function"
+    ) {
+      return createdAt.toMillis();
+    }
+
+    if (createdAt.seconds) {
+      return (
+        createdAt.seconds * 1000
+      );
+    }
+
+    if (createdAt instanceof Date) {
+      return createdAt.getTime();
+    }
+
+    const time = new Date(
+      createdAt
+    ).getTime();
+
+    return Number.isNaN(time)
+      ? 0
+      : time;
+  };
+
+  // =========================
+  // FORMAT POST TIME
+  // =========================
+
+  const formatPostTime = (
+    createdAt
+  ) => {
+    const time =
+      getTime(createdAt);
+
+    if (!time) {
+      return "Recently";
+    }
+
+    const difference =
+      Date.now() - time;
+
+    const minutes = Math.floor(
+      difference / (1000 * 60)
+    );
+
+    const hours = Math.floor(
+      difference /
+        (1000 * 60 * 60)
+    );
+
+    const days = Math.floor(
+      difference /
+        (1000 * 60 * 60 * 24)
+    );
+
+    if (minutes < 1) {
+      return "Just now";
+    }
+
+    if (minutes < 60) {
+      return `${minutes} minute${
+        minutes !== 1
+          ? "s"
+          : ""
+      } ago`;
+    }
+
+    if (hours < 24) {
+      return `${hours} hour${
+        hours !== 1
+          ? "s"
+          : ""
+      } ago`;
+    }
+
+    if (days < 7) {
+      return `${days} day${
+        days !== 1
+          ? "s"
+          : ""
+      } ago`;
+    }
+
+    return new Date(
+      time
+    ).toLocaleDateString();
+  };
+
+  // =========================
+  // AUTH
+  // =========================
+
   useEffect(() => {
+
     const unsubscribe =
       onAuthStateChanged(
         auth,
@@ -71,21 +175,33 @@ function Profile() {
         }
       );
 
-    return () => unsubscribe();
+    return () =>
+      unsubscribe();
+
   }, [navigate]);
+
+
+  // =========================
+  // LOAD PROFILE
+  // =========================
 
   const loadProfile = async (
     currentUser
   ) => {
+
     try {
-      const profileRef = doc(
-        db,
-        "users",
-        currentUser.uid
-      );
+
+      const profileRef =
+        doc(
+          db,
+          "users",
+          currentUser.uid
+        );
 
       const snapshot =
-        await getDoc(profileRef);
+        await getDoc(
+          profileRef
+        );
 
       if (snapshot.exists()) {
 
@@ -114,20 +230,31 @@ function Profile() {
           currentUser.displayName ||
             ""
         );
+
       }
 
     } catch (error) {
+
       console.error(
         "Profile loading error:",
         error
       );
+
     }
+
   };
+
+
+  // =========================
+  // LOAD USER ADS
+  // =========================
 
   const loadUserAds = async (
     uid
   ) => {
+
     try {
+
       const adsQuery =
         query(
           collection(db, "ads"),
@@ -151,15 +278,35 @@ function Profile() {
           })
         );
 
+      // NEWEST FIRST
+
+      userAds.sort(
+        (a, b) =>
+          getTime(
+            b.createdAt
+          ) -
+          getTime(
+            a.createdAt
+          )
+      );
+
       setAds(userAds);
 
     } catch (error) {
+
       console.error(
         "Ads loading error:",
         error
       );
+
     }
+
   };
+
+
+  // =========================
+  // SAVE PROFILE
+  // =========================
 
   const saveProfile =
     async (e) => {
@@ -169,17 +316,31 @@ function Profile() {
       if (!user) return;
 
       try {
+
         setSaving(true);
+
+        const updatedName =
+          name.trim();
+
+        const updatedPhone =
+          phone.trim();
+
+        const updatedCity =
+          city.trim();
 
         await updateProfile(
           user,
           {
             displayName:
-              name.trim(),
+              updatedName,
           }
         );
 
-        await updateDoc(
+        // setDoc works even if
+        // the user document
+        // does not exist yet
+
+        await setDoc(
           doc(
             db,
             "users",
@@ -187,31 +348,49 @@ function Profile() {
           ),
           {
             name:
-              name.trim(),
+              updatedName,
 
             phone:
-              phone.trim(),
+              updatedPhone,
 
             city:
-              city.trim(),
+              updatedCity,
+
+            email:
+              user.email || "",
+
+            updatedAt:
+              new Date(),
+          },
+          {
+            merge: true,
           }
         );
 
-        setProfile((current) => ({
-          ...current,
-          name:
-            name.trim(),
-          phone:
-            phone.trim(),
-          city:
-            city.trim(),
-        }));
+        setProfile(
+          (current) => ({
+            ...current,
+            name:
+              updatedName,
+            phone:
+              updatedPhone,
+            city:
+              updatedCity,
+          })
+        );
+
+        setUser({
+          ...user,
+          displayName:
+            updatedName,
+        });
 
         alert(
           "Profile updated successfully! ✅"
         );
 
       } catch (error) {
+
         console.error(
           "Profile update error:",
           error
@@ -223,38 +402,68 @@ function Profile() {
         );
 
       } finally {
+
         setSaving(false);
+
       }
+
     };
+
+
+  // =========================
+  // LOGOUT
+  // =========================
 
   const handleLogout =
     async () => {
 
       try {
-        await signOut(auth);
+
+        await signOut(
+          auth
+        );
 
         navigate("/");
 
       } catch (error) {
+
         console.error(
           "Logout error:",
           error
         );
+
       }
+
     };
+
+
+  // =========================
+  // SHARE PROFILE
+  // =========================
 
   const shareProfile =
     async () => {
+
+      if (!user) return;
 
       const profileUrl =
         `${window.location.origin}${window.location.pathname}#/user/${user.uid}`;
 
       const shareData = {
         title:
-          `${name || "User"} - የኛ ገበያ`,
+          `${
+            name ||
+            "User"
+          } - የኛ ገበያ`,
+
         text:
-          `View ${name || "this user's"} profile on የኛ ገበያ.`,
-        url: profileUrl,
+          `View ${
+            name ||
+            "this user's"
+          } profile on የኛ ገበያ.`,
+
+        url:
+          profileUrl,
       };
 
       try {
@@ -262,9 +471,11 @@ function Profile() {
         if (
           navigator.share
         ) {
+
           await navigator.share(
             shareData
           );
+
         } else {
 
           await navigator.clipboard.writeText(
@@ -274,60 +485,115 @@ function Profile() {
           alert(
             "Profile link copied! 🔗"
           );
+
         }
 
       } catch (error) {
+
         console.log(
           "Share cancelled."
         );
+
       }
+
     };
 
+
+  // =========================
+  // LOADING
+  // =========================
+
   if (loading) {
+
     return (
+
       <main className="profile-page">
+
         <div className="profile-loading">
+
           Loading profile...
+
         </div>
+
       </main>
+
     );
+
   }
 
+
+  // =========================
+  // AVATAR
+  // =========================
+
+  const avatarLetter =
+    name
+      ? name
+          .charAt(0)
+          .toUpperCase()
+      : "👤";
+
+
   return (
+
     <main className="profile-page">
 
       <div className="profile-container">
 
-        {/* PROFILE HEADER */}
+
+        {/* =========================
+            PROFILE HEADER
+        ========================= */}
 
         <section className="profile-header">
 
           <div className="profile-avatar">
-            {name
-              ? name
-                  .charAt(0)
-                  .toUpperCase()
-              : "👤"}
+
+            {avatarLetter}
+
           </div>
+
 
           <div className="profile-header-info">
 
             <h1>
+
               {name ||
                 "My Account"}
+
             </h1>
 
-            <p>
-              {user?.email}
-            </p>
 
             <p>
+
+              {user?.email}
+
+            </p>
+
+
+            <p>
+
               📍{" "}
+
               {city ||
                 "Location not added"}
+
+            </p>
+
+
+            <p>
+
+              📢{" "}
+
+              {ads.length} Advertisement
+              {ads.length !== 1
+                ? "s"
+                : ""}
+
             </p>
 
           </div>
+
 
           <div className="profile-actions">
 
@@ -337,8 +603,11 @@ function Profile() {
               }
               className="profile-share-button"
             >
+
               🔗 Share Profile
+
             </button>
+
 
             <button
               onClick={
@@ -346,20 +615,28 @@ function Profile() {
               }
               className="profile-logout-button"
             >
+
               Logout
+
             </button>
 
           </div>
 
         </section>
 
-        {/* PROFILE FORM */}
+
+        {/* =========================
+            PROFILE FORM
+        ========================= */}
 
         <section className="profile-section">
 
           <h2>
+
             👤 My Profile
+
           </h2>
+
 
           <form
             className="profile-form"
@@ -369,8 +646,11 @@ function Profile() {
           >
 
             <label>
+
               Name
+
             </label>
+
 
             <input
               type="text"
@@ -383,9 +663,13 @@ function Profile() {
               required
             />
 
+
             <label>
+
               Email
+
             </label>
+
 
             <input
               type="email"
@@ -395,9 +679,13 @@ function Profile() {
               disabled
             />
 
+
             <label>
+
               Phone
+
             </label>
+
 
             <input
               type="tel"
@@ -409,9 +697,13 @@ function Profile() {
               }
             />
 
+
             <label>
+
               City
+
             </label>
+
 
             <input
               type="text"
@@ -423,85 +715,127 @@ function Profile() {
               }
             />
 
+
             <button
               type="submit"
               disabled={saving}
             >
+
               {saving
                 ? "Saving..."
                 : "💾 Save Profile"}
+
             </button>
 
           </form>
 
         </section>
 
-        {/* PUBLIC PROFILE */}
+
+        {/* =========================
+            PUBLIC PROFILE
+        ========================= */}
 
         <section className="profile-section">
 
           <h2>
+
             🌐 Public Profile
+
           </h2>
 
+
           <p>
+
             Other people can see your
             profile and advertisements.
+
           </p>
+
 
           <Link
             to={`/user/${user.uid}`}
             className="view-public-profile"
           >
+
             View My Public Profile →
+
           </Link>
 
         </section>
 
-        {/* MY ADS */}
+
+        {/* =========================
+            MY ADS
+        ========================= */}
 
         <section className="profile-section">
+
 
           <div className="profile-section-heading">
 
             <div>
+
               <h2>
+
                 📢 My Advertisements
+
               </h2>
 
+
               <p>
+
                 {ads.length} advertisement
                 {ads.length !== 1
                   ? "s"
                   : ""}
+
               </p>
+
             </div>
+
 
             <Link
               to="/post-ad"
               className="profile-post-button"
             >
+
               + Post Advertisement
+
             </Link>
 
           </div>
+
+
+          {/* =========================
+              NO ADS
+          ========================= */}
 
           {ads.length === 0 ? (
 
             <div className="profile-empty">
 
               <h3>
+
                 You haven't posted
                 any advertisements yet.
+
               </h3>
 
+
               <Link to="/post-ad">
+
                 📢 Post Your First Ad
+
               </Link>
 
             </div>
 
           ) : (
+
+            /* =========================
+                ADS
+            ========================= */
 
             <div className="profile-ads-grid">
 
@@ -515,16 +849,22 @@ function Profile() {
                     ? ad.images[0]
                     : ad.image;
 
+
                 return (
+
                   <Link
                     key={ad.id}
                     to={`/ad/${ad.id}`}
                     className="profile-ad-card"
                   >
 
+
+                    {/* IMAGE */}
+
                     <div className="profile-ad-image">
 
                       {adImage ? (
+
                         <img
                           src={adImage}
                           alt={
@@ -532,40 +872,98 @@ function Profile() {
                             "Advertisement"
                           }
                         />
+
                       ) : (
+
                         <div>
+
                           📷
+
                         </div>
+
                       )}
 
                     </div>
 
+
+                    {/* INFO */}
+
                     <div className="profile-ad-info">
 
+
+                      {/* SELLER */}
+
+                      <p className="profile-ad-seller">
+
+                        👤{" "}
+
+                        {ad.userName ||
+                          name ||
+                          "Seller"}
+
+                      </p>
+
+
+                      {/* TITLE */}
+
                       <h3>
+
                         {ad.title ||
                           "Advertisement"}
+
                       </h3>
 
+
+                      {/* PRICE */}
+
                       <strong>
+
                         ETB{" "}
+
                         {Number(
-                          ad.price || 0
+                          String(
+                            ad.price || 0
+                          ).replace(
+                            /,/g,
+                            ""
+                          )
                         ).toLocaleString(
                           "en-US"
                         )}
+
                       </strong>
 
+
+                      {/* CITY */}
+
                       <p>
+
                         📍{" "}
+
                         {ad.city ||
                           "Ethiopia"}
+
+                      </p>
+
+
+                      {/* POST TIME */}
+
+                      <p className="profile-ad-time">
+
+                        🕒 Posted{" "}
+
+                        {formatPostTime(
+                          ad.createdAt
+                        )}
+
                       </p>
 
                     </div>
 
                   </Link>
+
                 );
+
               })}
 
             </div>
@@ -577,6 +975,7 @@ function Profile() {
       </div>
 
     </main>
+
   );
 }
 

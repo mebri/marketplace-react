@@ -40,9 +40,7 @@ function Dashboard() {
 
     // Firestore Timestamp object
     if (ad.createdAt.seconds) {
-      return (
-        ad.createdAt.seconds * 1000
-      );
+      return ad.createdAt.seconds * 1000;
     }
 
     // JavaScript Date
@@ -50,7 +48,7 @@ function Dashboard() {
       return ad.createdAt.getTime();
     }
 
-    // String / fallback
+    // String or number fallback
     const time = new Date(
       ad.createdAt
     ).getTime();
@@ -61,76 +59,69 @@ function Dashboard() {
   };
 
   // =========================
-  // LOAD USER + ADS
+  // LOAD USER ADS
   // =========================
 
   useEffect(() => {
-    const unsubscribe =
-      onAuthStateChanged(
-        auth,
-        async (currentUser) => {
-
-          if (!currentUser) {
-            setUser(null);
-            setAds([]);
-            setLoading(false);
-            return;
-          }
-
-          setUser(currentUser);
-
-          try {
-            const snapshot =
-              await getDocs(
-                collection(db, "ads")
-              );
-
-            const allAds =
-              snapshot.docs.map(
-                (item) => ({
-                  id: item.id,
-                  ...item.data(),
-                })
-              );
-
-            // Only current user's ads
-            const myAds =
-              allAds.filter(
-                (ad) =>
-                  ad.userId ===
-                  currentUser.uid
-              );
-
-            // =========================
-            // NEWEST FIRST
-            // =========================
-
-            myAds.sort(
-              (a, b) =>
-                getAdTime(b) -
-                getAdTime(a)
-            );
-
-            setAds(myAds);
-
-          } catch (error) {
-
-            console.error(
-              "Dashboard error:",
-              error
-            );
-
-          } finally {
-
-            setLoading(false);
-
-          }
-
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      async (currentUser) => {
+        if (!currentUser) {
+          setUser(null);
+          setAds([]);
+          setLoading(false);
+          return;
         }
-      );
+
+        setUser(currentUser);
+
+        try {
+          const snapshot = await getDocs(
+            collection(db, "ads")
+          );
+
+          const allAds = snapshot.docs.map(
+            (item) => ({
+              id: item.id,
+              ...item.data(),
+            })
+          );
+
+          // Get only current user's ads
+          const myAds = allAds.filter(
+            (ad) =>
+              ad.userId === currentUser.uid
+          );
+
+          // =========================
+          // SORT NEWEST FIRST
+          // =========================
+
+          myAds.sort((a, b) => {
+            return (
+              getAdTime(b) -
+              getAdTime(a)
+            );
+          });
+
+          setAds(myAds);
+
+        } catch (error) {
+          console.error(
+            "Dashboard error:",
+            error
+          );
+
+          alert(
+            "Error loading advertisements."
+          );
+        }
+
+        setLoading(false);
+      }
+    );
 
     return () => unsubscribe();
-
   }, []);
 
   // =========================
@@ -138,21 +129,16 @@ function Dashboard() {
   // =========================
 
   const logout = async () => {
-
     try {
-
       await signOut(auth);
 
       navigate("/login");
 
     } catch (error) {
-
       console.error(error);
 
       alert(error.message);
-
     }
-
   };
 
   // =========================
@@ -160,14 +146,13 @@ function Dashboard() {
   // =========================
 
   if (loading) {
-
     return (
-
       <main className="dashboard-page">
 
         <div className="dashboard-loading">
 
-          <div className="dashboard-spinner"></div>
+          <div className="dashboard-spinner">
+          </div>
 
           <h2>
             Loading Dashboard...
@@ -176,9 +161,7 @@ function Dashboard() {
         </div>
 
       </main>
-
     );
-
   }
 
   // =========================
@@ -186,9 +169,7 @@ function Dashboard() {
   // =========================
 
   if (!user) {
-
     return (
-
       <main className="dashboard-page">
 
         <div className="login-required">
@@ -202,7 +183,8 @@ function Dashboard() {
           </h1>
 
           <p>
-            Please login to access your dashboard.
+            Please login to access your
+            dashboard.
           </p>
 
           <Link
@@ -215,37 +197,32 @@ function Dashboard() {
         </div>
 
       </main>
-
     );
-
   }
 
   // =========================
   // TOTAL IMAGES
   // =========================
 
-  const totalImages =
-    ads.reduce(
-      (total, ad) => {
+  const totalImages = ads.reduce(
+    (total, ad) => {
 
-        if (
-          Array.isArray(ad.images)
-        ) {
+      if (
+        Array.isArray(ad.images)
+      ) {
+        return (
+          total +
+          ad.images.length
+        );
+      }
 
-          return (
-            total +
-            ad.images.length
-          );
+      return ad.image
+        ? total + 1
+        : total;
 
-        }
-
-        return ad.image
-          ? total + 1
-          : total;
-
-      },
-      0
-    );
+    },
+    0
+  );
 
   // =========================
   // TOTAL CATEGORIES
@@ -253,19 +230,54 @@ function Dashboard() {
 
   const totalCategories = [
     ...new Set(
-
       ads
         .map(
           (ad) =>
             ad.category
         )
         .filter(Boolean)
-
     ),
   ].length;
 
-  return (
+  // =========================
+  // GET FIRST IMAGE
+  // =========================
 
+  const getAdImage = (ad) => {
+
+    if (
+      Array.isArray(ad.images) &&
+      ad.images.length > 0
+    ) {
+      return ad.images[0];
+    }
+
+    return ad.image || "";
+  };
+
+  // =========================
+  // FORMAT DATE
+  // =========================
+
+  const formatAdDate = (ad) => {
+
+    const time =
+      getAdTime(ad);
+
+    if (!time) {
+      return "";
+    }
+
+    return new Date(
+      time
+    ).toLocaleString();
+  };
+
+  // =========================
+  // PAGE
+  // =========================
+
+  return (
     <main className="dashboard-page">
 
       {/* =========================
@@ -490,7 +502,7 @@ function Dashboard() {
             </h2>
 
             <p>
-              Your most recently posted items
+              Newest advertisements first
             </p>
 
           </div>
@@ -527,8 +539,8 @@ function Dashboard() {
             </h3>
 
             <p>
-              Start selling by posting
-              your first advertisement.
+              Start selling by posting your
+              first advertisement.
             </p>
 
             <Link
@@ -543,7 +555,7 @@ function Dashboard() {
         ) : (
 
           /* =========================
-              ADS GRID
+              ADS
           ========================= */
 
           <div className="dashboard-ads-grid">
@@ -552,16 +564,8 @@ function Dashboard() {
               .slice(0, 6)
               .map((ad) => {
 
-                // Get first image
-
                 const adImage =
-                  Array.isArray(
-                    ad.images
-                  ) &&
-                  ad.images.length > 0
-                    ? ad.images[0]
-                    : ad.image;
-
+                  getAdImage(ad);
 
                 return (
 
@@ -577,10 +581,6 @@ function Dashboard() {
                     <Link
                       to={`/ad/${ad.id}`}
                       className="dashboard-ad-image-link"
-                      aria-label={`View ${
-                        ad.title ||
-                        "Advertisement"
-                      }`}
                     >
 
                       <div className="dashboard-ad-image">
@@ -635,24 +635,13 @@ function Dashboard() {
                       </span>
 
 
-                      {/* CLICKABLE TITLE */}
+                      <h3>
 
-                      <Link
-                        to={`/ad/${ad.id}`}
-                        className="dashboard-ad-title-link"
-                      >
+                        {ad.title ||
+                          "Untitled Advertisement"}
 
-                        <h3>
+                      </h3>
 
-                          {ad.title ||
-                            "Untitled Advertisement"}
-
-                        </h3>
-
-                      </Link>
-
-
-                      {/* PRICE */}
 
                       <div className="dashboard-ad-price">
 
@@ -665,8 +654,6 @@ function Dashboard() {
                       </div>
 
 
-                      {/* CITY */}
-
                       <p className="dashboard-ad-city">
 
                         📍{" "}
@@ -677,19 +664,15 @@ function Dashboard() {
                       </p>
 
 
-                      {/* =========================
-                          POST TIME
-                      ========================= */}
+                      {/* POST TIME */}
 
-                      {ad.createdAt && (
+                      {formatAdDate(ad) && (
 
-                        <p className="dashboard-ad-time">
+                        <p className="dashboard-ad-date">
 
-                          🕒{" "}
+                          🕒 Posted:{" "}
 
-                          {new Date(
-                            getAdTime(ad)
-                          ).toLocaleString()}
+                          {formatAdDate(ad)}
 
                         </p>
 
@@ -722,9 +705,7 @@ function Dashboard() {
       </section>
 
     </main>
-
   );
-
 }
 
 export default Dashboard;
