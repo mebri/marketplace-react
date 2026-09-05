@@ -21,10 +21,14 @@ function AdDetails() {
   const navigate = useNavigate();
 
   const [ad, setAd] = useState(null);
-  const [loading, setLoading] =
-    useState(true);
+  const [seller, setSeller] = useState(null);
 
-  // Favorite
+  const [loading, setLoading] = useState(true);
+
+  // =========================
+  // FAVORITE
+  // =========================
+
   const [isFavorite, setIsFavorite] =
     useState(false);
 
@@ -33,11 +37,17 @@ function AdDetails() {
     setFavoriteLoading,
   ] = useState(false);
 
-  // Chat
+  // =========================
+  // CHAT
+  // =========================
+
   const [chatLoading, setChatLoading] =
     useState(false);
 
-  // Images
+  // =========================
+  // IMAGE GALLERY
+  // =========================
+
   const [
     currentImage,
     setCurrentImage,
@@ -62,36 +72,98 @@ function AdDetails() {
       const docSnap =
         await getDoc(docRef);
 
-      if (docSnap.exists()) {
-        const adData = {
-          id: docSnap.id,
-          ...docSnap.data(),
-        };
+      if (!docSnap.exists()) {
+        setLoading(false);
+        return;
+      }
 
-        setAd(adData);
+      const adData = {
+        id: docSnap.id,
+        ...docSnap.data(),
+      };
 
-        // Check favorite
-        if (auth.currentUser) {
-          const favoriteRef = doc(
+      setAd(adData);
+
+      // =========================
+      // LOAD SELLER PROFILE
+      // =========================
+
+      if (adData.userId) {
+        try {
+          const sellerRef = doc(
             db,
             "users",
-            auth.currentUser.uid,
-            "favorites",
-            id
+            adData.userId
           );
 
-          const favoriteSnap =
-            await getDoc(favoriteRef);
+          const sellerSnap =
+            await getDoc(
+              sellerRef
+            );
 
-          setIsFavorite(
-            favoriteSnap.exists()
+          if (sellerSnap.exists()) {
+            setSeller({
+              uid: sellerSnap.id,
+              ...sellerSnap.data(),
+            });
+          } else {
+            setSeller({
+              uid: adData.userId,
+              name:
+                adData.userName ||
+                "",
+              city:
+                adData.city ||
+                "",
+            });
+          }
+        } catch (sellerError) {
+          console.error(
+            "Seller profile error:",
+            sellerError
           );
+
+          setSeller({
+            uid: adData.userId,
+            name:
+              adData.userName ||
+              "",
+            city:
+              adData.city ||
+              "",
+          });
         }
       }
 
-      setLoading(false);
+      // =========================
+      // CHECK FAVORITE
+      // =========================
+
+      if (auth.currentUser) {
+        const favoriteRef = doc(
+          db,
+          "users",
+          auth.currentUser.uid,
+          "favorites",
+          id
+        );
+
+        const favoriteSnap =
+          await getDoc(
+            favoriteRef
+          );
+
+        setIsFavorite(
+          favoriteSnap.exists()
+        );
+      }
+
     } catch (error) {
-      console.error(error);
+      console.error(
+        "Error loading advertisement:",
+        error
+      );
+    } finally {
       setLoading(false);
     }
   };
@@ -100,245 +172,485 @@ function AdDetails() {
   // FAVORITE
   // =========================
 
-  const toggleFavorite = async () => {
-    if (!auth.currentUser) {
-      alert(
-        "Please log in to save advertisements."
-      );
+  const toggleFavorite =
+    async () => {
 
-      return;
-    }
-
-    if (!ad) return;
-
-    try {
-      setFavoriteLoading(true);
-
-      const favoriteRef = doc(
-        db,
-        "users",
-        auth.currentUser.uid,
-        "favorites",
-        id
-      );
-
-      if (isFavorite) {
-        await deleteDoc(favoriteRef);
-
-        setIsFavorite(false);
-
+      if (!auth.currentUser) {
         alert(
-          "Advertisement removed from favorites."
-        );
-      } else {
-        await setDoc(
-          favoriteRef,
-          {
-            adId: id,
-
-            title:
-              ad.title || "",
-
-            price:
-              ad.price || "",
-
-            city:
-              ad.city || "",
-
-            category:
-              ad.category || "",
-
-            description:
-              ad.description || "",
-
-            image:
-              ad.image || "",
-
-            images:
-              ad.images || [],
-
-            phone:
-              ad.phone || "",
-
-            whatsapp:
-              ad.whatsapp || "",
-
-            telegram:
-              ad.telegram || "",
-
-            userEmail:
-              ad.userEmail || "",
-
-            condition:
-              ad.condition || "",
-
-            savedAt:
-              new Date(),
-          }
-        );
-
-        setIsFavorite(true);
-
-        alert(
-          "Advertisement saved to favorites! ❤️"
-        );
-      }
-    } catch (error) {
-      console.error(error);
-
-      alert(
-        error.message ||
-          "Could not save advertisement."
-      );
-    } finally {
-      setFavoriteLoading(false);
-    }
-  };
-
-  // =========================
-  // CHAT WITH SELLER
-  // =========================
-
-  const startChat = async () => {
-    if (!auth.currentUser) {
-      alert(
-        "Please log in to chat with the seller."
-      );
-
-      navigate("/login");
-
-      return;
-    }
-
-    if (!ad) return;
-
-    // Prevent seller from chatting with themselves
-    if (
-      ad.userId ===
-      auth.currentUser.uid
-    ) {
-      alert(
-        "This is your advertisement. You cannot chat with yourself."
-      );
-
-      return;
-    }
-
-    try {
-      setChatLoading(true);
-
-      const buyerId =
-        auth.currentUser.uid;
-
-      const sellerId =
-        ad.userId;
-
-      if (!sellerId) {
-        alert(
-          "Seller information is not available."
+          "Please log in to save advertisements."
         );
 
         return;
       }
 
-      // Create a consistent chat ID
-      const chatId =
-        buyerId < sellerId
-          ? `${buyerId}_${sellerId}_${id}`
-          : `${sellerId}_${buyerId}_${id}`;
+      if (!ad) return;
 
-      const chatRef = doc(
-        db,
-        "chats",
-        chatId
-      );
+      try {
+        setFavoriteLoading(true);
 
-      // Check if chat already exists
-      const chatSnap =
-        await getDoc(chatRef);
-
-      if (!chatSnap.exists()) {
-        await setDoc(chatRef, {
-          participants: [
-            buyerId,
-            sellerId,
-          ],
-
-          buyerId,
-          sellerId,
-
-          adId: id,
-
-          adTitle:
-            ad.title || "",
-
-          adImage:
-            Array.isArray(ad.images) &&
-            ad.images.length > 0
-              ? ad.images[0]
-              : ad.image || "",
-
-          createdAt:
-            new Date(),
-
-          updatedAt:
-            new Date(),
-
-          lastMessage:
-            "",
-        });
-
-        // =========================
-        // CREATE NOTIFICATION
-        // =========================
-
-        await addDoc(
-          collection(
+        const favoriteRef =
+          doc(
             db,
             "users",
-            sellerId,
-            "notifications"
-          ),
-          {
-            type: "chat",
+            auth.currentUser.uid,
+            "favorites",
+            id
+          );
 
-            title:
-              "New chat request 💬",
+        if (isFavorite) {
 
-            message:
-              `Someone wants to chat with you about "${ad.title}".`,
+          await deleteDoc(
+            favoriteRef
+          );
 
-            adId: id,
+          setIsFavorite(false);
 
-            chatId,
+          alert(
+            "Advertisement removed from favorites."
+          );
 
-            fromUserId:
-              buyerId,
+        } else {
 
-            read: false,
+          await setDoc(
+            favoriteRef,
+            {
+              adId: id,
 
-            createdAt:
-              new Date(),
-          }
+              title:
+                ad.title || "",
+
+              price:
+                ad.price || "",
+
+              city:
+                ad.city || "",
+
+              category:
+                ad.category || "",
+
+              description:
+                ad.description || "",
+
+              image:
+                ad.image || "",
+
+              images:
+                ad.images || [],
+
+              phone:
+                ad.phone || "",
+
+              whatsapp:
+                ad.whatsapp || "",
+
+              telegram:
+                ad.telegram || "",
+
+              userEmail:
+                ad.userEmail || "",
+
+              condition:
+                ad.condition || "",
+
+              type:
+                ad.type || "",
+
+              subcategory:
+                ad.subcategory || "",
+
+              userId:
+                ad.userId || "",
+
+              userName:
+                seller?.name ||
+                ad.userName ||
+                "",
+
+              savedAt:
+                new Date(),
+            }
+          );
+
+          setIsFavorite(true);
+
+          alert(
+            "Advertisement saved to favorites! ❤️"
+          );
+        }
+
+      } catch (error) {
+
+        console.error(
+          "Favorite error:",
+          error
         );
+
+        alert(
+          error.message ||
+            "Could not save advertisement."
+        );
+
+      } finally {
+
+        setFavoriteLoading(false);
+
+      }
+    };
+
+  // =========================
+  // CHAT WITH SELLER
+  // =========================
+
+  const startChat =
+    async () => {
+
+      if (!auth.currentUser) {
+
+        alert(
+          "Please log in to chat with the seller."
+        );
+
+        navigate("/login");
+
+        return;
       }
 
-      // Open chat
-      navigate(`/chat/${chatId}`);
+      if (!ad) return;
 
-    } catch (error) {
-      console.error(
-        "Chat error:",
-        error
-      );
+      // Seller cannot chat with themselves
 
-      alert(
-        error.message ||
-          "Could not start chat."
-      );
-    } finally {
-      setChatLoading(false);
+      if (
+        ad.userId ===
+        auth.currentUser.uid
+      ) {
+
+        alert(
+          "This is your advertisement. You cannot chat with yourself."
+        );
+
+        return;
+      }
+
+      try {
+
+        setChatLoading(true);
+
+        const buyerId =
+          auth.currentUser.uid;
+
+        const sellerId =
+          ad.userId;
+
+        if (!sellerId) {
+
+          alert(
+            "Seller information is not available."
+          );
+
+          return;
+        }
+
+        // =========================
+        // CHAT ID
+        // =========================
+
+        const chatId =
+          buyerId < sellerId
+            ? `${buyerId}_${sellerId}_${id}`
+            : `${sellerId}_${buyerId}_${id}`;
+
+        const chatRef =
+          doc(
+            db,
+            "chats",
+            chatId
+          );
+
+        const chatSnap =
+          await getDoc(
+            chatRef
+          );
+
+        // =========================
+        // CREATE CHAT
+        // =========================
+
+        if (
+          !chatSnap.exists()
+        ) {
+
+          await setDoc(
+            chatRef,
+            {
+              participants: [
+                buyerId,
+                sellerId,
+              ],
+
+              buyerId,
+
+              sellerId,
+
+              adId: id,
+
+              adTitle:
+                ad.title || "",
+
+              adImage:
+                Array.isArray(
+                  ad.images
+                ) &&
+                ad.images.length >
+                  0
+                  ? ad.images[0]
+                  : ad.image ||
+                    "",
+
+              buyerName:
+                auth.currentUser
+                  .displayName ||
+                auth.currentUser.email ||
+                "Buyer",
+
+              sellerName:
+                seller?.name ||
+                ad.userName ||
+                "Seller",
+
+              createdAt:
+                new Date(),
+
+              updatedAt:
+                new Date(),
+
+              lastMessage:
+                "",
+            }
+          );
+
+          // =========================
+          // SELLER NOTIFICATION
+          // =========================
+
+          await addDoc(
+            collection(
+              db,
+              "users",
+              sellerId,
+              "notifications"
+            ),
+            {
+              type: "chat",
+
+              title:
+                "New chat request 💬",
+
+              message:
+                `${
+                  auth.currentUser
+                    .displayName ||
+                  auth.currentUser.email ||
+                  "Someone"
+                } wants to chat with you about "${ad.title}".`,
+
+              adId: id,
+
+              chatId,
+
+              fromUserId:
+                buyerId,
+
+              fromUserName:
+                auth.currentUser
+                  .displayName ||
+                auth.currentUser.email ||
+                "Buyer",
+
+              read: false,
+
+              createdAt:
+                new Date(),
+            }
+          );
+        }
+
+        navigate(
+          `/chat/${chatId}`
+        );
+
+      } catch (error) {
+
+        console.error(
+          "Chat error:",
+          error
+        );
+
+        alert(
+          error.message ||
+            "Could not start chat."
+        );
+
+      } finally {
+
+        setChatLoading(false);
+
+      }
+    };
+
+  // =========================
+  // POSTED TIME
+  // =========================
+
+  const getPostedTime = (
+    createdAt
+  ) => {
+
+    if (!createdAt) {
+      return "";
     }
+
+    let date;
+
+    // Firestore Timestamp
+
+    if (
+      typeof createdAt.toDate ===
+      "function"
+    ) {
+
+      date =
+        createdAt.toDate();
+
+    }
+
+    // Firestore seconds
+
+    else if (
+      typeof createdAt.seconds ===
+      "number"
+    ) {
+
+      date = new Date(
+        createdAt.seconds *
+          1000 +
+          Math.floor(
+            (createdAt.nanoseconds ||
+              0) / 1000000
+          )
+      );
+
+    }
+
+    // JavaScript Date
+
+    else if (
+      createdAt instanceof Date
+    ) {
+
+      date = createdAt;
+
+    }
+
+    // Number or string
+
+    else {
+
+      date =
+        new Date(
+          createdAt
+        );
+
+    }
+
+    if (
+      Number.isNaN(
+        date.getTime()
+      )
+    ) {
+
+      return "";
+
+    }
+
+    const difference =
+      Date.now() -
+      date.getTime();
+
+    const seconds =
+      Math.floor(
+        difference / 1000
+      );
+
+    const minutes =
+      Math.floor(
+        seconds / 60
+      );
+
+    const hours =
+      Math.floor(
+        minutes / 60
+      );
+
+    const days =
+      Math.floor(
+        hours / 24
+      );
+
+    if (
+      difference < 0 ||
+      seconds < 60
+    ) {
+
+      return "Just now";
+
+    }
+
+    if (
+      minutes < 60
+    ) {
+
+      return `${minutes} minute${
+        minutes === 1
+          ? ""
+          : "s"
+      } ago`;
+
+    }
+
+    if (
+      hours < 24
+    ) {
+
+      return `${hours} hour${
+        hours === 1
+          ? ""
+          : "s"
+      } ago`;
+
+    }
+
+    if (
+      days < 7
+    ) {
+
+      return `${days} day${
+        days === 1
+          ? ""
+          : "s"
+      } ago`;
+
+    }
+
+    return date.toLocaleString(
+      "en-US",
+      {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+      }
+    );
   };
 
   // =========================
@@ -346,13 +658,17 @@ function AdDetails() {
   // =========================
 
   if (loading) {
+
     return (
       <div className="details-page">
+
         <h2>
           Loading...
         </h2>
+
       </div>
     );
+
   }
 
   // =========================
@@ -360,8 +676,10 @@ function AdDetails() {
   // =========================
 
   if (!ad) {
+
     return (
       <div className="details-page">
+
         <h2>
           Advertisement not found.
         </h2>
@@ -369,60 +687,63 @@ function AdDetails() {
         <Link to="/">
           ← Back Home
         </Link>
+
       </div>
     );
+
   }
 
   // =========================
-  // IMAGE LIST
+  // IMAGES
   // =========================
 
   const imageList =
-    ad.images &&
+    Array.isArray(
+      ad.images
+    ) &&
     ad.images.length > 0
+
       ? ad.images
+
       : ad.image
       ? [ad.image]
       : [];
 
-  // =========================
-  // NEXT IMAGE
-  // =========================
 
-  const nextImage = () => {
-    if (
-      imageList.length === 0
-    ) {
-      return;
-    }
+  const nextImage =
+    () => {
 
-    setCurrentImage(
-      (current) =>
-        current ===
-        imageList.length - 1
-          ? 0
-          : current + 1
-    );
-  };
+      if (
+        imageList.length === 0
+      ) return;
 
-  // =========================
-  // PREVIOUS IMAGE
-  // =========================
+      setCurrentImage(
+        (current) =>
+          current ===
+          imageList.length - 1
+            ? 0
+            : current + 1
+      );
 
-  const previousImage = () => {
-    if (
-      imageList.length === 0
-    ) {
-      return;
-    }
+    };
 
-    setCurrentImage(
-      (current) =>
-        current === 0
-          ? imageList.length - 1
-          : current - 1
-    );
-  };
+
+  const previousImage =
+    () => {
+
+      if (
+        imageList.length === 0
+      ) return;
+
+      setCurrentImage(
+        (current) =>
+          current === 0
+            ? imageList.length - 1
+            : current - 1
+      );
+
+    };
+
 
   // =========================
   // CONTACT INFORMATION
@@ -430,6 +751,7 @@ function AdDetails() {
 
   const phoneNumber =
     ad.phone || "";
+
 
   const whatsappNumber =
     (
@@ -441,63 +763,53 @@ function AdDetails() {
       ""
     );
 
+
   const telegramValue =
     ad.telegram || "";
+
 
   const telegramUsername =
     telegramValue
       .trim()
-      .replace("@", "");
+      .replace(/^@/, "");
+
 
   // =========================
-  // POSTED TIME
+  // SELLER NAME
   // =========================
 
-  const getPostedTime = () => {
-    if (!ad.createdAt) {
-      return "";
-    }
+  const sellerName =
+    seller?.name ||
+    ad.userName ||
+    "Seller";
 
-    let date;
 
-    if (
-      typeof ad.createdAt.toDate ===
-      "function"
-    ) {
-      date =
-        ad.createdAt.toDate();
+  const sellerCity =
+    seller?.city ||
+    ad.city ||
+    "";
 
-    } else if (
-      ad.createdAt.seconds
-    ) {
-      date = new Date(
-        ad.createdAt.seconds * 1000
-      );
 
-    } else {
-      date =
-        new Date(ad.createdAt);
-    }
+  const sellerAvatar =
+    sellerName
+      ? sellerName
+          .charAt(0)
+          .toUpperCase()
+      : "👤";
 
-    if (
-      Number.isNaN(
-        date.getTime()
-      )
-    ) {
-      return "";
-    }
-
-    return date.toLocaleString();
-  };
 
   const postedTime =
-    getPostedTime();
+    getPostedTime(
+      ad.createdAt
+    );
+
 
   return (
+
     <div className="details-page">
 
       {/* =========================
-          IMAGE
+          MAIN IMAGE
       ========================= */}
 
       <div className="details-image">
@@ -505,20 +817,26 @@ function AdDetails() {
         {imageList.length > 0 ? (
 
           <>
+
             <img
               src={
                 imageList[
                   currentImage
                 ]
               }
-              alt={ad.title}
+              alt={
+                ad.title ||
+                "Advertisement"
+              }
               className="details-photo"
             />
 
             {imageList.length > 1 && (
 
               <>
+
                 <button
+                  type="button"
                   className="
                     gallery-button
                     gallery-prev
@@ -530,7 +848,9 @@ function AdDetails() {
                   ❮
                 </button>
 
+
                 <button
+                  type="button"
                   className="
                     gallery-button
                     gallery-next
@@ -542,14 +862,19 @@ function AdDetails() {
                   ❯
                 </button>
 
+
                 <div
                   className="
                     image-counter
                   "
                 >
-                  {currentImage + 1}
+                  {
+                    currentImage + 1
+                  }
                   {" / "}
-                  {imageList.length}
+                  {
+                    imageList.length
+                  }
                 </div>
 
               </>
@@ -572,6 +897,7 @@ function AdDetails() {
 
       </div>
 
+
       {/* =========================
           THUMBNAILS
       ========================= */}
@@ -585,16 +911,17 @@ function AdDetails() {
         >
 
           {imageList.map(
-            (image, index) => (
+            (
+              image,
+              index
+            ) => (
 
               <img
                 key={index}
                 src={image}
-                alt={
-                  `${ad.title} ${
-                    index + 1
-                  }`
-                }
+                alt={`${ad.title || "Advertisement"} ${
+                  index + 1
+                }`}
                 className={
                   index ===
                   currentImage
@@ -615,6 +942,7 @@ function AdDetails() {
 
       )}
 
+
       {/* =========================
           AD INFORMATION
       ========================= */}
@@ -625,6 +953,22 @@ function AdDetails() {
         "
       >
 
+        {/* POST TIME */}
+
+        {postedTime && (
+
+          <p
+            className="
+              posted-time
+            "
+          >
+            🕒 Posted{" "}
+            {postedTime}
+          </p>
+
+        )}
+
+
         {/* CATEGORY */}
 
         <span
@@ -632,16 +976,26 @@ function AdDetails() {
             details-category
           "
         >
-          {ad.category ||
-            "Advertisement"}
+
+          {
+            ad.category ||
+            "Advertisement"
+          }
+
         </span>
+
 
         {/* TITLE */}
 
         <h1>
-          {ad.title ||
-            "Untitled Advertisement"}
+
+          {
+            ad.title ||
+            "Untitled Advertisement"
+          }
+
         </h1>
+
 
         {/* PRICE */}
 
@@ -662,25 +1016,11 @@ function AdDetails() {
 
         </h2>
 
-        {/* POST TIME */}
-
-        {postedTime && (
-
-          <p
-            className="
-              posted-time
-            "
-          >
-            🕒 Posted:
-            {" "}
-            {postedTime}
-          </p>
-
-        )}
 
         {/* FAVORITE */}
 
         <button
+          type="button"
           onClick={
             toggleFavorite
           }
@@ -700,14 +1040,16 @@ function AdDetails() {
 
         </button>
 
+
         {/* =========================
-            CHAT
+            CHAT WITH SELLER
         ========================= */}
 
         {ad.userId !==
           auth.currentUser?.uid && (
 
           <button
+            type="button"
             onClick={
               startChat
             }
@@ -727,7 +1069,10 @@ function AdDetails() {
 
         )}
 
-        {/* CITY */}
+
+        {/* =========================
+            DETAILS
+        ========================= */}
 
         {ad.city && (
 
@@ -745,7 +1090,6 @@ function AdDetails() {
 
         )}
 
-        {/* CONDITION */}
 
         {ad.condition && (
 
@@ -763,7 +1107,23 @@ function AdDetails() {
 
         )}
 
-        {/* SUBCATEGORY */}
+
+        {ad.type && (
+
+          <p>
+
+            <strong>
+              🏷️ Type:
+            </strong>
+
+            {" "}
+
+            {ad.type}
+
+          </p>
+
+        )}
+
 
         {ad.subcategory && (
 
@@ -781,7 +1141,6 @@ function AdDetails() {
 
         )}
 
-        {/* FURNITURE */}
 
         {ad.furnitureType && (
 
@@ -793,15 +1152,12 @@ function AdDetails() {
 
             {" "}
 
-            {
-              ad.furnitureType
-            }
+            {ad.furnitureType}
 
           </p>
 
         )}
 
-        {/* LABOR */}
 
         {ad.laborType && (
 
@@ -813,15 +1169,16 @@ function AdDetails() {
 
             {" "}
 
-            {
-              ad.laborType
-            }
+            {ad.laborType}
 
           </p>
 
         )}
 
-        {/* DESCRIPTION */}
+
+        {/* =========================
+            DESCRIPTION
+        ========================= */}
 
         <div
           className="
@@ -844,10 +1201,12 @@ function AdDetails() {
 
         </div>
 
+
         <hr />
 
+
         {/* =========================
-            SELLER INFORMATION
+            SELLER PROFILE
         ========================= */}
 
         <div
@@ -860,14 +1219,97 @@ function AdDetails() {
             👤 Seller Information
           </h3>
 
+
+          <div
+            className="
+              seller-profile-card
+            "
+          >
+
+            {/* AVATAR */}
+
+            <div
+              className="
+                seller-avatar
+              "
+            >
+
+              {sellerAvatar}
+
+            </div>
+
+
+            {/* SELLER DETAILS */}
+
+            <div
+              className="
+                seller-profile-details
+              "
+            >
+
+              <h3>
+
+                {sellerName}
+
+              </h3>
+
+
+              {sellerCity && (
+
+                <p>
+
+                  📍{" "}
+
+                  {sellerCity}
+
+                </p>
+
+              )}
+
+            </div>
+
+
+            {/* PROFILE BUTTON */}
+
+            {ad.userId && (
+
+              <Link
+                to={`/user/${ad.userId}`}
+                className="
+                  view-seller-profile-btn
+                "
+              >
+
+                View Profile →
+
+              </Link>
+
+            )}
+
+          </div>
+
+
+          {/* =========================
+              CONTACT
+          ========================= */}
+
+          <h3
+            className="
+              seller-contact-title
+            "
+          >
+
+            📞 Contact Seller
+
+          </h3>
+
+
           {/* PHONE */}
 
           {phoneNumber && (
 
             <a
-              href={
-                `tel:${phoneNumber}`
-              }
+              href={`tel:${phoneNumber}`}
               className="
                 phone-link
               "
@@ -882,6 +1324,7 @@ function AdDetails() {
             </a>
 
           )}
+
 
           {/* WHATSAPP */}
 
@@ -906,6 +1349,7 @@ function AdDetails() {
 
           )}
 
+
           {/* TELEGRAM */}
 
           {telegramUsername && (
@@ -928,6 +1372,7 @@ function AdDetails() {
             </a>
 
           )}
+
 
           {/* EMAIL */}
 
@@ -955,6 +1400,7 @@ function AdDetails() {
 
           )}
 
+
           {/* NO CONTACT */}
 
           {!phoneNumber &&
@@ -963,9 +1409,11 @@ function AdDetails() {
             !ad.userEmail && (
 
               <p>
+
                 Seller contact
                 information is not
                 available.
+
               </p>
 
             )}

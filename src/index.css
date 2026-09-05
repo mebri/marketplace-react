@@ -4446,4 +4446,128 @@ textarea {
 .telegram-btn:hover {
   background: #168ac2;
   transform: translateY(-2px);
+}@media (max-width: 600px) {
+  .seller-profile-card {
+    flex-wrap: wrap;
+  }
+
+  .view-seller-profile-btn {
+    width: 100%;
+    text-align: center;
+  }
+}/* Categories */
+.categories {
+  width: 100%;
+  padding: 10px 0;
+}
+
+.categories-list {
+  display: flex;
+  gap: 18px;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 10px 8px 18px;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  flex-wrap: nowrap;
+}
+
+.categories-list::-webkit-scrollbar {
+  display: none;
+}
+
+/* Each category */
+.category-item {
+  flex: 0 0 auto;
+  width: 110px;
+  text-align: center;
+  text-decoration: none;
+  color: #222;
+}
+
+/* Circular icon */
+.category-icon {
+  width: 82px;
+  height: 82px;
+  margin: 0 auto 8px;
+
+  border-radius: 50%;
+  overflow: hidden;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #f1f5f9;
+  border: 2px solid #e2e8f0;
+
+  font-size: 36px;
+  line-height: 1;
+
+  box-sizing: border-box;
+}
+
+/* Category name */
+.category-item span {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.25;
+  white-space: normal;
+}
+
+/* Hover */
+.category-item:hover .category-icon {
+  transform: scale(1.05);
+}
+
+.category-icon {
+  transition: transform 0.2s ease;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .categories-list {
+    gap: 14px;
+    padding-left: 10px;
+    padding-right: 10px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .category-item {
+    width: 92px;
+  }
+
+  .category-icon {
+    width: 70px;
+    height: 70px;
+    font-size: 30px;
+  }
+
+  .category-item span {
+    font-size: 13px;
+  }
+}
+
+/* Small phones */
+@media (max-width: 480px) {
+  .categories-list {
+    gap: 12px;
+  }
+
+  .category-item {
+    width: 84px;
+  }
+
+  .category-icon {
+    width: 64px;
+    height: 64px;
+    font-size: 27px;
+  }
+
+  .category-item span {
+    font-size: 12px;
+  }
 }
