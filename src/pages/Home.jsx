@@ -527,113 +527,76 @@ function Home() {
       </section>
 
       {/* =========================
-          CATEGORIES
-      ========================= */}
+    CIRCULAR MAIN CATEGORIES
+========================= */}
 
-      <section className="home-categories">
+<section className="home-categories">
 
-        <h2 className="home-section-title">
-          All Categories
-        </h2>
+  <h2 className="home-section-title">
+    All Categories
+  </h2>
 
-        <div className="home-category-grid">
+  <div className="home-category-scroll">
 
-          {categories.map(
-            (category) => {
+    {categories
+      .filter((category) =>
+        [
+          "cars",
+          "houses",
+          "rentals",
+          "electronics",
+          "furniture",
+          "labor",
+          "min-alish-tera",
+        ].includes(category.id)
+      )
+      .map((category) => (
 
-              const isOpen =
-                openCategory ===
-                category.id;
+        <div
+          key={category.id}
+          className="home-category-item"
+        >
 
-              return (
+          <button
+            type="button"
+            className="home-category-circle-button"
+            onClick={() => toggleCategory(category.id)}
+          >
 
-                <div
-                  key={category.id}
-                  className="home-category-wrapper"
+            <div className="home-category-circle">
+              {category.icon}
+            </div>
+
+            <div className="home-category-name">
+              {category.title}
+            </div>
+
+          </button>
+
+          {openCategory === category.id && (
+            <div className="home-category-options">
+
+              {category.options.map((option) => (
+                <Link
+                  key={option.name}
+                  to={option.link}
+                  className="home-category-option"
+                  onClick={(e) => e.stopPropagation()}
                 >
+                  {option.name}
+                </Link>
+              ))}
 
-                  {/* CATEGORY CARD */}
-
-                  <div
-                    className={`home-card ${
-                      isOpen
-                        ? "home-card-open"
-                        : ""
-                    }`}
-                    onClick={() =>
-                      toggleCategory(
-                        category.id
-                      )
-                    }
-                  >
-
-                    <div className="home-card-icon">
-                      {category.icon}
-                    </div>
-
-                    <h3>
-                      {category.title}
-                    </h3>
-
-                    <p>
-                      {category.description}
-                    </p>
-
-                    <span>
-                      {isOpen
-                        ? "Hide options ↑"
-                        : "Choose an option →"}
-                    </span>
-
-                  </div>
-
-                  {/* OPTIONS */}
-
-                  {isOpen && (
-
-                    <div className="category-options-panel">
-
-                      <h4>
-                        {category.title}
-                      </h4>
-
-                      {category.options.map(
-                        (option) => (
-
-                          <Link
-                            key={
-                              option.name
-                            }
-                            to={
-                              option.link
-                            }
-                            className="category-option-button"
-                            onClick={(e) =>
-                              e.stopPropagation()
-                            }
-                          >
-                            {
-                              option.name
-                            }
-                          </Link>
-
-                        )
-                      )}
-
-                    </div>
-
-                  )}
-
-                </div>
-
-              );
-
-            }
+            </div>
           )}
 
         </div>
 
-      </section>
+      ))}
+
+  </div>
+
+</section>
 
       {/* =========================
           LATEST ADS

@@ -1,0 +1,368 @@
+/* =========================================
+   MAIN CATEGORIES
+========================================= */
+
+.categories {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 20px 0;
+  overflow: hidden;
+}
+
+.categories-title {
+  margin: 0 0 20px;
+  padding: 0 12px;
+  font-size: 24px;
+  font-weight: 700;
+  color: #222;
+}
+
+/* =========================================
+   DESKTOP
+========================================= */
+
+.category-grid {
+  display: flex !important;
+  align-items: flex-start;
+  gap: 24px;
+
+  width: 100%;
+  box-sizing: border-box;
+
+  overflow-x: auto !important;
+  overflow-y: visible;
+
+  padding: 8px 12px 20px;
+
+  flex-wrap: nowrap !important;
+
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  -webkit-overflow-scrolling: touch;
+}
+
+.category-grid::-webkit-scrollbar {
+  display: none;
+}
+
+/* =========================================
+   CATEGORY CARD
+========================================= */
+
+.category-card {
+  flex: 0 0 120px !important;
+  width: 120px !important;
+  min-width: 120px !important;
+
+  box-sizing: border-box;
+
+  position: relative;
+}
+
+/* =========================================
+   MAIN CATEGORY BUTTON
+========================================= */
+
+.category-header {
+  width: 120px !important;
+  height: auto;
+
+  border: 0 !important;
+  background: transparent !important;
+
+  padding: 0 !important;
+  margin: 0 !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+
+  align-items: center !important;
+  justify-content: flex-start !important;
+
+  text-align: center;
+  cursor: pointer;
+
+  box-shadow: none !important;
+}
+
+/* =========================================
+   PERFECT CIRCLE
+========================================= */
+
+.category-icon {
+  width: 92px !important;
+  height: 92px !important;
+
+  min-width: 92px !important;
+  min-height: 92px !important;
+
+  max-width: 92px !important;
+  max-height: 92px !important;
+
+  border-radius: 50% !important;
+
+  background: #f1f5f9;
+
+  border: 2px solid #d9e1ea;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  box-sizing: border-box;
+
+  margin: 0 auto 10px !important;
+
+  padding: 0 !important;
+
+  overflow: hidden;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.category-icon span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: 100%;
+
+  font-size: 42px !important;
+  line-height: 1 !important;
+}
+
+/* =========================================
+   TITLE
+========================================= */
+
+.category-title {
+  width: 120px;
+
+  color: #222;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  line-height: 1.3;
+
+  text-align: center;
+
+  white-space: normal;
+}
+
+/* =========================================
+   ARROW
+========================================= */
+
+.category-arrow {
+  margin-top: 5px;
+
+  font-size: 10px;
+  color: #777;
+}
+
+/* =========================================
+   HOVER
+========================================= */
+
+.category-header:hover .category-icon {
+  transform: scale(1.06);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.12);
+}
+
+/* =========================================
+   SUBCATEGORIES
+========================================= */
+
+.category-options {
+  position: absolute;
+
+  top: 112px;
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  width: 230px;
+
+  padding: 10px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+
+  background: white;
+
+  border: 1px solid #e1e5ea;
+  border-radius: 12px;
+
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+
+  z-index: 100;
+}
+
+.category-option {
+  display: block;
+
+  padding: 9px 10px;
+
+  border-radius: 8px;
+
+  background: #f7f9fb;
+
+  color: #222;
+
+  text-decoration: none;
+
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+.category-option:hover {
+  background: #eaf2ff;
+  color: #1265d8;
+}
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 700px) {
+
+  .categories {
+    padding: 15px 0;
+  }
+
+  .categories-title {
+    font-size: 21px;
+    margin-bottom: 12px;
+  }
+
+  .category-grid {
+    display: flex !important;
+
+    flex-direction: row !important;
+
+    flex-wrap: nowrap !important;
+
+    gap: 16px !important;
+
+    overflow-x: scroll !important;
+    overflow-y: visible !important;
+
+    width: 100% !important;
+
+    padding: 8px 12px 25px !important;
+
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+
+    -webkit-overflow-scrolling: touch;
+
+    touch-action: pan-x;
+  }
+
+  .category-card {
+    flex: 0 0 100px !important;
+
+    width: 100px !important;
+
+    min-width: 100px !important;
+
+    max-width: 100px !important;
+  }
+
+  .category-header {
+    width: 100px !important;
+  }
+
+  .category-icon {
+    width: 72px !important;
+    height: 72px !important;
+
+    min-width: 72px !important;
+    min-height: 72px !important;
+
+    max-width: 72px !important;
+    max-height: 72px !important;
+  }
+
+  .category-icon span {
+    font-size: 32px !important;
+  }
+
+  .category-title {
+    width: 100px;
+
+    font-size: 12px;
+
+    line-height: 1.25;
+  }
+
+  .category-arrow {
+    font-size: 9px;
+  }
+
+  .category-options {
+    position: fixed;
+
+    top: auto;
+    bottom: 10px;
+
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    width: calc(100vw - 30px);
+
+    max-width: 320px;
+
+    z-index: 9999;
+  }
+}
+
+/* =========================================
+   VERY SMALL PHONES
+========================================= */
+
+@media (max-width: 400px) {
+
+  .category-grid {
+    gap: 12px !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
+  .category-card {
+    flex: 0 0 88px !important;
+    width: 88px !important;
+    min-width: 88px !important;
+  }
+
+  .category-header {
+    width: 88px !important;
+  }
+
+  .category-icon {
+    width: 64px !important;
+    height: 64px !important;
+
+    min-width: 64px !important;
+    min-height: 64px !important;
+
+    max-width: 64px !important;
+    max-height: 64px !important;
+  }
+
+  .category-icon span {
+    font-size: 28px !important;
+  }
+
+  .category-title {
+    width: 88px;
+    font-size: 11px;
+  }
+}

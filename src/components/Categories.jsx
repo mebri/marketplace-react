@@ -1,89 +1,37 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import "./Categories.css";
 
 function Categories() {
   const [openCategory, setOpenCategory] = useState(null);
 
   const categories = [
-    // =========================
-    // CARS
-    // =========================
     {
       icon: "🚗",
       title: "Cars",
       items: [
-        {
-          name: "🚗 New Cars",
-          link: "/cars?condition=new",
-        },
-        {
-          name: "🚙 Used Cars",
-          link: "/cars?condition=used",
-        },
+        { name: "🚗 New Cars", link: "/cars?condition=new" },
+        { name: "🚙 Used Cars", link: "/cars?condition=used" },
       ],
     },
-
-    // =========================
-    // ምንአለሽ ተራ
-    // =========================
     {
-      icon: "🏪",
-      title: "ምንአለሽ ተራ",
+      icon: "🏠",
+      title: "Houses",
       items: [
-        {
-          name: "🧱 Used Materials",
-          link: "/search?category=ምንአለሽ%20ተራ",
-        },
-        {
-          name: "🏪 Used Items",
-          link: "/search?category=ምንአለሽ%20ተራ",
-        },
-        {
-          name: "📦 Other Second-Hand Goods",
-          link: "/search?category=ምንአለሽ%20ተራ",
-        },
+        { name: "🏠 Houses for Sale", link: "/houses?type=sale" },
+        { name: "🏠 Houses for Rent", link: "/houses?type=rent" },
       ],
     },
-
-    // =========================
-    // BUILDING MATERIALS
-    // =========================
     {
-      icon: "🧱",
-      title: "Building Materials",
+      icon: "🏢",
+      title: "Rentals",
       items: [
-        {
-          name: "🧱 New Building Materials",
-          link: "/building-materials?condition=new",
-        },
-        {
-          name: "🧱 Used Building Materials",
-          link: "/building-materials?condition=used",
-        },
+        { name: "🏢 Apartments", link: "/rentals?type=apartment" },
+        { name: "🏠 Houses", link: "/rentals?type=house" },
+        { name: "🏪 Shops", link: "/rentals?type=shop" },
+        { name: "🏢 Offices", link: "/rentals?type=office" },
       ],
     },
-
-    // =========================
-    // SPARE PARTS
-    // =========================
-    {
-      icon: "🔧",
-      title: "Spare Parts",
-      items: [
-        {
-          name: "🔧 New Spare Parts",
-          link: "/spare-parts?condition=new",
-        },
-        {
-          name: "🔩 Used Spare Parts",
-          link: "/spare-parts?condition=used",
-        },
-      ],
-    },
-
-    // =========================
-    // ELECTRONICS
-    // =========================
     {
       icon: "📱",
       title: "Electronics",
@@ -122,111 +70,127 @@ function Categories() {
         },
       ],
     },
-
-    // =========================
-    // HOUSES
-    // =========================
     {
-      icon: "🏠",
-      title: "Houses",
+      icon: "🛋️",
+      title: "Furniture",
       items: [
         {
-          name: "🏠 Houses for Sale",
-          link: "/houses?type=sale",
+          name: "🛋️ Sofas",
+          link: "/search?category=Furniture&subcategory=Sofas",
         },
         {
-          name: "🏠 Houses for Rent",
-          link: "/houses?type=rent",
+          name: "🛏️ Beds",
+          link: "/search?category=Furniture&subcategory=Beds",
+        },
+        {
+          name: "🪑 Chairs & Tables",
+          link: "/search?category=Furniture&subcategory=Chairs%20%26%20Tables",
+        },
+        {
+          name: "🗄️ Cabinets",
+          link: "/search?category=Furniture&subcategory=Cabinets",
+        },
+        {
+          name: "📦 Other Furniture",
+          link: "/search?category=Furniture&subcategory=Other",
         },
       ],
     },
-
-    // =========================
-    // RENTALS
-    // =========================
     {
-      icon: "🏢",
-      title: "Rentals",
+      icon: "🔧",
+      title: "Labor & Services",
       items: [
         {
-          name: "🏢 Apartments",
-          link: "/rentals?type=apartment",
+          name: "🏗️ Construction",
+          link: "/search?category=Labor%20%26%20Services&subcategory=Construction",
         },
         {
-          name: "🏠 Houses",
-          link: "/rentals?type=house",
+          name: "⚡ Electrician",
+          link: "/search?category=Labor%20%26%20Services&subcategory=Electrician",
         },
         {
-          name: "🏪 Shops",
-          link: "/rentals?type=shop",
+          name: "🚰 Plumber",
+          link: "/search?category=Labor%20%26%20Services&subcategory=Plumber",
         },
         {
-          name: "🏢 Offices",
-          link: "/rentals?type=office",
+          name: "🎨 Painter",
+          link: "/search?category=Labor%20%26%20Services&subcategory=Painter",
+        },
+        {
+          name: "🧹 Cleaning",
+          link: "/search?category=Labor%20%26%20Services&subcategory=Cleaning",
+        },
+        {
+          name: "🚚 Moving",
+          link: "/search?category=Labor%20%26%20Services&subcategory=Moving",
+        },
+        {
+          name: "🛠️ Other Services",
+          link: "/search?category=Labor%20%26%20Services&subcategory=Other",
+        },
+      ],
+    },
+    {
+      icon: "🏪",
+      title: "ምንአለሽ ተራ",
+      items: [
+        {
+          name: "🧱 Used Materials",
+          link: "/search?category=ምንአለሽ%20ተራ",
+        },
+        {
+          name: "🏪 Used Items",
+          link: "/search?category=ምንአለሽ%20ተራ",
+        },
+        {
+          name: "📦 Other Second-Hand Goods",
+          link: "/search?category=ምንአለሽ%20ተራ",
         },
       ],
     },
   ];
 
   const toggleCategory = (title) => {
-    setOpenCategory(
-      openCategory === title ? null : title
+    setOpenCategory((current) =>
+      current === title ? null : title
     );
   };
 
   return (
     <section className="categories">
-
-      <h2>Browse Categories</h2>
+      <h2 className="categories-title">Browse Categories</h2>
 
       <div className="category-grid">
-
         {categories.map((category) => {
-
-          const isOpen =
-            openCategory === category.title;
+          const isOpen = openCategory === category.title;
 
           return (
             <div
+              key={category.title}
               className={`category-card ${
                 isOpen ? "category-open" : ""
               }`}
-              key={category.title}
             >
-
-              {/* =========================
-                  CATEGORY HEADER
-              ========================= */}
-
               <button
                 type="button"
                 className="category-header"
-                onClick={() =>
-                  toggleCategory(category.title)
-                }
+                onClick={() => toggleCategory(category.title)}
               >
-
                 <div className="category-icon">
-                  {category.icon}
+                  <span>{category.icon}</span>
                 </div>
 
-                <h3>
+                <div className="category-title">
                   {category.title}
-                </h3>
+                </div>
 
-                <span className="category-arrow">
+                <div className="category-arrow">
                   {isOpen ? "▲" : "▼"}
-                </span>
-
+                </div>
               </button>
-
-              {/* =========================
-                  SUBCATEGORIES
-              ========================= */}
 
               {isOpen && (
                 <div className="category-options">
-
                   {category.items.map((item) => (
                     <Link
                       key={item.name}
@@ -236,16 +200,12 @@ function Categories() {
                       {item.name}
                     </Link>
                   ))}
-
                 </div>
               )}
-
             </div>
           );
         })}
-
       </div>
-
     </section>
   );
 }
