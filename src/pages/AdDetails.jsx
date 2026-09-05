@@ -1,28 +1,30 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import {
+  Link,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 
 import {
   doc,
   getDoc,
   setDoc,
   deleteDoc,
+  collection,
+  addDoc,
 } from "firebase/firestore";
 
-import {
-  db,
-  auth,
-} from "../firebase/firebase";
-
+import { db, auth } from "../firebase/firebase";
 
 function AdDetails() {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const [ad, setAd] = useState(null);
   const [loading, setLoading] =
     useState(true);
 
   // Favorite
-
   const [isFavorite, setIsFavorite] =
     useState(false);
 
@@ -31,13 +33,15 @@ function AdDetails() {
     setFavoriteLoading,
   ] = useState(false);
 
-  // Images
+  // Chat
+  const [chatLoading, setChatLoading] =
+    useState(false);
 
+  // Images
   const [
     currentImage,
     setCurrentImage,
   ] = useState(0);
-
 
   // =========================
   // LOAD ADVERTISEMENT
@@ -47,10 +51,8 @@ function AdDetails() {
     loadAd();
   }, [id]);
 
-
   const loadAd = async () => {
     try {
-
       const docRef = doc(
         db,
         "ads",
@@ -60,9 +62,7 @@ function AdDetails() {
       const docSnap =
         await getDoc(docRef);
 
-
       if (docSnap.exists()) {
-
         const adData = {
           id: docSnap.id,
           ...docSnap.data(),
@@ -70,13 +70,8 @@ function AdDetails() {
 
         setAd(adData);
 
-
-        // =========================
-        // CHECK FAVORITE
-        // =========================
-
+        // Check favorite
         if (auth.currentUser) {
-
           const favoriteRef = doc(
             db,
             "users",
@@ -91,47 +86,33 @@ function AdDetails() {
           setIsFavorite(
             favoriteSnap.exists()
           );
-
         }
-
       }
 
       setLoading(false);
-
     } catch (error) {
-
       console.error(error);
-
       setLoading(false);
-
     }
   };
-
 
   // =========================
   // FAVORITE
   // =========================
 
   const toggleFavorite = async () => {
-
     if (!auth.currentUser) {
-
       alert(
         "Please log in to save advertisements."
       );
 
       return;
-
     }
-
 
     if (!ad) return;
 
-
     try {
-
       setFavoriteLoading(true);
-
 
       const favoriteRef = doc(
         db,
@@ -141,25 +122,18 @@ function AdDetails() {
         id
       );
 
-
       if (isFavorite) {
-
-        await deleteDoc(
-          favoriteRef
-        );
+        await deleteDoc(favoriteRef);
 
         setIsFavorite(false);
 
         alert(
           "Advertisement removed from favorites."
         );
-
       } else {
-
         await setDoc(
           favoriteRef,
           {
-
             adId: id,
 
             title:
@@ -200,75 +174,204 @@ function AdDetails() {
 
             savedAt:
               new Date(),
-
           }
         );
-
 
         setIsFavorite(true);
 
         alert(
           "Advertisement saved to favorites! ❤️"
         );
-
       }
-
     } catch (error) {
-
       console.error(error);
 
-      alert(error.message);
-
+      alert(
+        error.message ||
+          "Could not save advertisement."
+      );
     } finally {
-
       setFavoriteLoading(false);
-
     }
-
   };
 
+  // =========================
+  // CHAT WITH SELLER
+  // =========================
+
+  const startChat = async () => {
+    if (!auth.currentUser) {
+      alert(
+        "Please log in to chat with the seller."
+      );
+
+      navigate("/login");
+
+      return;
+    }
+
+    if (!ad) return;
+
+    // Prevent seller from chatting with themselves
+    if (
+      ad.userId ===
+      auth.currentUser.uid
+    ) {
+      alert(
+        "This is your advertisement. You cannot chat with yourself."
+      );
+
+      return;
+    }
+
+    try {
+      setChatLoading(true);
+
+      const buyerId =
+        auth.currentUser.uid;
+
+      const sellerId =
+        ad.userId;
+
+      if (!sellerId) {
+        alert(
+          "Seller information is not available."
+        );
+
+        return;
+      }
+
+      // Create a consistent chat ID
+      const chatId =
+        buyerId < sellerId
+          ? `${buyerId}_${sellerId}_${id}`
+          : `${sellerId}_${buyerId}_${id}`;
+
+      const chatRef = doc(
+        db,
+        "chats",
+        chatId
+      );
+
+      // Check if chat already exists
+      const chatSnap =
+        await getDoc(chatRef);
+
+      if (!chatSnap.exists()) {
+        await setDoc(chatRef, {
+          participants: [
+            buyerId,
+            sellerId,
+          ],
+
+          buyerId,
+          sellerId,
+
+          adId: id,
+
+          adTitle:
+            ad.title || "",
+
+          adImage:
+            Array.isArray(ad.images) &&
+            ad.images.length > 0
+              ? ad.images[0]
+              : ad.image || "",
+
+          createdAt:
+            new Date(),
+
+          updatedAt:
+            new Date(),
+
+          lastMessage:
+            "",
+        });
+
+        // =========================
+        // CREATE NOTIFICATION
+        // =========================
+
+        await addDoc(
+          collection(
+            db,
+            "users",
+            sellerId,
+            "notifications"
+          ),
+          {
+            type: "chat",
+
+            title:
+              "New chat request 💬",
+
+            message:
+              `Someone wants to chat with you about "${ad.title}".`,
+
+            adId: id,
+
+            chatId,
+
+            fromUserId:
+              buyerId,
+
+            read: false,
+
+            createdAt:
+              new Date(),
+          }
+        );
+      }
+
+      // Open chat
+      navigate(`/chat/${chatId}`);
+
+    } catch (error) {
+      console.error(
+        "Chat error:",
+        error
+      );
+
+      alert(
+        error.message ||
+          "Could not start chat."
+      );
+    } finally {
+      setChatLoading(false);
+    }
+  };
 
   // =========================
   // LOADING
   // =========================
 
   if (loading) {
-
     return (
-
       <div className="details-page">
-
         <h2>
           Loading...
         </h2>
-
       </div>
-
     );
-
   }
-
 
   // =========================
   // NOT FOUND
   // =========================
 
   if (!ad) {
-
     return (
-
       <div className="details-page">
-
         <h2>
           Advertisement not found.
         </h2>
 
+        <Link to="/">
+          ← Back Home
+        </Link>
       </div>
-
     );
-
   }
-
 
   // =========================
   // IMAGE LIST
@@ -282,57 +385,44 @@ function AdDetails() {
       ? [ad.image]
       : [];
 
-
   // =========================
   // NEXT IMAGE
   // =========================
 
   const nextImage = () => {
-
     if (
       imageList.length === 0
-    ) return;
-
+    ) {
+      return;
+    }
 
     setCurrentImage(
       (current) =>
-
         current ===
         imageList.length - 1
-
           ? 0
-
           : current + 1
-
     );
-
   };
-
 
   // =========================
   // PREVIOUS IMAGE
   // =========================
 
   const previousImage = () => {
-
     if (
       imageList.length === 0
-    ) return;
-
+    ) {
+      return;
+    }
 
     setCurrentImage(
       (current) =>
-
         current === 0
-
           ? imageList.length - 1
-
           : current - 1
-
     );
-
   };
-
 
   // =========================
   // CONTACT INFORMATION
@@ -340,7 +430,6 @@ function AdDetails() {
 
   const phoneNumber =
     ad.phone || "";
-
 
   const whatsappNumber =
     (
@@ -352,71 +441,60 @@ function AdDetails() {
       ""
     );
 
-
   const telegramValue =
     ad.telegram || "";
-
-
-  // Telegram username
 
   const telegramUsername =
     telegramValue
       .trim()
       .replace("@", "");
 
-
   // =========================
   // POSTED TIME
   // =========================
 
   const getPostedTime = () => {
-
     if (!ad.createdAt) {
       return "";
     }
 
-
     let date;
-
 
     if (
       typeof ad.createdAt.toDate ===
       "function"
     ) {
-
       date =
         ad.createdAt.toDate();
 
-    } else {
+    } else if (
+      ad.createdAt.seconds
+    ) {
+      date = new Date(
+        ad.createdAt.seconds * 1000
+      );
 
+    } else {
       date =
         new Date(ad.createdAt);
-
     }
-
 
     if (
-      Number.isNaN(date.getTime())
+      Number.isNaN(
+        date.getTime()
+      )
     ) {
-
       return "";
-
     }
 
-
     return date.toLocaleString();
-
   };
-
 
   const postedTime =
     getPostedTime();
 
-
   return (
-
     <div className="details-page">
-
 
       {/* =========================
           IMAGE
@@ -424,11 +502,9 @@ function AdDetails() {
 
       <div className="details-image">
 
-
         {imageList.length > 0 ? (
 
           <>
-
             <img
               src={
                 imageList[
@@ -439,11 +515,9 @@ function AdDetails() {
               className="details-photo"
             />
 
-
             {imageList.length > 1 && (
 
               <>
-
                 <button
                   className="
                     gallery-button
@@ -455,7 +529,6 @@ function AdDetails() {
                 >
                   ❮
                 </button>
-
 
                 <button
                   className="
@@ -469,23 +542,14 @@ function AdDetails() {
                   ❯
                 </button>
 
-
                 <div
                   className="
                     image-counter
                   "
                 >
-
-                  {
-                    currentImage + 1
-                  }
-
+                  {currentImage + 1}
                   {" / "}
-
-                  {
-                    imageList.length
-                  }
-
+                  {imageList.length}
                 </div>
 
               </>
@@ -501,15 +565,12 @@ function AdDetails() {
               no-details-image
             "
           >
-
             📷 No Image Available
-
           </div>
 
         )}
 
       </div>
-
 
       {/* =========================
           THUMBNAILS
@@ -524,37 +585,27 @@ function AdDetails() {
         >
 
           {imageList.map(
-            (
-              image,
-              index
-            ) => (
+            (image, index) => (
 
               <img
                 key={index}
-
                 src={image}
-
                 alt={
                   `${ad.title} ${
                     index + 1
                   }`
                 }
-
                 className={
                   index ===
                   currentImage
-
                     ? "thumbnail active-thumbnail"
-
                     : "thumbnail"
                 }
-
                 onClick={() =>
                   setCurrentImage(
                     index
                   )
                 }
-
               />
 
             )
@@ -563,7 +614,6 @@ function AdDetails() {
         </div>
 
       )}
-
 
       {/* =========================
           AD INFORMATION
@@ -575,7 +625,6 @@ function AdDetails() {
         "
       >
 
-
         {/* CATEGORY */}
 
         <span
@@ -583,26 +632,16 @@ function AdDetails() {
             details-category
           "
         >
-
-          {
-            ad.category ||
-            "Advertisement"
-          }
-
+          {ad.category ||
+            "Advertisement"}
         </span>
-
 
         {/* TITLE */}
 
         <h1>
-
-          {
-            ad.title ||
-            "Untitled Advertisement"
-          }
-
+          {ad.title ||
+            "Untitled Advertisement"}
         </h1>
-
 
         {/* PRICE */}
 
@@ -617,10 +656,11 @@ function AdDetails() {
               /,/g,
               ""
             )
-          ).toLocaleString()}
+          ).toLocaleString(
+            "en-US"
+          )}
 
         </h2>
-
 
         {/* POST TIME */}
 
@@ -631,50 +671,61 @@ function AdDetails() {
               posted-time
             "
           >
-
             🕒 Posted:
-
             {" "}
-
             {postedTime}
-
           </p>
 
         )}
 
-
         {/* FAVORITE */}
 
         <button
-
           onClick={
             toggleFavorite
           }
-
           disabled={
             favoriteLoading
           }
-
           className="
             favorite-btn
           "
-
         >
 
-          {
-            favoriteLoading
-
-              ? "Saving..."
-
-              : isFavorite
-
-              ? "❤️ Saved"
-
-              : "🤍 Save Advertisement"
-          }
+          {favoriteLoading
+            ? "Saving..."
+            : isFavorite
+            ? "❤️ Saved"
+            : "🤍 Save Advertisement"}
 
         </button>
 
+        {/* =========================
+            CHAT
+        ========================= */}
+
+        {ad.userId !==
+          auth.currentUser?.uid && (
+
+          <button
+            onClick={
+              startChat
+            }
+            disabled={
+              chatLoading
+            }
+            className="
+              chat-seller-btn
+            "
+          >
+
+            {chatLoading
+              ? "Opening chat..."
+              : "💬 Chat with Seller"}
+
+          </button>
+
+        )}
 
         {/* CITY */}
 
@@ -694,7 +745,6 @@ function AdDetails() {
 
         )}
 
-
         {/* CONDITION */}
 
         {ad.condition && (
@@ -713,7 +763,6 @@ function AdDetails() {
 
         )}
 
-
         {/* SUBCATEGORY */}
 
         {ad.subcategory && (
@@ -731,7 +780,6 @@ function AdDetails() {
           </p>
 
         )}
-
 
         {/* FURNITURE */}
 
@@ -753,7 +801,6 @@ function AdDetails() {
 
         )}
 
-
         {/* LABOR */}
 
         {ad.laborType && (
@@ -773,7 +820,6 @@ function AdDetails() {
           </p>
 
         )}
-
 
         {/* DESCRIPTION */}
 
@@ -798,9 +844,7 @@ function AdDetails() {
 
         </div>
 
-
         <hr />
-
 
         {/* =========================
             SELLER INFORMATION
@@ -816,23 +860,17 @@ function AdDetails() {
             👤 Seller Information
           </h3>
 
-
-          {/* =========================
-              PHONE
-          ========================= */}
+          {/* PHONE */}
 
           {phoneNumber && (
 
             <a
-
               href={
                 `tel:${phoneNumber}`
               }
-
               className="
                 phone-link
               "
-
             >
 
               📞 Call Seller
@@ -845,29 +883,21 @@ function AdDetails() {
 
           )}
 
-
-          {/* =========================
-              WHATSAPP
-          ========================= */}
+          {/* WHATSAPP */}
 
           {whatsappNumber && (
 
             <a
-
               href={
                 `https://wa.me/${whatsappNumber}`
               }
-
               target="_blank"
-
               rel="
                 noopener noreferrer
               "
-
               className="
                 whatsapp-btn
               "
-
             >
 
               💬 WhatsApp Seller
@@ -876,29 +906,21 @@ function AdDetails() {
 
           )}
 
-
-          {/* =========================
-              TELEGRAM
-          ========================= */}
+          {/* TELEGRAM */}
 
           {telegramUsername && (
 
             <a
-
               href={
                 `https://t.me/${telegramUsername}`
               }
-
               target="_blank"
-
               rel="
                 noopener noreferrer
               "
-
               className="
                 telegram-btn
               "
-
             >
 
               ✈️ Contact on Telegram
@@ -907,15 +929,11 @@ function AdDetails() {
 
           )}
 
-
-          {/* =========================
-              EMAIL
-          ========================= */}
+          {/* EMAIL */}
 
           {ad.userEmail && (
 
             <a
-
               href={
                 `mailto:${
                   ad.userEmail
@@ -926,11 +944,9 @@ function AdDetails() {
                   }`
                 )}`
               }
-
               className="
                 contact-btn
               "
-
             >
 
               📧 Email Seller
@@ -939,10 +955,7 @@ function AdDetails() {
 
           )}
 
-
-          {/* =========================
-              NO CONTACT
-          ========================= */}
+          {/* NO CONTACT */}
 
           {!phoneNumber &&
             !whatsappNumber &&
@@ -950,11 +963,9 @@ function AdDetails() {
             !ad.userEmail && (
 
               <p>
-
                 Seller contact
                 information is not
                 available.
-
               </p>
 
             )}
@@ -964,10 +975,7 @@ function AdDetails() {
       </div>
 
     </div>
-
   );
-
 }
-
 
 export default AdDetails;
