@@ -4815,71 +4815,442 @@ textarea {
 
     z-index: 9999;
   }
-}/* =========================================
-   FIX SUBCATEGORY MENU POSITIONING
-========================================= */
+}/* =====================================================
+   FINAL CIRCULAR HOME CATEGORIES
+===================================================== */
 
-/* Parent item container must be relative */
-.home-category-item {
-  position: relative !important;
-  flex: 0 0 92px !important;
-  width: 92px !important;
-  min-width: 92px !important;
+.home-categories {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  padding: 40px 20px 55px;
+
+  box-sizing: border-box;
+
+  position: relative;
+
+  overflow: visible;
+}
+
+.home-section-title {
+  text-align: center;
+
+  font-size: 30px;
+  font-weight: 800;
+
+  color: #222;
+
+  margin: 0 0 28px;
+}
+
+
+/* =====================================================
+   HORIZONTAL CATEGORY ROW
+===================================================== */
+
+.home-category-scroll {
+  display: flex !important;
+
+  flex-direction: row !important;
+
+  flex-wrap: nowrap !important;
+
+  align-items: flex-start;
+
+  justify-content: flex-start;
+
+  gap: 28px;
+
+  width: 100%;
+
+  overflow-x: auto !important;
+
+  overflow-y: hidden;
+
+  padding: 5px 10px 18px;
+
+  box-sizing: border-box;
+
+  scrollbar-width: none;
+
+  -ms-overflow-style: none;
+
+  -webkit-overflow-scrolling: touch;
+}
+
+.home-category-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+
+/* =====================================================
+   EACH MAIN CATEGORY
+===================================================== */
+
+.home-category-circle-item {
+  flex: 0 0 110px !important;
+
+  width: 110px !important;
+
+  min-width: 110px !important;
+
+  max-width: 110px !important;
+
+  border: none !important;
+
+  background: transparent !important;
+
+  padding: 0 !important;
+
+  margin: 0 !important;
+
+  cursor: pointer;
+
+  display: flex !important;
+
+  flex-direction: column !important;
+
+  align-items: center !important;
+
+  justify-content: flex-start !important;
+
   text-align: center;
 }
 
-/* Subcategory dropdown positioned right under the clicked icon */
-.home-category-options {
-  position: absolute !important;
-  top: 100% !important; /* Forces it right below the circle button */
-  bottom: auto !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
 
-  width: 210px !important;
-  max-width: 250px !important;
-  padding: 10px !important;
-  margin-top: 8px !important;
+/* =====================================================
+   PERFECT CIRCLE
+===================================================== */
 
-  background: #ffffff !important;
-  border: 1px solid #e2e8f0 !important;
-  border-radius: 12px !important;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.18) !important;
+.home-main-circle {
+  width: 86px !important;
+  height: 86px !important;
 
-  z-index: 9999 !important; /* Ensures it sits above other content */
+  min-width: 86px !important;
+  min-height: 86px !important;
+
+  max-width: 86px !important;
+  max-height: 86px !important;
+
+  border-radius: 50% !important;
+
+  background: #f5f7fa;
+
+  border: 2px solid #d5dee8;
+
+  display: flex !important;
+
+  align-items: center !important;
+
+  justify-content: center !important;
+
+  font-size: 42px;
+
+  line-height: 1;
+
+  box-sizing: border-box;
+
+  margin-bottom: 10px;
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
-/* Option link styling */
-.home-category-option {
-  display: block !important;
-  padding: 9px 12px !important;
-  margin-bottom: 6px !important;
-  background: #f8fafc !important;
-  color: #1a56db !important;
-  text-decoration: none !important;
-  border-radius: 8px !important;
-  font-size: 13px !important;
-  font-weight: 600 !important;
-  text-align: left !important;
+
+/* =====================================================
+   HOVER / ACTIVE
+===================================================== */
+
+.home-category-circle-item:hover
+.home-main-circle {
+
+  transform: scale(1.07);
+
+  border-color: #1976d2;
+
+  box-shadow:
+    0 6px 18px rgba(0, 0, 0, 0.12);
 }
 
-.home-category-option:last-child {
-  margin-bottom: 0 !important;
+.home-category-circle-item.active
+.home-main-circle {
+
+  border-color: #1976d2;
+
+  box-shadow:
+    0 5px 16px rgba(25, 118, 210, 0.20);
 }
 
-.home-category-option:hover {
-  background: #1a56db !important;
-  color: #ffffff !important;
+
+/* =====================================================
+   CATEGORY NAME
+===================================================== */
+
+.home-main-category-name {
+  width: 110px;
+
+  font-size: 14px;
+
+  font-weight: 700;
+
+  line-height: 1.25;
+
+  color: #222;
+
+  text-align: center;
+
+  white-space: normal;
 }
 
-/* Mobile responsive fix - prevents fixing menu to bottom of screen */
+
+/* =====================================================
+   SELECTED CATEGORY AREA
+
+   THIS IS IMPORTANT:
+   The menu now takes real space in the page.
+   It cannot cover Latest Advertisements.
+===================================================== */
+
+.home-selected-options {
+  width: 100%;
+
+  display: flex;
+
+  justify-content: center;
+
+  box-sizing: border-box;
+
+  margin-top: 18px;
+}
+
+
+/* =====================================================
+   OPTIONS BOX
+===================================================== */
+
+.home-options-box {
+  width: 100%;
+
+  max-width: 600px;
+
+  background: #ffffff;
+
+  border: 2px solid #1976d2;
+
+  border-radius: 14px;
+
+  padding: 18px;
+
+  box-sizing: border-box;
+
+  box-shadow:
+    0 5px 18px rgba(0, 0, 0, 0.10);
+}
+
+.home-options-box h3 {
+  margin: 0 0 14px;
+
+  text-align: center;
+
+  font-size: 19px;
+
+  color: #222;
+}
+
+
+/* =====================================================
+   OPTIONS
+===================================================== */
+
+.home-options-list {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 10px;
+
+  justify-content: center;
+}
+
+.home-option-button {
+  display: inline-block;
+
+  padding: 11px 16px;
+
+  border-radius: 8px;
+
+  background: #1976d2;
+
+  color: white;
+
+  text-decoration: none;
+
+  font-size: 14px;
+
+  font-weight: 700;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.home-option-button:hover {
+  background: #0d47a1;
+
+  transform: translateY(-1px);
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
 @media (max-width: 700px) {
-  .home-category-options {
-    position: absolute !important;
-    top: 100% !important;
-    bottom: auto !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    width: 200px !important;
+
+  .home-categories {
+
+    padding:
+      28px
+      0
+      40px;
+  }
+
+  .home-section-title {
+
+    font-size: 25px;
+
+    margin-bottom: 22px;
+  }
+
+  .home-category-scroll {
+
+    gap: 17px;
+
+    padding-left: 12px;
+
+    padding-right: 12px;
+  }
+
+  .home-category-circle-item {
+
+    flex: 0 0 88px !important;
+
+    width: 88px !important;
+
+    min-width: 88px !important;
+
+    max-width: 88px !important;
+  }
+
+  .home-main-circle {
+
+    width: 68px !important;
+
+    height: 68px !important;
+
+    min-width: 68px !important;
+
+    min-height: 68px !important;
+
+    max-width: 68px !important;
+
+    max-height: 68px !important;
+
+    font-size: 32px;
+  }
+
+  .home-main-category-name {
+
+    width: 88px;
+
+    font-size: 11px;
+
+    line-height: 1.2;
+  }
+
+  .home-selected-options {
+
+    padding:
+      0
+      12px;
+
+    margin-top: 12px;
+  }
+
+  .home-options-box {
+
+    padding: 14px;
+  }
+
+  .home-options-box h3 {
+
+    font-size: 17px;
+  }
+
+  .home-options-list {
+
+    flex-direction: column;
+
+    gap: 8px;
+  }
+
+  .home-option-button {
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+    text-align: center;
+  }
+}
+
+
+/* =====================================================
+   SMALL PHONES
+===================================================== */
+
+@media (max-width: 400px) {
+
+  .home-category-scroll {
+
+    gap: 13px;
+  }
+
+  .home-category-circle-item {
+
+    flex: 0 0 80px !important;
+
+    width: 80px !important;
+
+    min-width: 80px !important;
+
+    max-width: 80px !important;
+  }
+
+  .home-main-circle {
+
+    width: 62px !important;
+
+    height: 62px !important;
+
+    min-width: 62px !important;
+
+    min-height: 62px !important;
+
+    max-width: 62px !important;
+
+    max-height: 62px !important;
+
+    font-size: 28px;
+  }
+
+  .home-main-category-name {
+
+    width: 80px;
+
+    font-size: 10px;
   }
 }

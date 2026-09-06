@@ -536,6 +536,7 @@ function Home() {
     All Categories
   </h2>
 
+  {/* CIRCULAR CATEGORY ROW */}
   <div className="home-category-scroll">
 
     {categories
@@ -552,49 +553,71 @@ function Home() {
       )
       .map((category) => (
 
-        <div
+        <button
           key={category.id}
-          className="home-category-item"
+          type="button"
+          className={`home-category-circle-item ${
+            openCategory === category.id
+              ? "active"
+              : ""
+          }`}
+          onClick={() =>
+            toggleCategory(category.id)
+          }
         >
 
-          <button
-            type="button"
-            className="home-category-circle-button"
-            onClick={() => toggleCategory(category.id)}
-          >
+          <div className="home-main-circle">
+            {category.icon}
+          </div>
 
-            <div className="home-category-circle">
-              {category.icon}
-            </div>
+          <div className="home-main-category-name">
+            {category.title}
+          </div>
 
-            <div className="home-category-name">
-              {category.title}
-            </div>
-
-          </button>
-
-          {openCategory === category.id && (
-            <div className="home-category-options">
-
-              {category.options.map((option) => (
-                <Link
-                  key={option.name}
-                  to={option.link}
-                  className="home-category-option"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {option.name}
-                </Link>
-              ))}
-
-            </div>
-          )}
-
-        </div>
+        </button>
 
       ))}
 
   </div>
+
+  {/* SELECTED CATEGORY OPTIONS */}
+  {openCategory && (
+    <div className="home-selected-options">
+
+      {categories
+        .filter(
+          (category) =>
+            category.id === openCategory
+        )
+        .map((category) => (
+          <div
+            key={category.id}
+            className="home-options-box"
+          >
+
+            <h3>{category.title}</h3>
+
+            <div className="home-options-list">
+
+              {category.options.map(
+                (option) => (
+                  <Link
+                    key={option.name}
+                    to={option.link}
+                    className="home-option-button"
+                  >
+                    {option.name}
+                  </Link>
+                )
+              )}
+
+            </div>
+
+          </div>
+        ))}
+
+    </div>
+  )}
 
 </section>
 
