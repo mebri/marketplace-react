@@ -5253,4 +5253,280 @@ textarea {
 
     font-size: 10px;
   }
+}/* =========================================
+   MOBILE DISPLAY FIX
+========================================= */
+
+html,
+body,
+#root {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+img {
+  max-width: 100%;
+}
+
+/* Prevent pages from becoming tiny */
+.home-page,
+.home-categories,
+.latest-ads-section,
+.search-page,
+.my-ads-page,
+.dashboard-page,
+.details-page,
+.cars-page,
+.houses-page,
+.rentals-page {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .home-page,
+  .search-page,
+  .my-ads-page,
+  .dashboard-page,
+  .details-page,
+  .cars-page,
+  .houses-page,
+  .rentals-page {
+    width: 100%;
+    max-width: 100%;
+    padding-left: 12px;
+    padding-right: 12px;
+    box-sizing: border-box;
+  }
+
+  h1 {
+    font-size: 28px;
+  }
+
+  h2 {
+    font-size: 24px;
+  }
+
+  h3 {
+    font-size: 18px;
+  }
+
+  p {
+    font-size: 14px;
+  }
+}/* =========================================================
+   FINAL MOBILE PAGE SIZE FIX
+========================================================= */
+
+html {
+  width: 100%;
+  min-width: 100%;
+}
+
+body {
+  width: 100%;
+  min-width: 100%;
+  overflow-x: hidden;
+}
+
+#root {
+  width: 100%;
+  min-width: 100%;
+}
+
+/* Main pages */
+.home-page,
+.search-page,
+.my-ads-page,
+.dashboard-page,
+.cars-page,
+.houses-page,
+.rentals-page,
+.details-page,
+.post-ad-page,
+.edit-ad-page,
+.profile-page,
+.account-page {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Images */
+img {
+  max-width: 100%;
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+  .home-page,
+  .search-page,
+  .my-ads-page,
+  .dashboard-page,
+  .cars-page,
+  .houses-page,
+  .rentals-page,
+  .details-page,
+  .post-ad-page,
+  .edit-ad-page,
+  .profile-page,
+  .account-page {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Do not make the whole website tiny */
+  .search-page,
+  .my-ads-page,
+  .dashboard-page,
+  .cars-page,
+  .houses-page,
+  .rentals-page,
+  .details-page {
+    min-width: 0;
+  }
+
+  /* Text */
+  .home-page h1,
+  .search-page h1,
+  .my-ads-page h1,
+  .dashboard-page h1,
+  .cars-page h1,
+  .houses-page h1,
+  .rentals-page h1 {
+    max-width: 100%;
+  }
+
+  /* Cards */
+  .latest-ad-card,
+  .my-ad-card,
+  .dashboard-ad-card,
+  .car-card,
+  .profile-ad-card {
+    min-width: 0;
+  }
+}q
+@media (max-width: 600px) {
+
+  .home-category-scroll {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    gap: 10px !important;
+
+    padding: 5px 8px 12px !important;
+
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .home-category-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* MINI CATEGORY */
+  .home-category-circle-item {
+    flex: 0 0 62px !important;
+
+    width: 62px !important;
+    min-width: 62px !important;
+    max-width: 62px !important;
+  }
+
+  .home-category-circle-button {
+    width: 62px !important;
+  }
+
+  /* MINI CIRCLE */
+  .home-main-circle {
+    width: 46px !important;
+    height: 46px !important;
+
+    min-width: 46px !important;
+    min-height: 46px !important;
+
+    max-width: 46px !important;
+    max-height: 46px !important;
+
+    font-size: 22px !important;
+
+    border-width: 1.5px !important;
+
+    margin-bottom: 5px !important;
+  }
+
+  /* MINI TEXT */
+  .home-main-category-name {
+    width: 62px !important;
+
+    font-size: 9px !important;
+
+    font-weight: 600 !important;
+
+    line-height: 1.1 !important;
+
+    white-space: normal;
+  }
+
+  /* Category options remain normal size */
+  .home-selected-options {
+    padding: 0 10px !important;
+  }
+
+  .home-options-box {
+    max-width: 100% !important;
+    padding: 12px !important;
+  }
+
+  .home-option-button {
+    font-size: 13px !important;
+  }
+}@media (max-width: 400px) {
+
+  .home-category-scroll {
+    gap: 8px !important;
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+  }
+
+  .home-category-circle-item {
+    flex: 0 0 56px !important;
+    width: 56px !important;
+    min-width: 56px !important;
+  }
+
+  .home-category-circle-button {
+    width: 56px !important;
+  }
+
+  .home-main-circle {
+    width: 42px !important;
+    height: 42px !important;
+
+    min-width: 42px !important;
+    min-height: 42px !important;
+
+    max-width: 42px !important;
+    max-height: 42px !important;
+
+    font-size: 20px !important;
+  }
+
+  .home-main-category-name {
+    width: 56px !important;
+    font-size: 8px !important;
+  }
 }
