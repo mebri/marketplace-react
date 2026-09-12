@@ -449,3 +449,35 @@
     height: 50px;
   }
 }
+/* =========================================================
+   NAVBAR SLIDESHOW
+========================================================= */
+.navbar-slideshow {
+  width: 80px;
+  height: 35px;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin: 0 10px;
+  background: #f1f5f9;
+}
+
+.navbar-slideshow img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.5s ease;
+}
+
+/* Mobile adjustments */
+@media (max-width: 850px) {
+  .navbar-slideshow {
+    width: 55px;
+    height: 28px;
+    margin: 0 5px;
+  }
+}
