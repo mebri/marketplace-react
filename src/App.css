@@ -1521,7 +1521,124 @@ nav a:hover {
   text-decoration: none;
   color: inherit;
 }
+/* =========================================================
+   MODERN HOMEPAGE POLISH
+========================================================= */
 
+/* 1. Soft Modern Hero Section */
+.home-hero {
+  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%) !important;
+  padding: 70px 20px !important;
+  border-bottom-left-radius: 24px;
+  border-bottom-right-radius: 24px;
+  box-shadow: 0 10px 30px rgba(30, 58, 138, 0.15);
+}
+
+.home-hero h1 {
+  font-size: 42px !important;
+  letter-spacing: -1px;
+  margin-bottom: 12px !important;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.15);
+}
+
+.home-hero p {
+  font-size: 17px !important;
+  opacity: 0.95;
+}
+
+/* 2. Better Search Bar */
+.home-search {
+  margin-top: 35px !important;
+  background: white;
+  padding: 8px;
+  border-radius: 14px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.home-search input {
+  box-shadow: none !important;
+  height: 48px !important;
+  background: #f8fafc !important;
+}
+
+.home-search-button {
+  height: 48px !important;
+  border-radius: 10px !important;
+  background: #f59e0b !important;
+  padding: 0 28px !important;
+  font-weight: 800;
+}
+
+/* 3. Cleaner Section Titles */
+.home-section-title {
+  font-size: 28px !important;
+  letter-spacing: -0.5px;
+  margin-bottom: 25px !important;
+}
+
+/* 4. Beautiful Category Circles */
+.home-category-scroll {
+  gap: 20px !important;
+  padding: 10px 15px 30px !important;
+}
+
+.home-main-circle {
+  background: white !important;
+  border: 2px solid #e2e8f0 !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important;
+  transition: all 0.3s ease !important;
+}
+
+.home-category-circle-item:hover .home-main-circle {
+  transform: translateY(-5px) scale(1.05) !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 10px 20px rgba(59, 130, 246, 0.2) !important;
+}
+
+.home-main-category-name {
+  color: #1e293b !important;
+  font-weight: 700 !important;
+}
+
+/* 5. Modern Latest Ads Cards */
+.latest-ad-card {
+  border-radius: 20px !important;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.04) !important;
+  border: 1px solid #f1f5f9 !important;
+  transition: all 0.3s ease !important;
+}
+
+.latest-ad-card:hover {
+  transform: translateY(-6px) !important;
+  box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important;
+}
+
+.latest-ad-image {
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+}
+
+.latest-ad-info h3 {
+  font-size: 18px !important;
+  color: #0f172a !important;
+}
+
+.latest-ad-info h4 {
+  color: #059669 !important;
+  font-weight: 800 !important;
+  font-size: 20px !important;
+}
+
+.latest-view-button {
+  background: #3b82f6 !important;
+  border-radius: 12px !important;
+  font-weight: 700 !important;
+  transition: background 0.3s ease !important;
+}
+
+.latest-view-button:hover {
+  background: #2563eb !important;
+}
 .dashboard-ad-title-link:hover h3 {
   color: #1769d1;
 }
