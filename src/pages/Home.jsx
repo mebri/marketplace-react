@@ -1,39 +1,3 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import {
-  collection,
-  getDocs,
-} from "firebase/firestore";
-import { db } from "../firebase/firebase";
-
-function Home() {
-  const [openCategory, setOpenCategory] =
-    useState(null);
-
-  const [latestAds, setLatestAds] =
-    useState([]);
-
-  const [adsLoading, setAdsLoading] =
-    useState(true);
-
-  // =========================
-  // CATEGORIES
-  // =========================
-
-  const categories = [
-    {
-      id: "cars",
-      icon: "🚗",
-      title: "Cars",
-      description:
-        "New, used, electric cars and car rental",
-      options: [
-        {
-          name: "🚗 New Cars",
-          link: "/cars?condition=new",
-        },
-        {
-          name: "🚙 Used Cars",
           link: "/cars?condition=used",
         },
         {
