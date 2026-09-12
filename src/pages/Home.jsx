@@ -1,39 +1,3 @@
-          link: "/cars?condition=used",
-        },
-        {
-          name: "⚡ Electric Cars",
-          link: "/cars?condition=electric",
-        },
-        {
-          name: "🚘 Cars for Rent",
-          link: "/cars?condition=rent",
-        },
-      ],
-    },
-
-    {
-      id: "houses",
-      icon: "🏠",
-      title: "Houses",
-      description:
-        "Houses for sale and rent",
-      options: [
-        {
-          name: "🏠 Houses for Sale",
-          link: "/houses?type=sale",
-        },
-        {
-          name: "🏠 Houses for Rent",
-          link: "/houses?type=rent",
-        },
-      ],
-    },
-
-    {
-      id: "rentals",
-      icon: "🏢",
-      title: "Rentals",
-      description:
         "Apartments, shops and offices",
       options: [
         {
