@@ -1330,3 +1330,61 @@ img { max-width: 100%; }
     margin-top: 8px !important;
   }
 }
+/* =========================================================
+   FORCE SEARCH & VIEW ALL CARDS TO MATCH HOMEPAGE
+========================================================= */
+@media (max-width: 600px) {
+  /* 1. Clamp the description to exactly 3 lines */
+  .car-description,
+  .latest-ad-description {
+    display: -webkit-box !important;
+    -webkit-line-clamp: 3 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    font-size: 12px !important;
+    line-height: 1.4 !important;
+    margin-top: 6px !important;
+    color: #666 !important;
+  }
+
+  /* 2. Make the price blue like the Home page */
+  .car-price,
+  .latest-ad-info h4 {
+    color: #1976d2 !important; /* Blue */
+    font-size: 16px !important;
+    font-weight: 700 !important;
+  }
+
+  /* 3. Make the View Details button blue and compact */
+  .car-details-button,
+  .car-details-link,
+  .latest-view-button {
+    background: #1976d2 !important; /* Blue */
+    color: white !important;
+    font-size: 13px !important;
+    padding: 10px !important;
+    border-radius: 6px !important;
+    margin-top: 8px !important;
+    display: block !important;
+    text-align: center !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 4. Make the condition and city text smaller so they don't take up too much space */
+  .car-condition,
+  .car-city,
+  .latest-ad-info p:not(.latest-ad-description) {
+    font-size: 12px !important;
+    margin: 4px 0 !important;
+  }
+
+  /* 5. Keep the card heights balanced */
+  .car-card,
+  .latest-ad-card {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    height: 100% !important;
+  }
+}
