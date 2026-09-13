@@ -1446,3 +1446,34 @@ img { max-width: 100%; }
     height: 100% !important;
   }
 }
+/* =========================================================
+   CLAMP LONG DESCRIPTIONS ON SEARCH & OTHER PAGES
+========================================================= */
+@media (max-width: 600px) {
+  /* Target any description paragraph inside ad cards */
+  .car-description,
+  .latest-ad-description,
+  .ad-description,
+  .search-card p,
+  .car-info p:not(.car-price):not(.car-city):not(.car-condition) {
+    display: -webkit-box !important;
+    -webkit-line-clamp: 3 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    font-size: 12px !important;
+    line-height: 1.4 !important;
+    margin-top: 6px !important;
+    color: #666 !important;
+    max-height: 4.2em !important; /* Fallback */
+  }
+
+  /* Make sure all ad cards have a consistent height */
+  .car-card,
+  .latest-ad-card,
+  .search-ad-card {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    height: 100% !important;
+  }
+}
