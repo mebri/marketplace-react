@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { auth } from "../firebase/firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import NavbarSlideshow from "./NavbarSlideshow"; // ADDED THIS IMPORT
 import "./Navbar.css";
 
 function Navbar() {
@@ -33,7 +32,6 @@ function Navbar() {
 
   return (
     <nav className="navbar">
-
       <div className="nav-container">
 
         {/* LOGO */}
@@ -48,9 +46,6 @@ function Navbar() {
             className="nav-logo-image"
           />
         </Link>
-
-        {/* SLIDESHOW - EXACTLY BETWEEN LOGO AND HAMBURGER */}
-        <NavbarSlideshow />
 
         {/* HAMBURGER - MOBILE ONLY */}
         <button
