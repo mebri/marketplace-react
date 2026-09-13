@@ -39,7 +39,10 @@ function Search() {
       const snapshot = await getDocs(
         collection(db, "ads")
       );
-
+// SORT BY POST TIME (NEWEST FIRST)
+ads.sort((a, b) => {
+  return getAdTime(b) - getAdTime(a);
+});
       const allAds = snapshot.docs.map((item) => ({
         id: item.id,
         ...item.data(),
