@@ -197,40 +197,7 @@ function Home() {
         </div>
       </section>
 
-      {/* MODERN FEATURED SHOWCASE */}
-      <section className="featured-showcase">
-        <h2 className="home-section-title" style={{ marginBottom: '20px' }}>Featured</h2>
-        <div className="featured-row">
-          <Link to="/cars" className="featured-card">
-            <img src="https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=600&q=80" alt="Modern Cars" />
-            <div className="featured-overlay">
-              <h3>Modern Cars</h3>
-              <span>Explore Cars →</span>
-            </div>
-          </Link>
-          <Link to="/houses" className="featured-card">
-            <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=600&q=80" alt="Houses" />
-            <div className="featured-overlay">
-              <h3>Houses</h3>
-              <span>Find a Home →</span>
-            </div>
-          </Link>
-          <Link to="/search?category=Electronics&subcategory=Phones" className="featured-card">
-            <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=600&q=80" alt="Smartphones" />
-            <div className="featured-overlay">
-              <h3>Smartphones</h3>
-              <span>Shop Phones →</span>
-            </div>
-          </Link>
-          <Link to="/search?category=Furniture" className="featured-card">
-            <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=600&q=80" alt="Furniture" />
-            <div className="featured-overlay">
-              <h3>Furniture</h3>
-              <span>View Collection →</span>
-            </div>
-          </Link>
-        </div>
-      </section>
+      {/
 
       {/* CIRCULAR MAIN CATEGORIES */}
       <section className="home-categories">
