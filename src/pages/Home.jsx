@@ -197,8 +197,6 @@ function Home() {
         </div>
       </section>
 
-      {/
-
       {/* CIRCULAR MAIN CATEGORIES */}
       <section className="home-categories">
         <h2 className="home-section-title">All Categories</h2>
