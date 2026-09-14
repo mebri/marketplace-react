@@ -1,14 +1,22 @@
-
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { auth } from "../firebase/firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
+
+// NEW: Firebase imports for notifications
+import { db } from "../firebase/firebase";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
+
 import "./Navbar.css";
 
 function Navbar() {
   const [user, setUser] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
+  // =========================
+  // AUTH LISTENER
+  // =========================
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -16,6 +24,27 @@ function Navbar() {
 
     return () => unsubscribe();
   }, []);
+
+  // =========================
+  // NOTIFICATIONS LISTENER
+  // =========================
+  useEffect(() => {
+    if (!user) {
+      setUnreadCount(0);
+      return;
+    }
+
+    const q = query(
+      collection(db, "users", user.uid, "notifications"),
+      where("read", "==", false)
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setUnreadCount(snapshot.size);
+    });
+
+    return () => unsubscribe();
+  }, [user]);
 
   const handleLogout = async () => {
     try {
@@ -81,9 +110,22 @@ function Navbar() {
             </>
           ) : (
             <>
+              {/* NOTIFICATION BELL */}
+              <Link
+                to="/notifications"
+                className="dashboard-btn notification-bell"
+                onClick={closeMenu}
+              >
+                🔔
+                {unreadCount > 0 && (
+                  <span className="notification-badge">
+                    {unreadCount > 9 ? "9+" : unreadCount}
+                  </span>
+                )}
+              </Link>
+
               <Link to="/dashboard" className="dashboard-btn">Dashboard</Link>
               <Link to="/my-ads" className="myads-btn">My Ads</Link>
-              <Link to="/chats" className="myads-btn">💬 Chats</Link>
               <Link to="/post-ad" className="post-btn">+ Post Ad</Link>
               <button onClick={handleLogout} className="logout-btn">Logout</button>
             </>
