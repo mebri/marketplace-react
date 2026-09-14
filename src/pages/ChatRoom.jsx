@@ -56,22 +56,45 @@ function ChatRoom() {
     });
     await updateDoc(doc(db, "chats", chatId), {
       lastMessage: msg,
-      lastMessageAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
     });
   };
 
-  if (loading) return <div className="chat-room-page"><p>Loading...</p></div>;
-  if (!user) return <div className="chat-room-page"><p>Please log in.</p></div>;
-  if (!chat) return <div className="chat-room-page"><p>Chat not found.</p></div>;
+  if (loading) {
+    return (
+      <div className="chat-room-page">
+        <p style={{ padding: 20 }}>Loading...</p>
+      </div>
+    );
+  }
 
-  const otherId = chat.participants.find((id) => id !== user.uid);
-  const otherName = chat.participantNames?.[otherId] || "User";
+  if (!user) {
+    return (
+      <div className="login-required">
+        <div className="login-required-icon">🔒</div>
+        <h1>Please Log In</h1>
+        <Link to="/login" className="dashboard-primary-btn">Go to Login</Link>
+      </div>
+    );
+  }
+
+  if (!chat) {
+    return (
+      <div className="chat-room-page">
+        <p style={{ padding: 20 }}>Chat not found.</p>
+        <Link to="/chats" style={{ padding: 20 }}>← Back to Chats</Link>
+      </div>
+    );
+  }
+
+  const isBuyer = chat.buyerId === user.uid;
+  const otherName = isBuyer ? chat.sellerName : chat.buyerName;
 
   return (
     <div className="chat-room-page">
       <div className="chat-room-header">
         <Link to="/chats" className="chat-back">←</Link>
-        <h2>{otherName}</h2>
+        <h2>{otherName || "User"}</h2>
       </div>
 
       {chat.adTitle && (
