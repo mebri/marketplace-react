@@ -1817,3 +1817,211 @@ img { max-width: 100%; }
 }
 .chat-seller-btn:hover { background: #0d47a1; }
 .chat-seller-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+/* =========================================================
+   AD DETAILS - POLISHED LAYOUT
+========================================================= */
+
+/* Action buttons (Save + Chat) in one row */
+.details-actions-row {
+  display: flex;
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.action-btn {
+  flex: 1;
+  padding: 13px 10px;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.favorite-action {
+  background: #fff;
+  color: #e11d48;
+  border-color: #fecdd3;
+}
+.favorite-action:hover { background: #fff1f2; }
+.favorite-action.active {
+  background: #e11d48;
+  color: white;
+  border-color: #e11d48;
+}
+.favorite-action:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.chat-action {
+  background: #1976d2;
+  color: white;
+  border-color: #1976d2;
+}
+.chat-action:hover { background: #0d47a1; border-color: #0d47a1; }
+.chat-action:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* View Profile block button */
+.block-profile-btn {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 15px;
+  padding: 13px;
+  background: #f0f6ff;
+  color: #1976d2;
+  border: 2px solid #1976d2;
+  border-radius: 10px;
+  text-align: center;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 15px;
+  transition: all 0.2s ease;
+}
+.block-profile-btn:hover {
+  background: #1976d2;
+  color: white;
+}
+
+/* Seller info block polish */
+.seller-information {
+  margin-top: 20px;
+  padding: 20px;
+  background: #f8fafc;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+}
+.seller-information h3 {
+  margin: 0 0 15px;
+  font-size: 18px;
+  color: #0f172a;
+}
+
+.seller-profile-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.seller-avatar {
+  width: 55px;
+  height: 55px;
+  min-width: 55px;
+  border-radius: 50%;
+  background: #1976d2;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.seller-profile-details h3 {
+  margin: 0 0 4px;
+  font-size: 17px;
+  color: #0f172a;
+}
+.seller-profile-details p {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.seller-contact-title {
+  margin: 25px 0 15px !important;
+}
+
+/* Contact buttons full-width block */
+.phone-link,
+.whatsapp-btn,
+.telegram-btn,
+.contact-btn {
+  display: block !important;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 10px;
+  padding: 13px;
+  border-radius: 10px;
+  text-align: center;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 15px;
+  transition: all 0.2s ease;
+}
+
+.phone-link {
+  background: #1976d2;
+  color: white;
+}
+.phone-link span {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  opacity: 0.9;
+  margin-top: 3px;
+}
+.phone-link:hover { background: #0d47a1; }
+
+.whatsapp-btn {
+  background: #25d366;
+  color: white;
+}
+.whatsapp-btn:hover { background: #1da851; }
+
+.telegram-btn {
+  background: #229ed9;
+  color: white;
+}
+.telegram-btn:hover { background: #168ac2; }
+
+/* Description block polish */
+.details-description {
+  margin-top: 20px;
+  padding: 18px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border-left: 4px solid #1976d2;
+}
+.details-description h3 {
+  margin: 0 0 10px;
+  font-size: 16px;
+  color: #0f172a;
+}
+.details-description p {
+  margin: 0;
+  line-height: 1.7;
+  color: #334155;
+  white-space: pre-wrap;
+}
+
+/* Posted time styling */
+.posted-time {
+  color: #64748b;
+  font-size: 14px;
+  margin: 0 0 10px;
+}
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+  .details-actions-row {
+    gap: 8px;
+  }
+  .action-btn {
+    font-size: 14px;
+    padding: 12px 8px;
+  }
+  .seller-information {
+    padding: 15px;
+  }
+  .seller-avatar {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    font-size: 20px;
+  }
+}
