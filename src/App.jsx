@@ -36,6 +36,13 @@ import Contact from "./pages/Contact";
 import Profile from "./pages/Profile";
 import UserProfile from "./pages/UserProfile";
 
+// =========================
+// CHAT PAGES (NEW)
+// =========================
+
+import Chats from "./pages/Chats";
+import ChatRoom from "./pages/ChatRoom";
+
 function App() {
   return (
     <HashRouter>
@@ -92,11 +99,6 @@ function App() {
 
         {/* =========================
             SEARCH
-            Used for:
-            Electronics
-            Furniture
-            Labor & Services
-            ምንአለሽ ተራ
         ========================= */}
 
         <Route
@@ -202,6 +204,26 @@ function App() {
         <Route
           path="/contact"
           element={<Contact />}
+        />
+
+
+        {/* =========================
+            CHATS LIST (NEW)
+        ========================= */}
+
+        <Route
+          path="/chats"
+          element={<Chats />}
+        />
+
+
+        {/* =========================
+            CHAT ROOM (NEW)
+        ========================= */}
+
+        <Route
+          path="/chat/:chatId"
+          element={<ChatRoom />}
         />
 
       </Routes>
