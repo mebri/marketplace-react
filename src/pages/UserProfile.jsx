@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { doc, getDoc, collection, getDocs, query, where } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  collection,
+  getDocs,
+} from "firebase/firestore";
 import { db } from "../firebase/firebase";
 
 function UserProfile() {
@@ -14,8 +19,10 @@ function UserProfile() {
   // =========================
   const getAdTime = (ad) => {
     if (!ad?.createdAt) return 0;
-    if (typeof ad.createdAt.toMillis === "function") return ad.createdAt.toMillis();
-    if (typeof ad.createdAt === "object" && ad.createdAt.seconds) return ad.createdAt.seconds * 1000;
+    if (typeof ad.createdAt.toMillis === "function")
+      return ad.createdAt.toMillis();
+    if (typeof ad.createdAt === "object" && ad.createdAt.seconds)
+      return ad.createdAt.seconds * 1000;
     if (ad.createdAt instanceof Date) return ad.createdAt.getTime();
     const date = new Date(ad.createdAt).getTime();
     return Number.isNaN(date) ? 0 : date;
@@ -27,8 +34,10 @@ function UserProfile() {
   const getPostedTime = (createdAt) => {
     if (!createdAt) return "";
     let postedDate;
-    if (typeof createdAt.toDate === "function") postedDate = createdAt.toDate();
-    else if (createdAt.seconds) postedDate = new Date(createdAt.seconds * 1000);
+    if (typeof createdAt.toDate === "function")
+      postedDate = createdAt.toDate();
+    else if (createdAt.seconds)
+      postedDate = new Date(createdAt.seconds * 1000);
     else if (createdAt instanceof Date) postedDate = createdAt;
     else postedDate = new Date(createdAt);
 
@@ -43,11 +52,16 @@ function UserProfile() {
 
     if (difference < 0) return "Just now";
     if (seconds < 60) return "Just now";
-    if (minutes < 60) return `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
+    if (minutes < 60)
+      return `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
     if (hours < 24) return `${hours} hour${hours === 1 ? "" : "s"} ago`;
     if (days < 7) return `${days} day${days === 1 ? "" : "s"} ago`;
 
-    return postedDate.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+    return postedDate.toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
   };
 
   useEffect(() => {
@@ -56,7 +70,7 @@ function UserProfile() {
 
   const loadUser = async () => {
     try {
-      // Load user profile
+      // 1. Load user profile
       const userRef = doc(db, "users", uid);
       const userSnapshot = await getDoc(userRef);
 
@@ -66,18 +80,28 @@ function UserProfile() {
         return;
       }
 
-      setProfile(userSnapshot.data());
+      const profileData = userSnapshot.data();
+      setProfile(profileData);
 
-      // Load user's ads
-      const adsQuery = query(collection(db, "ads"), where("userId", "==", uid));
-      const adsSnapshot = await getDocs(adsQuery);
+      // 2. Load ALL ads and filter by this user
+      const allAdsSnap = await getDocs(collection(db, "ads"));
 
-      const userAds = adsSnapshot.docs.map((document) => ({
-        id: document.id,
-        ...document.data(),
+      const allAds = allAdsSnap.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
       }));
 
-      // SORT BY POST TIME (NEWEST FIRST)
+      // Filter ads that belong to this seller
+      const userAds = allAds.filter((ad) => {
+        return (
+          ad.userId === uid ||
+          ad.uid === uid ||
+          ad.ownerId === uid ||
+          ad.userEmail === profileData.email
+        );
+      });
+
+      // SORT NEWEST FIRST
       userAds.sort((a, b) => getAdTime(b) - getAdTime(a));
 
       setAds(userAds);
@@ -95,13 +119,12 @@ function UserProfile() {
       text: `View ${profile?.name || "this user's"} profile on የኛ ገበያ.`,
       url: profileUrl,
     };
-
     try {
       if (navigator.share) {
         await navigator.share(shareData);
       } else {
         await navigator.clipboard.writeText(profileUrl);
-        alert("Profile link copied!");
+        alert("Profile link copied! 🔗");
       }
     } catch (error) {
       console.log("Share cancelled.");
@@ -111,7 +134,8 @@ function UserProfile() {
   if (loading) {
     return (
       <div className="profile-loading">
-        <h1>Loading profile...</h1>
+        <div className="dashboard-spinner"></div>
+        <h2>Loading profile...</h2>
       </div>
     );
   }
@@ -119,76 +143,141 @@ function UserProfile() {
   if (!profile) {
     return (
       <div className="profile-not-found">
+        <div className="login-required-icon">🔍</div>
         <h1>User Not Found</h1>
-        <p>This profile does not exist or has been removed.</p>
-        <Link to="/">← Back Home</Link>
+        <p>This profile doesn't exist or has been removed.</p>
+        <Link to="/" className="dashboard-primary-btn">
+          ← Back Home
+        </Link>
       </div>
     );
   }
 
+  const avatarLetter = profile.name
+    ? profile.name.charAt(0).toUpperCase()
+    : "👤";
+
   return (
     <div className="profile-page">
       <div className="profile-container">
-        {/* PUBLIC HEADER */}
-        <div className="profile-header">
-          <div className="profile-avatar">
-            {profile.name ? profile.name.charAt(0).toUpperCase() : "👤"}
-          </div>
+        {/* =========================
+            PROFILE HEADER
+        ========================= */}
+        <div className="profile-header public-profile-header">
+          <div className="profile-avatar">{avatarLetter}</div>
+
           <div className="profile-header-info">
             <h1>{profile.name || "የኛ ገበያ User"}</h1>
             {profile.city && <p>📍 {profile.city}</p>}
-            <p>📢 {ads.length} advertisement{ads.length !== 1 ? "s" : ""}</p>
+            <p>
+              📢 {ads.length} advertisement
+              {ads.length !== 1 ? "s" : ""}
+            </p>
           </div>
+
           <div className="profile-actions">
-            <button onClick={shareProfile} className="profile-share-button">
-              🔗 Share Profile
+            <button
+              onClick={shareProfile}
+              className="profile-share-button"
+            >
+              🔗 Share
             </button>
           </div>
         </div>
 
-        {/* CONTACT */}
-        <div className="profile-section">
-          <h2>📞 About This Seller</h2>
-          {profile.phone && <p className="public-profile-detail">📞 <a href={`tel:${profile.phone}`}>{profile.phone}</a></p>}
-          {profile.city && <p className="public-profile-detail">📍 {profile.city}</p>}
-        </div>
+        {/* =========================
+            CONTACT SECTION
+        ========================= */}
+        {(profile.phone || profile.city || profile.email) && (
+          <div className="profile-section">
+            <h2>📞 Contact Information</h2>
 
-        {/* ADS */}
+            {profile.phone && (
+              <p className="public-profile-detail">
+                📞{" "}
+                <a href={`tel:${profile.phone}`}>{profile.phone}</a>
+              </p>
+            )}
+
+            {profile.city && (
+              <p className="public-profile-detail">📍 {profile.city}</p>
+            )}
+
+            {profile.email && (
+              <p className="public-profile-detail">
+                📧{" "}
+                <a href={`mailto:${profile.email}`}>{profile.email}</a>
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* =========================
+            ALL ADS
+        ========================= */}
         <div className="profile-section">
           <div className="profile-section-heading">
-            <h2>📢 Advertisements</h2>
+            <h2>📢 All Advertisements</h2>
+            <span className="profile-ad-count">
+              {ads.length} ad{ads.length !== 1 ? "s" : ""}
+            </span>
           </div>
 
           {ads.length === 0 ? (
             <div className="profile-empty">
-              <h3>No advertisements yet.</h3>
+              <div className="no-ads-icon">📭</div>
+              <h3>No advertisements yet</h3>
+              <p>This seller hasn't posted any ads.</p>
             </div>
           ) : (
-            <div className="profile-ads-grid">
+            <div className="public-ads-grid">
               {ads.map((ad) => {
-                const adImage = Array.isArray(ad.images) && ad.images.length > 0 ? ad.images[0] : ad.image;
+                const adImage =
+                  Array.isArray(ad.images) && ad.images.length > 0
+                    ? ad.images[0]
+                    : ad.image;
                 const postedTime = getPostedTime(ad.createdAt);
 
                 return (
-                  <Link to={`/ad/${ad.id}`} className="profile-ad-card" key={ad.id}>
-                    <div className="profile-ad-image">
+                  <Link
+                    to={`/ad/${ad.id}`}
+                    className="public-ad-card"
+                    key={ad.id}
+                  >
+                    <div className="public-ad-image">
                       {adImage ? (
-                        <img src={adImage} alt={ad.title || "Advertisement"} />
+                        <img
+                          src={adImage}
+                          alt={ad.title || "Advertisement"}
+                          loading="lazy"
+                        />
                       ) : (
-                        <span>📷 No Image</span>
+                        <div className="public-ad-no-image">📷</div>
                       )}
                     </div>
-                    <div className="profile-ad-info">
-                      <span>{ad.category || "Advertisement"}</span>
-                      <h3>{ad.title || "Advertisement"}</h3>
-                      <strong>
-                        ETB {Number(String(ad.price || 0).replace(/,/g, "")).toLocaleString("en-US")}
+
+                    <div className="public-ad-info">
+                      <span className="public-ad-category">
+                        {ad.category || "Advertisement"}
+                      </span>
+
+                      <h3>{ad.title || "Untitled"}</h3>
+
+                      <strong className="public-ad-price">
+                        ETB{" "}
+                        {Number(
+                          String(ad.price || 0).replace(/,/g, "")
+                        ).toLocaleString("en-US")}
                       </strong>
-                      {ad.city && <p>📍 {ad.city}</p>}
-                      
-                      {/* POSTED TIME */}
+
+                      {ad.city && (
+                        <p className="public-ad-city">📍 {ad.city}</p>
+                      )}
+
                       {postedTime && (
-                        <p className="latest-ad-posted-time">🕒 Posted {postedTime}</p>
+                        <p className="public-ad-time">
+                          🕒 {postedTime}
+                        </p>
                       )}
                     </div>
                   </Link>
