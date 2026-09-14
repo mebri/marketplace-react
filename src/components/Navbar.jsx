@@ -47,14 +47,14 @@ function Navbar() {
 
   return (
     <nav className="navbar">
-      <div className="nav-container">
+      <div className="navbar-container">
 
         {/* LOGO */}
-        <Link to="/" className="nav-logo" onClick={closeMenu}>
+        <Link to="/" className="navbar-brand" onClick={closeMenu}>
           <img
             src={`${import.meta.env.BASE_URL}logo.png`}
             alt="የኛ ገበያ"
-            className="nav-logo-image"
+            className="navbar-logo"
           />
         </Link>
 
@@ -86,7 +86,7 @@ function Navbar() {
         </div>
 
         {/* DESKTOP MAIN NAVIGATION */}
-        <div className="nav-links desktop-nav">
+        <div className="navbar-nav">
           <Link to="/" onClick={closeMenu}>Home</Link>
           <Link to="/cars" onClick={closeMenu}>Cars</Link>
           <Link to="/houses" onClick={closeMenu}>Houses</Link>
@@ -98,7 +98,7 @@ function Navbar() {
         </div>
 
         {/* DESKTOP USER AREA */}
-        <div className="nav-user desktop-user">
+        <div className="navbar-actions desktop-user">
           {!user ? (
             <>
               <Link to="/login" className="login-btn">Login</Link>
@@ -114,7 +114,6 @@ function Navbar() {
                   </span>
                 )}
               </Link>
-
               <Link to="/chats" className="myads-btn">💬 Chats</Link>
               <Link to="/dashboard" className="dashboard-btn">Dashboard</Link>
               <Link to="/my-ads" className="myads-btn">My Ads</Link>
@@ -128,7 +127,6 @@ function Navbar() {
 
       {/* =========================================================
           MOBILE SECOND ROW - DASHBOARD + POST AD
-          (Always visible below the main row on mobile)
       ========================================================= */}
       {user && (
         <div className="mobile-second-row">
@@ -142,7 +140,7 @@ function Navbar() {
       )}
 
       {/* =========================================================
-          MOBILE HAMBURGER MENU (Nav links + My Ads + Logout)
+          MOBILE HAMBURGER MENU
       ========================================================= */}
       {menuOpen && (
         <div className="mobile-menu-dropdown">
