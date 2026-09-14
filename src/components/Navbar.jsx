@@ -58,9 +58,11 @@ function Navbar() {
           />
         </Link>
 
-        {/* MOBILE QUICK ACTIONS (Bell + Chat + Hamburger) */}
+        {/* MOBILE QUICK ACTIONS */}
         <div className="mobile-quick-actions">
-          {user && (
+
+          {/* IF LOGGED IN: Bell + Chat + Hamburger */}
+          {user ? (
             <>
               <Link to="/notifications" className="icon-btn" onClick={closeMenu}>
                 🔔
@@ -73,16 +75,32 @@ function Navbar() {
               <Link to="/chats" className="icon-btn" onClick={closeMenu}>
                 💬
               </Link>
+              <button
+                className="menu-toggle"
+                onClick={() => setMenuOpen(!menuOpen)}
+                aria-label="Open menu"
+              >
+                {menuOpen ? "✕" : "☰"}
+              </button>
+            </>
+          ) : (
+            /* IF NOT LOGGED IN: Login + Register (visible) + Hamburger */
+            <>
+              <Link to="/login" className="guest-login-btn" onClick={closeMenu}>
+                Login
+              </Link>
+              <Link to="/register" className="guest-register-btn" onClick={closeMenu}>
+                Register
+              </Link>
+              <button
+                className="menu-toggle"
+                onClick={() => setMenuOpen(!menuOpen)}
+                aria-label="Open menu"
+              >
+                {menuOpen ? "✕" : "☰"}
+              </button>
             </>
           )}
-
-          <button
-            className="menu-toggle"
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="Open menu"
-          >
-            {menuOpen ? "✕" : "☰"}
-          </button>
         </div>
 
         {/* DESKTOP MAIN NAVIGATION */}
@@ -127,6 +145,7 @@ function Navbar() {
 
       {/* =========================================================
           MOBILE SECOND ROW - DASHBOARD + POST AD
+          (Only when logged in)
       ========================================================= */}
       {user && (
         <div className="mobile-second-row">
@@ -153,27 +172,17 @@ function Navbar() {
           <Link to="/search?category=Electronics" onClick={closeMenu}>Electronics</Link>
           <Link to="/search?category=ምንአለሽ%20ተራ" onClick={closeMenu}>ምንአለሽ ተራ</Link>
 
-          <div className="mobile-menu-footer">
-            {user ? (
-              <>
-                <Link to="/my-ads" onClick={closeMenu} className="mobile-menu-myads">
-                  📢 My Ads
-                </Link>
-                <button onClick={handleLogout} className="mobile-menu-logout">
-                  Logout
-                </button>
-              </>
-            ) : (
-              <>
-                <Link to="/login" onClick={closeMenu} className="mobile-menu-login">
-                  Login
-                </Link>
-                <Link to="/register" onClick={closeMenu} className="mobile-menu-register">
-                  Register
-                </Link>
-              </>
-            )}
-          </div>
+          {/* Only show footer actions if logged in (since login/register are already outside for guests) */}
+          {user && (
+            <div className="mobile-menu-footer">
+              <Link to="/my-ads" onClick={closeMenu} className="mobile-menu-myads">
+                📢 My Ads
+              </Link>
+              <button onClick={handleLogout} className="mobile-menu-logout">
+                Logout
+              </button>
+            </div>
+          )}
         </div>
       )}
     </nav>
