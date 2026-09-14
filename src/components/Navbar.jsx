@@ -83,6 +83,7 @@ function Navbar() {
             <>
               <Link to="/dashboard" className="dashboard-btn">Dashboard</Link>
               <Link to="/my-ads" className="myads-btn">My Ads</Link>
+              <Link to="/chats" className="myads-btn">💬 Chats</Link>
               <Link to="/post-ad" className="post-btn">+ Post Ad</Link>
               <button onClick={handleLogout} className="logout-btn">Logout</button>
             </>
