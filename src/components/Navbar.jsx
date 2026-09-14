@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { auth } from "../firebase/firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 
-// NEW: Firebase imports for notifications
+// Firebase imports for notifications
 import { db } from "../firebase/firebase";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 
@@ -122,6 +122,15 @@ function Navbar() {
                     {unreadCount > 9 ? "9+" : unreadCount}
                   </span>
                 )}
+              </Link>
+
+              {/* CHATS - RESTORED */}
+              <Link
+                to="/chats"
+                className="myads-btn"
+                onClick={closeMenu}
+              >
+                💬 Chats
               </Link>
 
               <Link to="/dashboard" className="dashboard-btn">Dashboard</Link>
