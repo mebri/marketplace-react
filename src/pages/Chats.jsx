@@ -23,11 +23,18 @@ function Chats() {
 
     const unsub = onSnapshot(q, (snap) => {
       const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+
+      // Sort by updatedAt (newest first)
       list.sort((a, b) => {
-        const aT = a.lastMessageAt?.toMillis?.() || (a.lastMessageAt?.seconds * 1000) || 0;
-        const bT = b.lastMessageAt?.toMillis?.() || (b.lastMessageAt?.seconds * 1000) || 0;
-        return bT - aT;
+        const getTime = (t) => {
+          if (!t) return 0;
+          if (t.toMillis) return t.toMillis();
+          if (t.seconds) return t.seconds * 1000;
+          return new Date(t).getTime();
+        };
+        return getTime(b.updatedAt) - getTime(a.updatedAt);
       });
+
       setChats(list);
       setLoading(false);
     });
@@ -40,7 +47,13 @@ function Chats() {
     return d.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
   };
 
-  if (loading) return <div className="chats-page"><h1>Loading...</h1></div>;
+  if (loading) {
+    return (
+      <div className="chats-page">
+        <h1>Loading...</h1>
+      </div>
+    );
+  }
 
   if (!user) {
     return (
@@ -64,17 +77,19 @@ function Chats() {
         <div className="chats-list">
           {chats.map((chat) => {
             const otherId = chat.participants.find((id) => id !== user.uid);
-            const otherName = chat.participantNames?.[otherId] || "User";
+            const isBuyer = chat.buyerId === user.uid;
+            const otherName = isBuyer ? chat.sellerName : chat.buyerName;
+
             return (
               <Link to={`/chat/${chat.id}`} key={chat.id} className="chat-item">
                 <div className="chat-item-avatar">
-                  {otherName.charAt(0).toUpperCase()}
+                  {(otherName || "U").charAt(0).toUpperCase()}
                 </div>
                 <div className="chat-item-info">
-                  <h3>{otherName}</h3>
-                  <p>{chat.lastMessage || "Start a conversation"}</p>
+                  <h3>{otherName || "User"}</h3>
+                  <p>{chat.lastMessage || `About: ${chat.adTitle || "Advertisement"}`}</p>
                 </div>
-                <div className="chat-item-time">{formatTime(chat.lastMessageAt)}</div>
+                <div className="chat-item-time">{formatTime(chat.updatedAt)}</div>
               </Link>
             );
           })}
