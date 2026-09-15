@@ -51,27 +51,46 @@ function App() {
       {/* Scroll Manager - restores scroll position on back */}
       <ScrollManager />
 
-      {/* Navbar - only ONCE, outside of Routes */}
+      {/* Navbar - only ONCE */}
       <Navbar />
 
       {/* Routes */}
       <Routes>
 
+        {/* HOME */}
         <Route path="/" element={<Home />} />
+
+        {/* CATEGORIES */}
         <Route path="/cars" element={<Cars />} />
         <Route path="/houses" element={<Houses />} />
         <Route path="/rentals" element={<Rentals />} />
+
+        {/* SEARCH */}
         <Route path="/search" element={<Search />} />
+
+        {/* AD DETAILS */}
         <Route path="/ad/:id" element={<AdDetails />} />
+
+        {/* POST / EDIT AD */}
         <Route path="/post-ad" element={<PostAd />} />
         <Route path="/edit-ad/:id" element={<EditAd />} />
+
+        {/* DASHBOARD / MY ADS */}
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/my-ads" element={<MyAds />} />
+
+        {/* AUTH */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+
+        {/* PROFILE */}
         <Route path="/profile" element={<Profile />} />
         <Route path="/user/:uid" element={<UserProfile />} />
+
+        {/* CONTACT */}
         <Route path="/contact" element={<Contact />} />
+
+        {/* CHAT */}
         <Route path="/chats" element={<Chats />} />
         <Route path="/chat/:chatId" element={<ChatRoom />} />
 
