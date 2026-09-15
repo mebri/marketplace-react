@@ -2921,3 +2921,94 @@ img { max-width: 100%; }
   opacity: 0.6;
   cursor: not-allowed;
 }
+/* =========================================================
+   PROFILE VIEW MODE
+========================================================= */
+.profile-view {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 5px 0;
+}
+
+.profile-view-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  background: #f8fafc;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.profile-view-label {
+  font-weight: 700;
+  color: #64748b;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.profile-view-value {
+  font-weight: 600;
+  color: #0f172a;
+  font-size: 15px;
+  word-break: break-word;
+  text-align: right;
+  flex: 1;
+  min-width: 0;
+}
+
+/* =========================================================
+   PROFILE FORM ACTIONS (Save + Cancel)
+========================================================= */
+.profile-form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  grid-column: 1 / -1;
+}
+
+.profile-form-actions button {
+  flex: 1;
+  padding: 14px;
+  border-radius: 9px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.profile-form-actions button[type="submit"] {
+  background: #1976d2;
+  color: white;
+}
+
+.profile-form-actions button[type="submit"]:hover {
+  background: #0d47a1;
+}
+
+.profile-form-actions button[type="submit"]:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.profile-cancel-btn {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1 !important;
+}
+
+.profile-cancel-btn:hover {
+  background: #e2e8f0;
+}
+
+/* Mobile: stack buttons vertically */
+@media (max-width: 500px) {
+  .profile-form-actions {
+    flex-direction: column-reverse;
+  }
+}
