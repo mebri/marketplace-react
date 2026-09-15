@@ -9,6 +9,7 @@ import {
 // =========================
 
 import Navbar from "./components/Navbar";
+import ScrollManager from "./components/ScrollManager";
 
 // =========================
 // PAGES
@@ -37,7 +38,7 @@ import Profile from "./pages/Profile";
 import UserProfile from "./pages/UserProfile";
 
 // =========================
-// CHAT PAGES (NEW)
+// CHAT PAGES
 // =========================
 
 import Chats from "./pages/Chats";
@@ -47,184 +48,32 @@ function App() {
   return (
     <HashRouter>
 
-      {/* =========================
-          NAVBAR
-      ========================= */}
+      {/* Scroll Manager - restores scroll position on back */}
+      <ScrollManager />
 
+      {/* Navbar - only ONCE, outside of Routes */}
       <Navbar />
 
-      {/* =========================
-          ROUTES
-      ========================= */}
-
+      {/* Routes */}
       <Routes>
 
-        {/* HOME */}
-
-        <Route
-          path="/"
-          element={<Home />}
-        />
-
-
-        {/* =========================
-            CARS
-        ========================= */}
-
-        <Route
-          path="/cars"
-          element={<Cars />}
-        />
-
-
-        {/* =========================
-            HOUSES
-        ========================= */}
-
-        <Route
-          path="/houses"
-          element={<Houses />}
-        />
-
-
-        {/* =========================
-            RENTALS
-        ========================= */}
-
-        <Route
-          path="/rentals"
-          element={<Rentals />}
-        />
-
-
-        {/* =========================
-            SEARCH
-        ========================= */}
-
-        <Route
-          path="/search"
-          element={<Search />}
-        />
-
-
-        {/* =========================
-            AD DETAILS
-        ========================= */}
-
-        <Route
-          path="/ad/:id"
-          element={<AdDetails />}
-        />
-
-
-        {/* =========================
-            POST AD
-        ========================= */}
-
-        <Route
-          path="/post-ad"
-          element={<PostAd />}
-        />
-
-
-        {/* =========================
-            EDIT AD
-        ========================= */}
-
-        <Route
-          path="/edit-ad/:id"
-          element={<EditAd />}
-        />
-
-
-        {/* =========================
-            DASHBOARD
-        ========================= */}
-
-        <Route
-          path="/dashboard"
-          element={<Dashboard />}
-        />
-
-
-        {/* =========================
-            MY ADS
-        ========================= */}
-
-        <Route
-          path="/my-ads"
-          element={<MyAds />}
-        />
-
-
-        {/* =========================
-            LOGIN
-        ========================= */}
-
-        <Route
-          path="/login"
-          element={<Login />}
-        />
-
-
-        {/* =========================
-            REGISTER
-        ========================= */}
-
-        <Route
-          path="/register"
-          element={<Register />}
-        />
-
-
-        {/* =========================
-            PROFILE
-        ========================= */}
-
-        <Route
-          path="/profile"
-          element={<Profile />}
-        />
-
-
-        {/* =========================
-            PUBLIC USER PROFILE
-        ========================= */}
-
-        <Route
-          path="/user/:uid"
-          element={<UserProfile />}
-        />
-
-
-        {/* =========================
-            CONTACT
-        ========================= */}
-
-        <Route
-          path="/contact"
-          element={<Contact />}
-        />
-
-
-        {/* =========================
-            CHATS LIST (NEW)
-        ========================= */}
-
-        <Route
-          path="/chats"
-          element={<Chats />}
-        />
-
-
-        {/* =========================
-            CHAT ROOM (NEW)
-        ========================= */}
-
-        <Route
-          path="/chat/:chatId"
-          element={<ChatRoom />}
-        />
+        <Route path="/" element={<Home />} />
+        <Route path="/cars" element={<Cars />} />
+        <Route path="/houses" element={<Houses />} />
+        <Route path="/rentals" element={<Rentals />} />
+        <Route path="/search" element={<Search />} />
+        <Route path="/ad/:id" element={<AdDetails />} />
+        <Route path="/post-ad" element={<PostAd />} />
+        <Route path="/edit-ad/:id" element={<EditAd />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/my-ads" element={<MyAds />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/user/:uid" element={<UserProfile />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/chats" element={<Chats />} />
+        <Route path="/chat/:chatId" element={<ChatRoom />} />
 
       </Routes>
 
