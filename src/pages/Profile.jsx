@@ -1,3 +1,4 @@
+import { uploadImageToCloudinary } from "../utils/uploadImage";
 import { useEffect, useState } from "react";
 
 import {
