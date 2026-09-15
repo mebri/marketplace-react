@@ -2650,3 +2650,99 @@ img { max-width: 100%; }
 .chat-bubble.theirs .chat-seen {
   color: #6b7280;
 }
+/* =========================================================
+   NOTIFICATION PERMISSION BANNER
+========================================================= */
+.notif-prompt-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: linear-gradient(135deg, #1976d2, #0d47a1);
+  color: white;
+  padding: 12px 16px;
+  border-radius: 0;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  flex-wrap: wrap;
+}
+
+.notif-prompt-text {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  flex: 1;
+  min-width: 0;
+}
+
+.notif-prompt-text strong {
+  font-weight: 700;
+}
+
+.notif-prompt-text span {
+  display: block;
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.notif-prompt-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.notif-enable-btn {
+  background: #ffffff;
+  color: #1976d2;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.notif-enable-btn:hover {
+  background: #eaf3ff;
+}
+
+.notif-dismiss-btn {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+}
+
+.notif-dismiss-btn:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+@media (max-width: 600px) {
+  .notif-prompt-banner {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+  .notif-prompt-text {
+    font-size: 13px;
+  }
+  .notif-prompt-text span {
+    font-size: 11px;
+  }
+  .notif-enable-btn {
+    padding: 7px 12px;
+    font-size: 12px;
+  }
+}
