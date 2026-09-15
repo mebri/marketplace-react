@@ -2631,3 +2631,22 @@ img { max-width: 100%; }
     display: none !important;
   }
 }
+/* =========================================================
+   CHAT SEEN INDICATOR
+========================================================= */
+.chat-seen {
+  display: block;
+  font-size: 11px;
+  margin-top: 4px;
+  text-align: right;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.chat-bubble.mine .chat-seen {
+  color: #e0e7ff;
+}
+
+.chat-bubble.theirs .chat-seen {
+  color: #6b7280;
+}
