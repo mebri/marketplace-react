@@ -232,7 +232,13 @@ function UserProfile() {
 
         {/* PROFILE HEADER */}
         <div className="profile-header public-profile-header">
-          <div className="profile-avatar">{avatarLetter}</div>
+          <div className="profile-avatar">
+  {profile.imageUrl ? (
+    <img src={profile.imageUrl} alt={profile.name || "User"} />
+  ) : (
+    avatarLetter
+  )}
+</div>
           <div className="profile-header-info">
             <h1>{profile.name || "የኛ ገበያ User"}</h1>
             {profile.city && <p>📍 {profile.city}</p>}
