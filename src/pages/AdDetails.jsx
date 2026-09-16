@@ -15,6 +15,7 @@ import {
 } from "firebase/firestore";
 
 import { db, auth } from "../firebase/firebase";
+import ImageLightbox from "../components/ImageLightbox";
 
 function AdDetails() {
   const { id } = useParams();
