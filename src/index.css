@@ -2193,3 +2193,11 @@ img {
   .public-ad-image { height: 115px; }
   .public-ad-info h3 { font-size: 12px; }
 }
+/* =========================================================
+   SCROLL FIX - keep sticky working + prevent horizontal scroll
+========================================================= */
+#root {
+  width: 100%;
+  overflow-x: clip;
+  overflow-y: visible;
+}
