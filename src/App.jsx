@@ -32,6 +32,8 @@ import Contact from "./pages/Contact";
 import Profile from "./pages/Profile";
 import UserProfile from "./pages/UserProfile";
 
+import Admin from "./pages/Admin";
+
 // CHAT + NOTIFICATIONS
 import Chats from "./pages/Chats";
 import ChatRoom from "./pages/ChatRoom";
@@ -75,6 +77,7 @@ function App() {
 
         <Route path="/notifications" element={<Notifications />} />
 
+        <Route path="/admin" element={<Admin />} />
       </Routes>
 
     </HashRouter>
