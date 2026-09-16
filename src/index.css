@@ -3430,3 +3430,131 @@ img { max-width: 100%; }
   .skeleton-line { height: 12px; }
   .skeleton-line.long { height: 14px; }
 }
+/* =========================================================
+   SEARCH PAGE - FILTERS & SORT
+========================================================= */
+.search-result-title {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 16px;
+  color: #475569;
+  font-weight: 600;
+}
+
+.search-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-end;
+  background: white;
+  padding: 16px;
+  border-radius: 14px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+  margin-bottom: 16px;
+}
+
+.search-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 130px;
+}
+
+.search-filter-group label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.search-filter-group select,
+.search-filter-group input {
+  padding: 11px 14px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  background: #f8fafc;
+  outline: none;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+
+.search-filter-group select:focus,
+.search-filter-group input:focus {
+  border-color: #1976d2;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+}
+
+.search-clear-filters {
+  padding: 11px 18px;
+  background: #fee2e2;
+  color: #dc2626;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  white-space: nowrap;
+}
+
+.search-clear-filters:hover {
+  background: #fecaca;
+}
+
+.search-result-count {
+  text-align: center;
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.search-no-results {
+  background: white;
+  border-radius: 16px;
+  padding: 60px 25px;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+}
+
+.search-no-results-icon {
+  font-size: 55px;
+  margin-bottom: 15px;
+}
+
+.search-no-results h2 {
+  margin: 0 0 10px;
+  color: #0f172a;
+  font-size: 22px;
+}
+
+.search-no-results p {
+  color: #64748b;
+  margin: 0 0 20px;
+}
+
+/* Mobile: stack filters nicely */
+@media (max-width: 700px) {
+  .search-filter-bar {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .search-filter-group {
+    flex: 1 1 100%;
+    min-width: 100%;
+  }
+
+  .search-clear-filters {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+}
