@@ -43,7 +43,15 @@ function App() {
 
       <ScrollManager />
       <Navbar />
-      <NotificationPrompt />
+      <NotificationPrompt /><HashRouter>
+  <ScrollManager />
+  <Navbar />
+  <NotificationPrompt />
+  <OneSignalSetup />   {/* ← ADD THIS */}
+  <Routes>
+    ...
+  </Routes>
+</HashRouter>
 
       <Routes>
 
