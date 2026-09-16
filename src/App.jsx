@@ -8,7 +8,7 @@ import {
 import Navbar from "./components/Navbar";
 import ScrollManager from "./components/ScrollManager";
 import NotificationPrompt from "./components/NotificationPrompt";
-
+import OneSignalSetup from "./components/OneSignalSetup";
 // PAGES
 import Home from "./pages/Home";
 import Cars from "./pages/Cars";
