@@ -1,7 +1,6 @@
 import { useEffect, useLayoutEffect } from "react";
 import { useLocation } from "react-router-dom";
 
-// Get the actual scrolling element's Y position
 const getScrollY = () => {
   return Math.max(
     window.scrollY || 0,
@@ -11,27 +10,21 @@ const getScrollY = () => {
   );
 };
 
-// Force scroll on ALL possible scroll containers
 const scrollToY = (y) => {
   const html = document.documentElement;
   const prev = html.style.scrollBehavior;
   html.style.scrollBehavior = "auto";
-
   window.scrollTo(0, y);
   html.scrollTop = y;
   document.body.scrollTop = y;
   const root = document.getElementById("root");
   if (root) root.scrollTop = y;
-
   html.style.scrollBehavior = prev;
 };
 
-// Max scrollable distance across ALL possible containers
 const getMaxScroll = () => {
   const root = document.getElementById("root");
-  const rootMax = root
-    ? root.scrollHeight - root.clientHeight
-    : 0;
+  const rootMax = root ? root.scrollHeight - root.clientHeight : 0;
   const windowMax =
     document.documentElement.scrollHeight - window.innerHeight;
   return Math.max(rootMax, windowMax, 0);
@@ -47,22 +40,25 @@ function ScrollManager() {
     }
   }, []);
 
-  // SAVE scroll position — listens on window AND document (capture)
+  // SAVE scroll position
   useEffect(() => {
     if (!key) return;
-
     const storageKey = "scroll:" + key;
 
+    // Skip scroll events for the first 500ms to avoid mount-time
+    // transient events (which fire y=0 and would overwrite the real value)
+    const mountedAt = Date.now();
+    const SAVE_DELAY_MS = 500;
+
     const save = () => {
+      if (Date.now() - mountedAt < SAVE_DELAY_MS) return;
       const y = getScrollY();
       try {
         sessionStorage.setItem(storageKey, String(y));
       } catch (e) {}
     };
 
-    // Listen on window
     window.addEventListener("scroll", save, { passive: true });
-    // Also listen on any element that scrolls (document with capture)
     document.addEventListener("scroll", save, {
       passive: true,
       capture: true,
@@ -74,32 +70,30 @@ function ScrollManager() {
     };
   }, [key]);
 
-  // RESTORE — when history entry changes
+  // RESTORE scroll position
   useLayoutEffect(() => {
     if (!key) return;
 
     const storageKey = "scroll:" + key;
     let saved = null;
-
     try {
       saved = sessionStorage.getItem(storageKey);
     } catch (e) {}
 
-    console.log("🧭 ScrollManager:", {
-      key,
-      path: location.pathname + location.search,
-      saved,
-      currentY: getScrollY(),
-    });
+    const isBack = saved !== null;
+    console.log(
+      "🧭 ScrollManager:",
+      isBack ? "RESTORE" : "FRESH",
+      "key=" + key,
+      "saved=" + saved
+    );
 
-    // First visit → top
-    if (saved === null) {
+    if (!isBack) {
       scrollToY(0);
       return;
     }
 
     const target = parseInt(saved, 10) || 0;
-
     if (target === 0) {
       scrollToY(0);
       return;
@@ -108,20 +102,18 @@ function ScrollManager() {
     let cancelled = false;
     let attempts = 0;
     let timer = null;
-    let consecutiveSuccesses = 0;
+    let successes = 0;
 
     const tryRestore = () => {
       if (cancelled) return;
       attempts++;
 
       const maxScroll = getMaxScroll();
-
       if (maxScroll >= target) {
         scrollToY(target);
-
         if (Math.abs(getScrollY() - target) < 5) {
-          consecutiveSuccesses++;
-          if (consecutiveSuccesses >= 2) {
+          successes++;
+          if (successes >= 2) {
             cancelled = true;
             if (timer) clearTimeout(timer);
             console.log("✅ Scroll restored to", target);
@@ -141,7 +133,7 @@ function ScrollManager() {
       cancelled = true;
       if (timer) clearTimeout(timer);
     };
-  }, [key, location.pathname, location.search]);
+  }, [key]);
 
   return null;
 }
