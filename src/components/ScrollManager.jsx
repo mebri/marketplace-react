@@ -1,75 +1,80 @@
 import { useEffect, useLayoutEffect } from "react";
-import { useLocation, useNavigationType } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 function ScrollManager() {
   const location = useLocation();
-  const navType = useNavigationType();
-  const path = location.pathname + location.search;
+  const key = location.key;
 
-  // Disable browser's native scroll restoration (it fights with ours)
+  // Disable browser's auto restore
   useEffect(() => {
     if ("scrollRestoration" in window.history) {
       window.history.scrollRestoration = "manual";
     }
   }, []);
 
-  // Save scroll position for current path — ONLY on real scroll events
-  // (not on mount, because mount happens after DOM swap)
+  // SAVE: continuously save scroll position for this exact history entry
   useEffect(() => {
-    const key = "scroll:" + path;
-    let lastY = window.scrollY;
+    if (!key) return;
+
+    const storageKey = "scroll:" + key;
 
     const save = () => {
-      const y = window.scrollY;
-      // Only save if user actually moved (avoids overwriting with 0
-      // during DOM swaps or layout changes)
-      if (Math.abs(y - lastY) > 1) {
-        try {
-          sessionStorage.setItem(key, String(y));
-        } catch (e) {
-          // sessionStorage may be blocked in private mode
-        }
-        lastY = y;
-      }
+      try {
+        sessionStorage.setItem(storageKey, String(window.scrollY));
+      } catch (e) {}
     };
 
     window.addEventListener("scroll", save, { passive: true });
+
     return () => {
+      // Save final position before unmount
+      save();
       window.removeEventListener("scroll", save);
     };
-  }, [path]);
+  }, [key]);
 
-  // Restore on back/forward (POP) navigation
+  // RESTORE: runs when the history entry changes
   useLayoutEffect(() => {
-    if (navType !== "POP") {
-      // Fresh navigation → go to top
+    if (!key) return;
+
+    const storageKey = "scroll:" + key;
+    let saved = null;
+
+    try {
+      saved = sessionStorage.getItem(storageKey);
+    } catch (e) {}
+
+    console.log("🧭 ScrollManager:", {
+      key,
+      path: location.pathname + location.search,
+      saved,
+    });
+
+    // First time visiting this history entry → go to top
+    if (saved === null) {
       window.scrollTo(0, 0);
       return;
     }
 
-    const key = "scroll:" + path;
-    let target = 0;
-    try {
-      target = parseInt(sessionStorage.getItem(key) || "0", 10);
-    } catch (e) {}
+    const target = parseInt(saved, 10) || 0;
 
-    console.log("🔙 ScrollManager POP:", { path, target });
-
-    if (!target || target === 0) {
+    if (target === 0) {
       window.scrollTo(0, 0);
       return;
     }
 
     let cancelled = false;
     let attempts = 0;
-    const maxAttempts = 120; // ~12 seconds
-    let observer = null;
     let timer = null;
-    let successCount = 0;
+    let consecutiveSuccesses = 0;
 
-    const doScroll = () => {
+    const jumpTo = () => {
       if (cancelled) return;
+      const html = document.documentElement;
+      const prev = html.style.scrollBehavior;
+      html.style.scrollBehavior = "auto";
       window.scrollTo(0, target);
+      html.style.scrollBehavior = prev;
     };
 
     const tryRestore = () => {
@@ -80,55 +85,34 @@ function ScrollManager() {
         document.documentElement.scrollHeight - window.innerHeight;
 
       if (maxScroll >= target) {
-        doScroll();
-        // If we're close enough, count as success
+        jumpTo();
+
         if (Math.abs(window.scrollY - target) < 5) {
-          successCount++;
-          // Two consecutive successes = stable
-          if (successCount >= 2) {
+          consecutiveSuccesses++;
+          if (consecutiveSuccesses >= 2) {
             cancelled = true;
-            if (observer) observer.disconnect();
             if (timer) clearTimeout(timer);
+            console.log("✅ Scroll restored to", target);
             return;
           }
         }
       }
 
-      if (attempts < maxAttempts) {
+      if (attempts < 150) {
         timer = setTimeout(tryRestore, 100);
+      } else {
+        console.warn("⛔ Scroll restore timed out. Max scroll:", maxScroll, "Target:", target);
       }
     };
-
-    // Watch DOM for changes (ads loading asynchronously)
-    if (typeof MutationObserver !== "undefined") {
-      observer = new MutationObserver(() => {
-        if (cancelled) return;
-        const maxScroll =
-          document.documentElement.scrollHeight - window.innerHeight;
-        if (maxScroll >= target) {
-          doScroll();
-        }
-      });
-      observer.observe(document.body, { childList: true, subtree: true });
-    }
 
     // Start immediately
     tryRestore();
 
-    // Hard cleanup after 15 seconds
-    const cleanupTimer = setTimeout(() => {
-      cancelled = true;
-      if (observer) observer.disconnect();
-      if (timer) clearTimeout(timer);
-    }, 15000);
-
     return () => {
       cancelled = true;
-      if (observer) observer.disconnect();
       if (timer) clearTimeout(timer);
-      clearTimeout(cleanupTimer);
     };
-  }, [path, navType]);
+  }, [key, location.pathname, location.search]);
 
   return null;
 }
