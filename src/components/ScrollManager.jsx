@@ -5,14 +5,14 @@ function ScrollManager() {
   const location = useLocation();
   const key = location.key;
 
-  // Disable browser's auto restore
+  // Disable browser's auto scroll restore
   useEffect(() => {
     if ("scrollRestoration" in window.history) {
       window.history.scrollRestoration = "manual";
     }
   }, []);
 
-  // SAVE: continuously save scroll position for this exact history entry
+  // SAVE scroll position — ONLY on real scroll events (no cleanup save!)
   useEffect(() => {
     if (!key) return;
 
@@ -26,14 +26,15 @@ function ScrollManager() {
 
     window.addEventListener("scroll", save, { passive: true });
 
+    // IMPORTANT: Do NOT call save() in cleanup — the DOM has already
+    // changed by then, so window.scrollY would be 0, overwriting
+    // the correct value.
     return () => {
-      // Save final position before unmount
-      save();
       window.removeEventListener("scroll", save);
     };
   }, [key]);
 
-  // RESTORE: runs when the history entry changes
+  // RESTORE — runs when history entry changes
   useLayoutEffect(() => {
     if (!key) return;
 
@@ -50,7 +51,7 @@ function ScrollManager() {
       saved,
     });
 
-    // First time visiting this history entry → go to top
+    // First visit to this entry → top
     if (saved === null) {
       window.scrollTo(0, 0);
       return;
@@ -101,11 +102,15 @@ function ScrollManager() {
       if (attempts < 150) {
         timer = setTimeout(tryRestore, 100);
       } else {
-        console.warn("⛔ Scroll restore timed out. Max scroll:", maxScroll, "Target:", target);
+        console.warn(
+          "⛔ Scroll restore timed out. Max scroll:",
+          maxScroll,
+          "Target:",
+          target
+        );
       }
     };
 
-    // Start immediately
     tryRestore();
 
     return () => {
