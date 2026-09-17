@@ -4330,3 +4330,69 @@ img {
     width: 100%;
   }
 }
+
+/* =========================================================
+   STICKY SEARCH BAR (WRAPPER APPROACH)
+========================================================= */
+.home-search-wrapper {
+  position: sticky;
+  top: 130px;
+  z-index: 950;
+  background: #f5f7fb;
+  padding: 12px 20px 15px;
+  margin-top: -20px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+}
+
+.home-search {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 750px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.home-search input {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  height: 50px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 10px;
+  outline: none;
+  font-size: 16px;
+  background: white;
+  color: #222;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+  transition: box-shadow 0.2s ease;
+}
+
+.home-search input:hover {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+}
+
+.home-search input:focus {
+  cursor: text;
+  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.2);
+}
+
+@media (max-width: 850px) {
+  .home-search-wrapper {
+    top: 115px;
+  }
+}
+
+@media (max-width: 600px) {
+  .home-search-wrapper {
+    top: 115px;
+    padding: 10px 12px 12px;
+  }
+  .home-search input {
+    height: 46px;
+    padding: 0 14px;
+    font-size: 14px;
+  }
+}
