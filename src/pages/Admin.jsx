@@ -6,7 +6,7 @@ import {
   collection,
   getDocs,
   doc,
-  getDoc,
+  getDocFromServer,
 } from "firebase/firestore";
 
 function Admin() {
@@ -31,7 +31,9 @@ function Admin() {
       try {
         console.log("🔍 Checking admin for UID:", currentUser.uid);
 
-        import { getDocFromServer } from "firebase/firestore";
+        const userDoc = await getDocFromServer(
+          doc(db, "users", currentUser.uid)
+        );
 
         console.log("📄 Document exists:", userDoc.exists());
         console.log("📄 Full data:", userDoc.data());
