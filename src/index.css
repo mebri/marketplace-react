@@ -5171,30 +5171,50 @@ img {
 }
 
 /* =========================================================
-   STICKY SEARCH BAR
+   STICKY SEARCH BAR - WRAPPER
 ========================================================= */
-.home-search {
+.home-search-wrapper {
   position: sticky;
   top: 130px;
   z-index: 950;
-  background: rgba(25, 118, 210, 0.98);
-  padding: 12px;
-  border-radius: 12px;
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-  transition: top 0.2s ease;
+  background: #f5f7fb;
+  padding: 12px 20px 15px;
+  margin-top: -20px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+}
+
+.home-search {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  max-width: 750px;
+  margin: 0 auto;
 }
 
 @media (max-width: 850px) {
-  .home-search {
+  .home-search-wrapper {
     top: 115px;
   }
 }
 
 @media (max-width: 600px) {
-  .home-search {
+  .home-search-wrapper {
     top: 115px;
+    padding: 10px 12px 12px;
+  }
+  .home-search {
+    flex-direction: column;
+    width: 100%;
+  }
+  .home-search input {
+    width: 100%;
+    flex: none;
+  }
+  .home-search-button {
+    width: 100%;
+  }
+}
     margin-left: 12px;
     margin-right: 12px;
     max-width: calc(100% - 24px);
