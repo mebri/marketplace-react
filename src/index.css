@@ -4670,3 +4670,27 @@ img {
   font-weight: 600;
   margin: 6px 0;
 }
+
+/* =========================================================
+   AD VIEW COUNTER
+========================================================= */
+.details-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin: 5px 0 10px;
+}
+
+.details-meta-row .posted-time {
+  margin: 0;
+}
+
+.views-count {
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
