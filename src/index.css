@@ -160,6 +160,15 @@ img {
   gap: 10px;
   max-width: 750px;
   margin: 28px auto 0;
+  position: sticky;
+  top: 130px; /* ← just below the sticky navbar (72px navbar + 58px second row) */
+  z-index: 950;
+  background: rgba(25, 118, 210, 0.98);
+  padding: 12px;
+  border-radius: 12px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }
 
 .home-search input {
@@ -2200,4 +2209,21 @@ img {
   width: 100%;
   overflow-x: clip;
   overflow-y: visible;
+}
+/* =========================================================
+   STICKY SEARCH BAR - MOBILE
+========================================================= */
+@media (max-width: 850px) {
+  .home-search {
+    top: 115px;
+  }
+}
+
+@media (max-width: 600px) {
+  .home-search {
+    top: 115px;
+    margin-left: 12px;
+    margin-right: 12px;
+    max-width: calc(100% - 24px);
+  }
 }
