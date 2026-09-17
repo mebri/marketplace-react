@@ -116,6 +116,9 @@ function Home() {
         <h1>የኛ ገበያ</h1>
         <h2>Buy • Sell • Rent Across Ethiopia</h2>
         <p>Find cars, houses, rentals, electronics, furniture, labor and more anywhere in Ethiopia.</p>
+      </section>
+
+      <div className="home-search-wrapper">
         <div className="home-search">
           <input
             type="text"
@@ -130,7 +133,7 @@ function Home() {
           />
           <Link to="/search" className="home-search-button">🔎 Search</Link>
         </div>
-      </section>
+      </div>
 
       <section className="home-categories">
         <h2 className="home-section-title">All Categories</h2>
