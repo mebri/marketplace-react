@@ -13,6 +13,7 @@ import {
   deleteDoc,
   collection,
   addDoc,
+  increment,
 } from "firebase/firestore";
 
 import { db, auth } from "../firebase/firebase";
@@ -30,8 +31,6 @@ function AdDetails() {
   const [chatLoading, setChatLoading] = useState(false);
   const [currentImage, setCurrentImage] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
-
-  // NEW: sold status toggle
   const [statusLoading, setStatusLoading] = useState(false);
 
   // =========================
@@ -53,6 +52,34 @@ function AdDetails() {
 
       const adData = { id: docSnap.id, ...docSnap.data() };
       setAd(adData);
+
+      // =========================
+      // INCREMENT VIEW COUNT
+      // =========================
+      // Only count if:
+      // - Viewer is NOT the owner
+      // - This ad hasn't been viewed in this session already
+      try {
+        const viewerId = auth.currentUser?.uid || "guest";
+        const sessionKey = `viewed_${id}_${viewerId}`;
+
+        const alreadyViewed = sessionStorage.getItem(sessionKey);
+        const isOwner = auth.currentUser?.uid === adData.userId;
+
+        if (!alreadyViewed && !isOwner) {
+          await updateDoc(docRef, { views: increment(1) });
+          sessionStorage.setItem(sessionKey, "1");
+
+          // Update local state so the display reflects the new count
+          setAd((prev) => ({
+            ...prev,
+            views: (prev.views || 0) + 1,
+          }));
+        }
+      } catch (viewErr) {
+        // View tracking shouldn't break the page
+        console.error("View count error:", viewErr);
+      }
 
       // LOAD SELLER
       if (adData.userId) {
@@ -459,10 +486,13 @@ function AdDetails() {
           {isSold ? "❌ SOLD OUT" : "✅ AVAILABLE"}
         </span>
 
-        {/* POST TIME */}
-        {postedTime && (
-          <p className="posted-time">🕒 Posted {postedTime}</p>
-        )}
+        {/* POST TIME + VIEWS */}
+        <div className="details-meta-row">
+          {postedTime && (
+            <span className="posted-time">🕒 Posted {postedTime}</span>
+          )}
+          <span className="views-count">👁 {ad.views || 0} views</span>
+        </div>
 
         {/* CATEGORY */}
         <span className="details-category">
