@@ -64,7 +64,17 @@ function Home() {
     try {
       const snapshot = await getDocs(collection(db, "ads"));
       const ads = snapshot.docs.map((document) => ({ id: document.id, ...document.data() }));
-      ads.sort((a, b) => getAdTime(b) - getAdTime(a));
+
+      // =========================
+      // SORT: Featured first, then newest
+      // =========================
+      ads.sort((a, b) => {
+        const aFeat = a.featured ? 1 : 0;
+        const bFeat = b.featured ? 1 : 0;
+        if (aFeat !== bFeat) return bFeat - aFeat;
+        return getAdTime(b) - getAdTime(a);
+      });
+
       setLatestAds(ads);
     } catch (error) {
       console.error("Error loading latest advertisements:", error);
@@ -119,36 +129,36 @@ function Home() {
       </section>
 
       <div className="home-search-wrapper">
-  <div className="home-search">
-    <input
-      type="text"
-      placeholder="🔎 Search cars, houses, furniture, labor and more..."
-      onKeyDown={(e) => {
-        if (e.key === "Enter") {
-          const value = e.target.value.trim();
-          if (value) window.location.hash = `/search?search=${encodeURIComponent(value)}`;
-          else window.location.hash = "/search";
-        }
-      }}
-    />
-    <button
-      type="button"
-      className="home-search-icon"
-      onClick={() => {
-        const input = document.querySelector(".home-search input");
-        const value = input?.value.trim();
-        if (value) {
-          window.location.hash = `/search?search=${encodeURIComponent(value)}`;
-        } else {
-          window.location.hash = "/search";
-        }
-      }}
-      aria-label="Search"
-    >
-      🔎
-    </button>
-  </div>
-</div>
+        <div className="home-search">
+          <input
+            type="text"
+            placeholder="🔎 Search cars, houses, furniture, labor and more..."
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                const value = e.target.value.trim();
+                if (value) window.location.hash = `/search?search=${encodeURIComponent(value)}`;
+                else window.location.hash = "/search";
+              }
+            }}
+          />
+          <button
+            type="button"
+            className="home-search-icon"
+            onClick={() => {
+              const input = document.querySelector(".home-search input");
+              const value = input?.value.trim();
+              if (value) {
+                window.location.hash = `/search?search=${encodeURIComponent(value)}`;
+              } else {
+                window.location.hash = "/search";
+              }
+            }}
+            aria-label="Search"
+          >
+            🔎
+          </button>
+        </div>
+      </div>
 
       <section className="home-categories">
         <h2 className="home-section-title">All Categories</h2>
@@ -223,11 +233,13 @@ function Home() {
                 : "No description available.";
               const postedTime = getPostedTime(ad.createdAt);
               const isSold = ad.status === "sold";
+              const isFeatured = ad.featured === true;
 
               return (
                 <div className="latest-ad-card" key={ad.id}>
                   <Link to={`/ad/${ad.id}`} className="latest-ad-image-link">
                     <div className="latest-ad-image">
+                      {isFeatured && <div className="card-featured-badge">⭐ FEATURED</div>}
                       {isSold && <div className="card-sold-badge">SOLD</div>}
                       {adImage ? (
                         <img
@@ -247,11 +259,17 @@ function Home() {
                     <span className="latest-ad-category">{ad.category || "Advertisement"}</span>
                     <h3>{ad.title || "Untitled Advertisement"}</h3>
                     <h4>ETB {Number(ad.price || 0).toLocaleString()}</h4>
+
                     {postedTime && <p className="latest-ad-posted-time">🕒 Posted {postedTime}</p>}
                     {ad.city && <p>📍 {ad.city}</p>}
                     {ad.condition && <p>🔄 {ad.condition}</p>}
                     {ad.subcategory && <p>📂 {ad.subcategory}</p>}
+
+                    {/* VIEW COUNT */}
+                    <p className="latest-ad-views">👁 {ad.views || 0} views</p>
+
                     <p className="latest-ad-description">{shortDescription}</p>
+
                     {Array.isArray(ad.images) && ad.images.length > 1 && (
                       <p className="image-count">🖼️ {ad.images.length} images</p>
                     )}
