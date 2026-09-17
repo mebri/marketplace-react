@@ -5169,3 +5169,34 @@ img {
   padding: 20px;
   font-size: 14px;
 }
+
+/* =========================================================
+   STICKY SEARCH BAR
+========================================================= */
+.home-search {
+  position: sticky;
+  top: 130px;
+  z-index: 950;
+  background: rgba(25, 118, 210, 0.98);
+  padding: 12px;
+  border-radius: 12px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  transition: top 0.2s ease;
+}
+
+@media (max-width: 850px) {
+  .home-search {
+    top: 115px;
+  }
+}
+
+@media (max-width: 600px) {
+  .home-search {
+    top: 115px;
+    margin-left: 12px;
+    margin-right: 12px;
+    max-width: calc(100% - 24px);
+  }
+}
