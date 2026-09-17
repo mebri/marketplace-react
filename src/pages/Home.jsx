@@ -119,21 +119,23 @@ function Home() {
       </section>
 
       <div className="home-search-wrapper">
-        <div className="home-search">
-          <input
-            type="text"
-            placeholder="🔎 Search cars, houses, furniture, labor and more..."
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                const value = e.target.value.trim();
-                if (value) window.location.hash = `/search?search=${encodeURIComponent(value)}`;
-                else window.location.hash = "/search";
-              }
-            }}
-          />
-          <Link to="/search" className="home-search-button">🔎 Search</Link>
-        </div>
-      </div>
+  <div className="home-search">
+    <input
+      type="text"
+      placeholder="🔎 Search cars, houses, furniture, labor and more..."
+      onClick={() => {
+        window.location.hash = "/search";
+      }}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          const value = e.target.value.trim();
+          if (value) window.location.hash = `/search?search=${encodeURIComponent(value)}`;
+          else window.location.hash = "/search";
+        }
+      }}
+    />
+  </div>
+</div>
 
       <section className="home-categories">
         <h2 className="home-section-title">All Categories</h2>
