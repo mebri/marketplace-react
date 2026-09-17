@@ -123,9 +123,6 @@ function Home() {
     <input
       type="text"
       placeholder="🔎 Search cars, houses, furniture, labor and more..."
-      onClick={() => {
-        window.location.hash = "/search";
-      }}
       onKeyDown={(e) => {
         if (e.key === "Enter") {
           const value = e.target.value.trim();
@@ -134,6 +131,22 @@ function Home() {
         }
       }}
     />
+    <button
+      type="button"
+      className="home-search-icon"
+      onClick={() => {
+        const input = document.querySelector(".home-search input");
+        const value = input?.value.trim();
+        if (value) {
+          window.location.hash = `/search?search=${encodeURIComponent(value)}`;
+        } else {
+          window.location.hash = "/search";
+        }
+      }}
+      aria-label="Search"
+    >
+      🔎
+    </button>
   </div>
 </div>
 
