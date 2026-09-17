@@ -14,6 +14,10 @@ import {
   collection,
   addDoc,
   increment,
+  query,
+  where,
+  getDocs,
+  serverTimestamp,
 } from "firebase/firestore";
 
 import { db, auth } from "../firebase/firebase";
@@ -32,6 +36,7 @@ function AdDetails() {
   const [currentImage, setCurrentImage] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [statusLoading, setStatusLoading] = useState(false);
+  const [reportLoading, setReportLoading] = useState(false);
 
   // =========================
   // LOAD ADVERTISEMENT
@@ -53,31 +58,22 @@ function AdDetails() {
       const adData = { id: docSnap.id, ...docSnap.data() };
       setAd(adData);
 
-      // =========================
       // INCREMENT VIEW COUNT
-      // =========================
-      // Only count if:
-      // - Viewer is NOT the owner
-      // - This ad hasn't been viewed in this session already
       try {
         const viewerId = auth.currentUser?.uid || "guest";
         const sessionKey = `viewed_${id}_${viewerId}`;
-
         const alreadyViewed = sessionStorage.getItem(sessionKey);
         const isOwner = auth.currentUser?.uid === adData.userId;
 
         if (!alreadyViewed && !isOwner) {
           await updateDoc(docRef, { views: increment(1) });
           sessionStorage.setItem(sessionKey, "1");
-
-          // Update local state so the display reflects the new count
           setAd((prev) => ({
             ...prev,
             views: (prev.views || 0) + 1,
           }));
         }
       } catch (viewErr) {
-        // View tracking shouldn't break the page
         console.error("View count error:", viewErr);
       }
 
@@ -86,7 +82,6 @@ function AdDetails() {
         try {
           const sellerRef = doc(db, "users", adData.userId);
           const sellerSnap = await getDoc(sellerRef);
-
           if (sellerSnap.exists()) {
             setSeller({ uid: sellerSnap.id, ...sellerSnap.data() });
           } else {
@@ -126,6 +121,64 @@ function AdDetails() {
   };
 
   // =========================
+  // REPORT AD
+  // =========================
+  const reportAd = async () => {
+    if (!auth.currentUser) {
+      alert("Please log in to report an advertisement.");
+      navigate("/login");
+      return;
+    }
+    if (!ad) return;
+    if (ad.userId === auth.currentUser.uid) {
+      alert("You cannot report your own advertisement.");
+      return;
+    }
+
+    const reason = window.prompt(
+      "Why are you reporting this ad?\n\nExamples: scam, wrong info, offensive, duplicate"
+    );
+    if (!reason || !reason.trim()) return;
+
+    try {
+      setReportLoading(true);
+
+      // Check for existing report from this user for this ad
+      const reportsRef = collection(db, "reports");
+      const q = query(
+        reportsRef,
+        where("adId", "==", id),
+        where("reportedBy", "==", auth.currentUser.uid)
+      );
+      const existing = await getDocs(q);
+
+      if (!existing.empty) {
+        alert("You already reported this advertisement. Thank you!");
+        setReportLoading(false);
+        return;
+      }
+
+      await addDoc(reportsRef, {
+        adId: id,
+        adTitle: ad.title || "",
+        adUserId: ad.userId || "",
+        reportedBy: auth.currentUser.uid,
+        reportedByEmail: auth.currentUser.email || "",
+        reason: reason.trim(),
+        status: "pending",
+        createdAt: serverTimestamp(),
+      });
+
+      alert("Thank you. We'll review this ad. ✅");
+    } catch (err) {
+      console.error("Report error:", err);
+      alert("Could not submit report: " + err.message);
+    } finally {
+      setReportLoading(false);
+    }
+  };
+
+  // =========================
   // TOGGLE SOLD STATUS
   // =========================
   const toggleSoldStatus = async () => {
@@ -150,10 +203,7 @@ function AdDetails() {
         soldAt: newStatus === "sold" ? new Date() : null,
       });
 
-      setAd((prev) => ({
-        ...prev,
-        status: newStatus,
-      }));
+      setAd((prev) => ({ ...prev, status: newStatus }));
       alert(
         newStatus === "sold"
           ? "Marked as SOLD ✅"
@@ -359,9 +409,6 @@ function AdDetails() {
     );
   }
 
-  // =========================
-  // IMAGES
-  // =========================
   const imageList =
     Array.isArray(ad.images) && ad.images.length > 0
       ? ad.images
@@ -383,20 +430,11 @@ function AdDetails() {
     );
   };
 
-  // =========================
-  // CONTACT INFORMATION
-  // =========================
   const phoneNumber = ad.phone || "";
-  const whatsappNumber = (ad.whatsapp || phoneNumber || "").replace(
-    /\D/g,
-    ""
-  );
+  const whatsappNumber = (ad.whatsapp || phoneNumber || "").replace(/\D/g, "");
   const telegramValue = ad.telegram || "";
   const telegramUsername = telegramValue.trim().replace(/^@/, "");
 
-  // =========================
-  // SELLER NAME
-  // =========================
   const sellerName = seller?.name || ad.userName || "Seller";
   const sellerCity = seller?.city || ad.city || "";
   const sellerAvatar = sellerName ? sellerName.charAt(0).toUpperCase() : "👤";
@@ -407,9 +445,6 @@ function AdDetails() {
 
   return (
     <div className="details-page">
-      {/* =========================
-          MAIN IMAGE
-      ========================= */}
       <div className="details-image">
         {imageList.length > 0 ? (
           <>
@@ -420,10 +455,7 @@ function AdDetails() {
               onClick={() => setLightboxOpen(true)}
               style={{ cursor: "zoom-in" }}
             />
-
-            {/* SOLD OVERLAY ON MAIN IMAGE */}
             {isSold && <div className="sold-overlay-big">SOLD</div>}
-
             {imageList.length > 1 && (
               <>
                 <button
@@ -451,9 +483,6 @@ function AdDetails() {
         )}
       </div>
 
-      {/* =========================
-          THUMBNAILS
-      ========================= */}
       {imageList.length > 1 && (
         <div className="image-thumbnails">
           {imageList.map((image, index) => (
@@ -475,18 +504,11 @@ function AdDetails() {
         </div>
       )}
 
-      {/* =========================
-          AD INFORMATION
-      ========================= */}
       <div className="details-info">
-        {/* SOLD / AVAILABLE BADGE */}
-        <span
-          className={`status-badge ${isSold ? "sold" : "available"}`}
-        >
+        <span className={`status-badge ${isSold ? "sold" : "available"}`}>
           {isSold ? "❌ SOLD OUT" : "✅ AVAILABLE"}
         </span>
 
-        {/* POST TIME + VIEWS */}
         <div className="details-meta-row">
           {postedTime && (
             <span className="posted-time">🕒 Posted {postedTime}</span>
@@ -494,15 +516,12 @@ function AdDetails() {
           <span className="views-count">👁 {ad.views || 0} views</span>
         </div>
 
-        {/* CATEGORY */}
         <span className="details-category">
           {ad.category || "Advertisement"}
         </span>
 
-        {/* TITLE */}
         <h1>{ad.title || "Untitled Advertisement"}</h1>
 
-        {/* PRICE */}
         <h2>
           ETB{" "}
           {Number(String(ad.price || 0).replace(/,/g, "")).toLocaleString(
@@ -510,9 +529,6 @@ function AdDetails() {
           )}
         </h2>
 
-        {/* =========================
-            OWNER: MARK AS SOLD BUTTON
-        ========================= */}
         {isOwner && (
           <button
             type="button"
@@ -528,9 +544,6 @@ function AdDetails() {
           </button>
         )}
 
-        {/* =========================
-            ACTION BUTTONS
-        ========================= */}
         <div className="details-actions-row">
           <button
             type="button"
@@ -554,55 +567,42 @@ function AdDetails() {
               disabled={chatLoading || isSold}
               className="action-btn chat-action"
             >
-              {chatLoading
-                ? "Opening..."
-                : isSold
-                ? "❌ Sold"
-                : "💬 Chat"}
+              {chatLoading ? "Opening..." : isSold ? "❌ Sold" : "💬 Chat"}
             </button>
           )}
         </div>
 
-        {/* =========================
-            DETAILS
-        ========================= */}
         {ad.city && (
           <p>
             <strong>📍 City:</strong> {ad.city}
           </p>
         )}
-
         {ad.condition && (
           <p>
             <strong>🔄 Condition:</strong> {ad.condition}
           </p>
         )}
-
         {ad.type && (
           <p>
             <strong>🏷️ Type:</strong> {ad.type}
           </p>
         )}
-
         {ad.subcategory && (
           <p>
             <strong>📂 Type:</strong> {ad.subcategory}
           </p>
         )}
-
         {ad.furnitureType && (
           <p>
             <strong>🛋️ Furniture:</strong> {ad.furnitureType}
           </p>
         )}
-
         {ad.laborType && (
           <p>
             <strong>👷 Service:</strong> {ad.laborType}
           </p>
         )}
 
-        {/* DESCRIPTION */}
         <div className="details-description">
           <h3>Description</h3>
           <p>{ad.description || "No description available."}</p>
@@ -610,7 +610,6 @@ function AdDetails() {
 
         <hr />
 
-        {/* SELLER */}
         <div className="seller-information">
           <h3>👤 Seller Information</h3>
 
@@ -642,7 +641,6 @@ function AdDetails() {
               <span>{phoneNumber}</span>
             </a>
           )}
-
           {whatsappNumber && (
             <a
               href={`https://wa.me/${whatsappNumber}`}
@@ -653,7 +651,6 @@ function AdDetails() {
               💬 WhatsApp Seller
             </a>
           )}
-
           {telegramUsername && (
             <a
               href={`https://t.me/${telegramUsername}`}
@@ -664,14 +661,26 @@ function AdDetails() {
               ✈️ Contact on Telegram
             </a>
           )}
-
           {!phoneNumber && !whatsappNumber && !telegramUsername && (
             <p>Seller contact information is not available.</p>
           )}
         </div>
+
+        {/* =========================
+            REPORT AD BUTTON
+        ========================= */}
+        {!isOwner && (
+          <button
+            type="button"
+            onClick={reportAd}
+            disabled={reportLoading}
+            className="report-ad-btn"
+          >
+            {reportLoading ? "Submitting..." : "🚩 Report This Ad"}
+          </button>
+        )}
       </div>
 
-      {/* LIGHTBOX */}
       {lightboxOpen && imageList.length > 0 && (
         <ImageLightbox
           images={imageList}
