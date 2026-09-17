@@ -1344,7 +1344,12 @@ img {
   animation: dashboardSpin 0.8s linear infinite;
   margin-bottom: 15px;
 }
-@keyframes dashboardSpin { to { transform: rotate(360deg); } }
+
+@keyframes dashboardSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 
 .login-required {
   max-width: 500px;
