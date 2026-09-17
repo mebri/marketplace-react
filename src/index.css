@@ -4305,68 +4305,22 @@ img {
   gap: 10px;
   max-width: 750px;
   margin: 0 auto;
-}
-
-@media (max-width: 850px) {
-  .home-search-wrapper {
-    top: 115px;
-  }
-}
-
-@media (max-width: 600px) {
-  .home-search-wrapper {
-    top: 115px;
-    padding: 10px 12px 12px;
-  }
-  .home-search {
-    flex-direction: column;
-    width: 100%;
-  }
-  .home-search input {
-    width: 100%;
-    flex: none;
-  }
-  .home-search-button {
-    width: 100%;
-  }
-}
-
-/* =========================================================
-   STICKY SEARCH BAR
-========================================================= */
-.home-search-wrapper {
-  position: sticky;
-  top: 130px;
-  z-index: 950;
-  background: #f5f7fb;
-  padding: 12px 20px 15px;
-  margin-top: -20px;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
-}
-
-.home-search {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  max-width: 750px;
-  margin: 0 auto;
   width: 100%;
 }
 
 .home-search input {
-  flex: 1;
+  flex: 1 1 auto;
   min-width: 0;
   height: 58px;
   padding: 0 22px;
-  border: none;
+  border: 2px solid transparent;
   border-radius: 12px;
   outline: none;
   font-size: 17px;
   background: white;
   color: #222;
   box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12);
-  transition: box-shadow 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .home-search input::placeholder {
@@ -4375,13 +4329,14 @@ img {
 }
 
 .home-search input:focus {
-  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.25);
+  border-color: #1976d2;
+  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.2);
 }
 
 .home-search-icon {
+  flex: 0 0 auto;
   height: 58px;
   width: 58px;
-  min-width: 58px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -4391,12 +4346,16 @@ img {
   border-radius: 12px;
   font-size: 22px;
   cursor: pointer;
-  transition: background 0.2s ease, transform 0.15s ease;
+  transition: background 0.2s ease;
+  box-shadow: 0 3px 12px rgba(255, 152, 0, 0.35);
 }
 
 .home-search-icon:hover {
   background: #f57c00;
-  transform: translateY(-1px);
+}
+
+.home-search-icon:active {
+  transform: scale(0.96);
 }
 
 @media (max-width: 850px) {
@@ -4419,13 +4378,12 @@ img {
   }
 
   .home-search input::placeholder {
-    font-size: 14px;
+    font-size: 13px;
   }
 
   .home-search-icon {
     height: 52px;
     width: 52px;
-    min-width: 52px;
     font-size: 20px;
     border-radius: 10px;
   }
