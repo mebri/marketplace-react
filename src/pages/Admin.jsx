@@ -20,9 +20,6 @@ function Admin() {
   const [loadingData, setLoadingData] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
 
-  // =========================
-  // AUTH + ADMIN CHECK
-  // =========================
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (currentUser) => {
       if (!currentUser) {
@@ -33,7 +30,9 @@ function Admin() {
 
       try {
         console.log("🔍 Checking admin for UID:", currentUser.uid);
+
         const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+
         console.log("📄 Document exists:", userDoc.exists());
         console.log("📄 Full data:", userDoc.data());
         console.log("📄 isAdmin value:", userDoc.data()?.isAdmin);
@@ -54,9 +53,6 @@ function Admin() {
     return () => unsub();
   }, []);
 
-  // =========================
-  // LOAD DATA
-  // =========================
   const loadData = async () => {
     try {
       const usersSnap = await getDocs(collection(db, "users"));
@@ -89,30 +85,18 @@ function Admin() {
     }
   };
 
-  // =========================
-  // HELPERS
-  // =========================
   const formatDate = (ts) => {
     if (!ts) return "—";
     const d = ts.toDate ? ts.toDate() : new Date(ts.seconds ? ts.seconds * 1000 : ts);
     if (Number.isNaN(d.getTime())) return "—";
-    return d.toLocaleDateString("en-GB", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
+    return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
   };
 
   const formatDateTime = (ts) => {
     if (!ts) return "—";
     const d = ts.toDate ? ts.toDate() : new Date(ts.seconds ? ts.seconds * 1000 : ts);
     if (Number.isNaN(d.getTime())) return "—";
-    return d.toLocaleString("en-GB", {
-      day: "numeric",
-      month: "short",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    return d.toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
   };
 
   const last24h = Date.now() - 24 * 60 * 60 * 1000;
@@ -121,9 +105,6 @@ function Admin() {
     return t > last24h;
   }).length;
 
-  // =========================
-  // GATES
-  // =========================
   if (checking) {
     return (
       <div className="admin-page">
@@ -161,9 +142,6 @@ function Admin() {
     );
   }
 
-  // =========================
-  // RENDER
-  // =========================
   return (
     <div className="admin-page">
       <div className="admin-container">
@@ -179,7 +157,6 @@ function Admin() {
           </div>
         ) : (
           <>
-            {/* STATS */}
             <div className="admin-stats">
               <div className="admin-stat-card">
                 <div className="admin-stat-icon">👥</div>
@@ -188,7 +165,6 @@ function Admin() {
                   <p>Total Users</p>
                 </div>
               </div>
-
               <div className="admin-stat-card">
                 <div className="admin-stat-icon">📢</div>
                 <div>
@@ -196,7 +172,6 @@ function Admin() {
                   <p>Total Ads</p>
                 </div>
               </div>
-
               <div className="admin-stat-card">
                 <div className="admin-stat-icon">💬</div>
                 <div>
@@ -204,7 +179,6 @@ function Admin() {
                   <p>Total Chats</p>
                 </div>
               </div>
-
               <div className="admin-stat-card highlight">
                 <div className="admin-stat-icon">✨</div>
                 <div>
@@ -214,35 +188,21 @@ function Admin() {
               </div>
             </div>
 
-            {/* TABS */}
             <div className="admin-tabs">
-              <button
-                className={activeTab === "overview" ? "active" : ""}
-                onClick={() => setActiveTab("overview")}
-              >
+              <button className={activeTab === "overview" ? "active" : ""} onClick={() => setActiveTab("overview")}>
                 📊 Overview
               </button>
-              <button
-                className={activeTab === "users" ? "active" : ""}
-                onClick={() => setActiveTab("users")}
-              >
+              <button className={activeTab === "users" ? "active" : ""} onClick={() => setActiveTab("users")}>
                 👥 Users
               </button>
-              <button
-                className={activeTab === "ads" ? "active" : ""}
-                onClick={() => setActiveTab("ads")}
-              >
+              <button className={activeTab === "ads" ? "active" : ""} onClick={() => setActiveTab("ads")}>
                 📢 Ads
               </button>
-              <button
-                className={activeTab === "chats" ? "active" : ""}
-                onClick={() => setActiveTab("chats")}
-              >
+              <button className={activeTab === "chats" ? "active" : ""} onClick={() => setActiveTab("chats")}>
                 💬 Chats
               </button>
             </div>
 
-            {/* OVERVIEW */}
             {activeTab === "overview" && (
               <div className="admin-grid-2">
                 <div className="admin-panel">
@@ -289,7 +249,6 @@ function Admin() {
               </div>
             )}
 
-            {/* USERS TAB */}
             {activeTab === "users" && (
               <div className="admin-panel">
                 <h2>👥 All Users ({users.length})</h2>
@@ -316,7 +275,6 @@ function Admin() {
               </div>
             )}
 
-            {/* ADS TAB */}
             {activeTab === "ads" && (
               <div className="admin-panel">
                 <h2>📢 All Ads ({ads.length})</h2>
@@ -342,7 +300,6 @@ function Admin() {
               </div>
             )}
 
-            {/* CHATS TAB */}
             {activeTab === "chats" && (
               <div className="admin-panel">
                 <h2>💬 Recent Chats ({chats.length})</h2>
