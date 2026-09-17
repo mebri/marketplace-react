@@ -4332,7 +4332,7 @@ img {
 }
 
 /* =========================================================
-   STICKY SEARCH BAR (WRAPPER APPROACH)
+   STICKY SEARCH BAR
 ========================================================= */
 .home-search-wrapper {
   position: sticky;
@@ -4348,6 +4348,7 @@ img {
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: 8px;
   max-width: 750px;
   margin: 0 auto;
   width: 100%;
@@ -4356,27 +4357,46 @@ img {
 .home-search input {
   flex: 1;
   min-width: 0;
-  width: 100%;
-  height: 50px;
-  padding: 0 18px;
+  height: 58px;
+  padding: 0 22px;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   outline: none;
-  font-size: 16px;
+  font-size: 17px;
   background: white;
   color: #222;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
-  cursor: pointer;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12);
   transition: box-shadow 0.2s ease;
 }
 
-.home-search input:hover {
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+.home-search input::placeholder {
+  color: #888;
+  font-size: 16px;
 }
 
 .home-search input:focus {
-  cursor: text;
-  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.2);
+  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.25);
+}
+
+.home-search-icon {
+  height: 58px;
+  width: 58px;
+  min-width: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ff9800;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 22px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.home-search-icon:hover {
+  background: #f57c00;
+  transform: translateY(-1px);
 }
 
 @media (max-width: 850px) {
@@ -4390,9 +4410,23 @@ img {
     top: 115px;
     padding: 10px 12px 12px;
   }
+
   .home-search input {
-    height: 46px;
-    padding: 0 14px;
+    height: 52px;
+    padding: 0 16px;
+    font-size: 15px;
+    border-radius: 10px;
+  }
+
+  .home-search input::placeholder {
     font-size: 14px;
+  }
+
+  .home-search-icon {
+    height: 52px;
+    width: 52px;
+    min-width: 52px;
+    font-size: 20px;
+    border-radius: 10px;
   }
 }
