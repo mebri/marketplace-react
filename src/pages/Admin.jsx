@@ -6,7 +6,11 @@ import {
   collection,
   getDocs,
   doc,
-  getDoc,
+  getDocFromServer,
+  deleteDoc,
+  updateDoc,
+  orderBy,
+  query,
 } from "firebase/firestore";
 
 function Admin() {
@@ -17,6 +21,7 @@ function Admin() {
   const [users, setUsers] = useState([]);
   const [ads, setAds] = useState([]);
   const [chats, setChats] = useState([]);
+  const [reports, setReports] = useState([]);
   const [loadingData, setLoadingData] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
 
@@ -30,13 +35,10 @@ function Admin() {
 
       try {
         console.log("🔍 Checking admin for UID:", currentUser.uid);
-
-        const userDoc = await getDoc(doc(db, "users", currentUser.uid));
-
-        console.log("📄 Document exists:", userDoc.exists());
-        console.log("📄 Full data:", userDoc.data());
+        const userDoc = await getDocFromServer(
+          doc(db, "users", currentUser.uid)
+        );
         console.log("📄 isAdmin value:", userDoc.data()?.isAdmin);
-        console.log("📄 isAdmin type:", typeof userDoc.data()?.isAdmin);
 
         if (userDoc.exists() && userDoc.data().isAdmin === true) {
           setIsAdmin(true);
@@ -64,6 +66,10 @@ function Admin() {
       const chatsSnap = await getDocs(collection(db, "chats"));
       const chatsList = chatsSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
 
+      // LOAD REPORTS (no orderBy to avoid index requirement)
+      const reportsSnap = await getDocs(collection(db, "reports"));
+      const reportsList = reportsSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+
       const getTime = (obj) => {
         if (!obj) return 0;
         if (obj.toMillis) return obj.toMillis();
@@ -74,14 +80,41 @@ function Admin() {
       usersList.sort((a, b) => getTime(b.createdAt) - getTime(a.createdAt));
       adsList.sort((a, b) => getTime(b.createdAt) - getTime(a.createdAt));
       chatsList.sort((a, b) => getTime(b.updatedAt) - getTime(a.updatedAt));
+      reportsList.sort((a, b) => getTime(b.createdAt) - getTime(a.createdAt));
 
       setUsers(usersList);
       setAds(adsList);
       setChats(chatsList);
+      setReports(reportsList);
     } catch (err) {
       console.error("Admin data load error:", err);
     } finally {
       setLoadingData(false);
+    }
+  };
+
+  const dismissReport = async (reportId) => {
+    if (!window.confirm("Dismiss this report?")) return;
+    try {
+      await deleteDoc(doc(db, "reports", reportId));
+      setReports((prev) => prev.filter((r) => r.id !== reportId));
+    } catch (err) {
+      console.error("Delete report error:", err);
+      alert("Could not dismiss report: " + err.message);
+    }
+  };
+
+  const deleteReportedAd = async (reportId, adId) => {
+    if (!window.confirm("DELETE the reported ad permanently?")) return;
+    try {
+      await deleteDoc(doc(db, "ads", adId));
+      await deleteDoc(doc(db, "reports", reportId));
+      setReports((prev) => prev.filter((r) => r.id !== reportId));
+      setAds((prev) => prev.filter((a) => a.id !== adId));
+      alert("Ad deleted successfully.");
+    } catch (err) {
+      console.error("Delete ad error:", err);
+      alert("Could not delete ad: " + err.message);
     }
   };
 
@@ -180,10 +213,10 @@ function Admin() {
                 </div>
               </div>
               <div className="admin-stat-card highlight">
-                <div className="admin-stat-icon">✨</div>
+                <div className="admin-stat-icon">🚩</div>
                 <div>
-                  <h2>{recentSignups}</h2>
-                  <p>New in 24h</p>
+                  <h2>{reports.length}</h2>
+                  <p>Reports</p>
                 </div>
               </div>
             </div>
@@ -200,6 +233,9 @@ function Admin() {
               </button>
               <button className={activeTab === "chats" ? "active" : ""} onClick={() => setActiveTab("chats")}>
                 💬 Chats
+              </button>
+              <button className={activeTab === "reports" ? "active" : ""} onClick={() => setActiveTab("reports")}>
+                🚩 Reports {reports.length > 0 && <span className="admin-tab-badge">{reports.length}</span>}
               </button>
             </div>
 
@@ -315,6 +351,54 @@ function Admin() {
                   </Link>
                 ))}
                 {chats.length === 0 && <p className="admin-empty">No chats yet.</p>}
+              </div>
+            )}
+
+            {activeTab === "reports" && (
+              <div className="admin-panel">
+                <h2>🚩 Reported Ads ({reports.length})</h2>
+                {reports.length === 0 ? (
+                  <p className="admin-empty">No reports yet. 🎉</p>
+                ) : (
+                  <div className="admin-table">
+                    {reports.map((r) => (
+                      <div className="report-row" key={r.id}>
+                        <div className="report-icon">🚩</div>
+                        <div className="report-info">
+                          <Link to={`/ad/${r.adId}`} className="report-title">
+                            {r.adTitle || "Untitled ad"}
+                          </Link>
+                          <span className="report-reason">
+                            Reason: <strong>{r.reason}</strong>
+                          </span>
+                          <span className="admin-muted">
+                            Reported by {r.reportedByEmail || "unknown"} • {formatDateTime(r.createdAt)}
+                          </span>
+                        </div>
+                        <div className="report-actions">
+                          <button
+                            className="report-view-btn"
+                            onClick={() => window.open(`#/ad/${r.adId}`, "_blank")}
+                          >
+                            View Ad
+                          </button>
+                          <button
+                            className="report-dismiss-btn"
+                            onClick={() => dismissReport(r.id)}
+                          >
+                            Dismiss
+                          </button>
+                          <button
+                            className="report-delete-btn"
+                            onClick={() => deleteReportedAd(r.id, r.adId)}
+                          >
+                            Delete Ad
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </>
