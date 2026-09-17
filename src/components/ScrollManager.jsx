@@ -25,8 +25,7 @@ const scrollToY = (y) => {
 const getMaxScroll = () => {
   const root = document.getElementById("root");
   const rootMax = root ? root.scrollHeight - root.clientHeight : 0;
-  const windowMax =
-    document.documentElement.scrollHeight - window.innerHeight;
+  const windowMax = document.documentElement.scrollHeight - window.innerHeight;
   return Math.max(rootMax, windowMax, 0);
 };
 
@@ -40,29 +39,23 @@ function ScrollManager() {
     }
   }, []);
 
-  // SAVE scroll position
+  // SAVE — but NEVER save 0
   useEffect(() => {
     if (!key) return;
     const storageKey = "scroll:" + key;
 
-    // Skip scroll events for the first 500ms to avoid mount-time
-    // transient events (which fire y=0 and would overwrite the real value)
-    const mountedAt = Date.now();
-    const SAVE_DELAY_MS = 500;
-
     const save = () => {
-      if (Date.now() - mountedAt < SAVE_DELAY_MS) return;
       const y = getScrollY();
+      // Critical: never save 0 — this prevents navigation-time
+      // transient scroll events from wiping the correct position
+      if (y === 0) return;
       try {
         sessionStorage.setItem(storageKey, String(y));
       } catch (e) {}
     };
 
     window.addEventListener("scroll", save, { passive: true });
-    document.addEventListener("scroll", save, {
-      passive: true,
-      capture: true,
-    });
+    document.addEventListener("scroll", save, { passive: true, capture: true });
 
     return () => {
       window.removeEventListener("scroll", save);
@@ -70,7 +63,7 @@ function ScrollManager() {
     };
   }, [key]);
 
-  // RESTORE scroll position
+  // RESTORE
   useLayoutEffect(() => {
     if (!key) return;
 
@@ -80,15 +73,14 @@ function ScrollManager() {
       saved = sessionStorage.getItem(storageKey);
     } catch (e) {}
 
-    const isBack = saved !== null;
     console.log(
       "🧭 ScrollManager:",
-      isBack ? "RESTORE" : "FRESH",
+      saved !== null ? "RESTORE" : "FRESH",
       "key=" + key,
       "saved=" + saved
     );
 
-    if (!isBack) {
+    if (saved === null) {
       scrollToY(0);
       return;
     }
@@ -108,8 +100,7 @@ function ScrollManager() {
       if (cancelled) return;
       attempts++;
 
-      const maxScroll = getMaxScroll();
-      if (maxScroll >= target) {
+      if (getMaxScroll() >= target) {
         scrollToY(target);
         if (Math.abs(getScrollY() - target) < 5) {
           successes++;
