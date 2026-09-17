@@ -91,14 +91,23 @@ function Admin() {
     if (!ts) return "—";
     const d = ts.toDate ? ts.toDate() : new Date(ts.seconds ? ts.seconds * 1000 : ts);
     if (Number.isNaN(d.getTime())) return "—";
-    return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+    return d.toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
   };
 
   const formatDateTime = (ts) => {
     if (!ts) return "—";
     const d = ts.toDate ? ts.toDate() : new Date(ts.seconds ? ts.seconds * 1000 : ts);
     if (Number.isNaN(d.getTime())) return "—";
-    return d.toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+    return d.toLocaleString("en-GB", {
+      day: "numeric",
+      month: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   const last24h = Date.now() - 24 * 60 * 60 * 1000;
@@ -125,7 +134,9 @@ function Admin() {
           <div className="admin-denied-icon">🔒</div>
           <h1>Please Log In</h1>
           <p>You need to be logged in to access the admin panel.</p>
-          <Link to="/login" className="dashboard-primary-btn">Go to Login</Link>
+          <Link to="/login" className="dashboard-primary-btn">
+            Go to Login
+          </Link>
         </div>
       </div>
     );
@@ -138,7 +149,9 @@ function Admin() {
           <div className="admin-denied-icon">⛔</div>
           <h1>Access Denied</h1>
           <p>You do not have permission to view this page.</p>
-          <Link to="/" className="dashboard-primary-btn">← Back Home</Link>
+          <Link to="/" className="dashboard-primary-btn">
+            ← Back Home
+          </Link>
         </div>
       </div>
     );
@@ -167,6 +180,7 @@ function Admin() {
                   <p>Total Users</p>
                 </div>
               </div>
+
               <div className="admin-stat-card">
                 <div className="admin-stat-icon">📢</div>
                 <div>
@@ -174,6 +188,7 @@ function Admin() {
                   <p>Total Ads</p>
                 </div>
               </div>
+
               <div className="admin-stat-card">
                 <div className="admin-stat-icon">💬</div>
                 <div>
@@ -181,6 +196,7 @@ function Admin() {
                   <p>Total Chats</p>
                 </div>
               </div>
+
               <div className="admin-stat-card highlight">
                 <div className="admin-stat-icon">✨</div>
                 <div>
@@ -191,16 +207,28 @@ function Admin() {
             </div>
 
             <div className="admin-tabs">
-              <button className={activeTab === "overview" ? "active" : ""} onClick={() => setActiveTab("overview")}>
+              <button
+                className={activeTab === "overview" ? "active" : ""}
+                onClick={() => setActiveTab("overview")}
+              >
                 📊 Overview
               </button>
-              <button className={activeTab === "users" ? "active" : ""} onClick={() => setActiveTab("users")}>
+              <button
+                className={activeTab === "users" ? "active" : ""}
+                onClick={() => setActiveTab("users")}
+              >
                 👥 Users
               </button>
-              <button className={activeTab === "ads" ? "active" : ""} onClick={() => setActiveTab("ads")}>
+              <button
+                className={activeTab === "ads" ? "active" : ""}
+                onClick={() => setActiveTab("ads")}
+              >
                 📢 Ads
               </button>
-              <button className={activeTab === "chats" ? "active" : ""} onClick={() => setActiveTab("chats")}>
+              <button
+                className={activeTab === "chats" ? "active" : ""}
+                onClick={() => setActiveTab("chats")}
+              >
                 💬 Chats
               </button>
             </div>
@@ -222,16 +250,24 @@ function Admin() {
                         <strong>{u.name || "Unnamed"}</strong>
                         <span>{u.email}</span>
                       </div>
-                      <span className="admin-row-time">{formatDate(u.createdAt)}</span>
+                      <span className="admin-row-time">
+                        {formatDate(u.createdAt)}
+                      </span>
                     </div>
                   ))}
-                  {users.length === 0 && <p className="admin-empty">No users yet.</p>}
+                  {users.length === 0 && (
+                    <p className="admin-empty">No users yet.</p>
+                  )}
                 </div>
 
                 <div className="admin-panel">
                   <h2>📢 Latest Ads</h2>
                   {ads.slice(0, 5).map((a) => (
-                    <Link to={`/ad/${a.id}`} className="admin-row clickable" key={a.id}>
+                    <Link
+                      to={`/ad/${a.id}`}
+                      className="admin-row clickable"
+                      key={a.id}
+                    >
                       <div className="admin-thumb">
                         {a.image || (a.images && a.images[0]) ? (
                           <img src={a.image || a.images[0]} alt={a.title} />
@@ -243,7 +279,9 @@ function Admin() {
                         <strong>{a.title || "Untitled"}</strong>
                         <span>ETB {Number(a.price || 0).toLocaleString()}</span>
                       </div>
-                      <span className="admin-row-time">{formatDate(a.createdAt)}</span>
+                      <span className="admin-row-time">
+                        {formatDate(a.createdAt)}
+                      </span>
                     </Link>
                   ))}
                   {ads.length === 0 && <p className="admin-empty">No ads yet.</p>}
@@ -267,10 +305,16 @@ function Admin() {
                       <div className="admin-row-info">
                         <strong>{u.name || "Unnamed"}</strong>
                         <span>{u.email}</span>
-                        {u.city && <span className="admin-muted">📍 {u.city}</span>}
+                        {u.city && (
+                          <span className="admin-muted">📍 {u.city}</span>
+                        )}
                       </div>
-                      {u.isAdmin && <span className="admin-badge-admin">ADMIN</span>}
-                      <span className="admin-row-time">{formatDate(u.createdAt)}</span>
+                      {u.isAdmin && (
+                        <span className="admin-badge-admin">ADMIN</span>
+                      )}
+                      <span className="admin-row-time">
+                        {formatDate(u.createdAt)}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -282,7 +326,11 @@ function Admin() {
                 <h2>📢 All Ads ({ads.length})</h2>
                 <div className="admin-table">
                   {ads.map((a) => (
-                    <Link to={`/ad/${a.id}`} className="admin-row clickable" key={a.id}>
+                    <Link
+                      to={`/ad/${a.id}`}
+                      className="admin-row clickable"
+                      key={a.id}
+                    >
                       <div className="admin-thumb">
                         {a.image || (a.images && a.images[0]) ? (
                           <img src={a.image || a.images[0]} alt={a.title} />
@@ -292,10 +340,17 @@ function Admin() {
                       </div>
                       <div className="admin-row-info">
                         <strong>{a.title || "Untitled"}</strong>
-                        <span>{a.category} • ETB {Number(a.price || 0).toLocaleString()}</span>
-                        {a.city && <span className="admin-muted">📍 {a.city}</span>}
+                        <span>
+                          {a.category} • ETB{" "}
+                          {Number(a.price || 0).toLocaleString()}
+                        </span>
+                        {a.city && (
+                          <span className="admin-muted">📍 {a.city}</span>
+                        )}
                       </div>
-                      <span className="admin-row-time">{formatDateTime(a.createdAt)}</span>
+                      <span className="admin-row-time">
+                        {formatDateTime(a.createdAt)}
+                      </span>
                     </Link>
                   ))}
                 </div>
@@ -306,17 +361,29 @@ function Admin() {
               <div className="admin-panel">
                 <h2>💬 Recent Chats ({chats.length})</h2>
                 {chats.slice(0, 30).map((c) => (
-                  <Link to={`/chat/${c.id}`} className="admin-row clickable" key={c.id}>
+                  <Link
+                    to={`/chat/${c.id}`}
+                    className="admin-row clickable"
+                    key={c.id}
+                  >
                     <div className="admin-thumb">💬</div>
                     <div className="admin-row-info">
                       <strong>{c.adTitle || "General inquiry"}</strong>
-                      <span>{c.buyerName} → {c.sellerName}</span>
-                      {c.lastMessage && <span className="admin-muted">"{c.lastMessage}"</span>}
+                      <span>
+                        {c.buyerName} → {c.sellerName}
+                      </span>
+                      {c.lastMessage && (
+                        <span className="admin-muted">"{c.lastMessage}"</span>
+                      )}
                     </div>
-                    <span className="admin-row-time">{formatDateTime(c.updatedAt)}</span>
+                    <span className="admin-row-time">
+                      {formatDateTime(c.updatedAt)}
+                    </span>
                   </Link>
                 ))}
-                {chats.length === 0 && <p className="admin-empty">No chats yet.</p>}
+                {chats.length === 0 && (
+                  <p className="admin-empty">No chats yet.</p>
+                )}
               </div>
             )}
           </>
