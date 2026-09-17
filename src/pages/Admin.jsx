@@ -31,7 +31,7 @@ function Admin() {
       try {
         console.log("🔍 Checking admin for UID:", currentUser.uid);
 
-        const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+        import { getDocFromServer } from "firebase/firestore";
 
         console.log("📄 Document exists:", userDoc.exists());
         console.log("📄 Full data:", userDoc.data());
