@@ -182,6 +182,20 @@ function Admin() {
           <h1>🛡️ Admin Dashboard</h1>
           <p>Manage and monitor የኛ ገበያ</p>
         </div>
+                {/* ANALYTICS CARD */}
+        <a
+          href="https://dash.cloudflare.com/5baa331a0df687b57358a40f9a0eef68/analytics/web-analytics"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="admin-analytics-card"
+        >
+          <h3>📊 View Website Analytics</h3>
+          <p>
+            See visitors, page views, top pages, countries, and traffic sources
+            in real-time.
+          </p>
+          <span className="admin-analytics-btn">Open Cloudflare Analytics →</span>
+        </a>
 
         {loadingData ? (
           <div className="admin-loading">
