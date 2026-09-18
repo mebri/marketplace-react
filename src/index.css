@@ -5341,3 +5341,34 @@ img {
     font-size: 18px !important;
   }
 }
+
+/* =========================================================
+   STICKY SEARCH BAR - TRANSPARENT BACKGROUND
+========================================================= */
+.home-search-wrapper {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.home-search {
+  background: transparent !important;
+}
+
+/* When scrolling, add a subtle blur so text stays readable */
+.home-search-wrapper::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(245, 247, 251, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+/* Show the blur only when the user scrolls past the hero */
+.home-search-wrapper.scrolled::before {
+  opacity: 1;
+}
