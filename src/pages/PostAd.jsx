@@ -47,7 +47,6 @@ function PostAd() {
 
       const draft = JSON.parse(saved);
 
-      // Only restore if there's meaningful data
       const hasData =
         draft.title ||
         draft.price ||
@@ -73,8 +72,6 @@ function PostAd() {
       if (draft.laborType) setLaborType(draft.laborType);
 
       setDraftRestored(true);
-
-      // Auto-hide the restored message after 5 seconds
       setTimeout(() => setDraftRestored(false), 5000);
     } catch (err) {
       console.error("Draft restore error:", err);
@@ -85,7 +82,6 @@ function PostAd() {
   // AUTO-SAVE DRAFT (debounced)
   // =========================
   useEffect(() => {
-    // Skip the very first render if nothing has been typed yet
     const hasAnyData =
       title || price || city || category || description || phone;
 
@@ -114,7 +110,6 @@ function PostAd() {
 
         localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
 
-        // Show the "Draft saved" indicator briefly
         setDraftSaved(true);
         setTimeout(() => setDraftSaved(false), 2000);
       } catch (err) {
@@ -147,7 +142,6 @@ function PostAd() {
 
     localStorage.removeItem(DRAFT_KEY);
 
-    // Reset all fields
     setTitle("");
     setPrice("");
     setCity("");
@@ -297,10 +291,8 @@ function PostAd() {
 
       alert("Advertisement posted successfully! 🎉");
 
-      // CLEAR DRAFT AFTER SUCCESS
       localStorage.removeItem(DRAFT_KEY);
 
-      // CLEAR FORM
       setTitle("");
       setPrice("");
       setCity("");
@@ -336,7 +328,6 @@ function PostAd() {
     <div className="post-ad-page">
       <h1>📢 Post Advertisement</h1>
 
-      {/* DRAFT STATUS BANNER */}
       {draftRestored && (
         <div className="draft-banner draft-restored">
           📝 Draft restored from your last session. Don't forget to re-select
@@ -595,29 +586,25 @@ function PostAd() {
               ))}
             </div>
           )}
-
-         </div>
-
-{/* PUBLISH BUTTON */}
-<button
-  type="submit"
-  disabled={uploading}
-  className="publish-ad-btn"
->
-  {uploading
-    ? "⏳ Uploading images..."
-    : "📢 Publish Advertisement"}
-</button>
-
-{/* CLEAR DRAFT (secondary) */}
-<button
-  type="button"
-  onClick={clearDraft}
-  className="clear-draft-btn-small"
->
-  🗑️ Clear Draft
-</button>
         </div>
+
+        <button
+          type="submit"
+          disabled={uploading}
+          className="publish-ad-btn"
+        >
+          {uploading
+            ? "⏳ Uploading images..."
+            : "📢 Publish Advertisement"}
+        </button>
+
+        <button
+          type="button"
+          onClick={clearDraft}
+          className="clear-draft-btn-small"
+        >
+          🗑️ Clear Draft
+        </button>
       </form>
     </div>
   );
