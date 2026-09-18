@@ -4924,3 +4924,101 @@ img {
     min-width: 0;
   }
 }
+
+/* =========================================================
+   SHARE BUTTONS
+========================================================= */
+.share-section {
+  margin-top: 20px;
+  padding: 18px;
+  background: #f8fafc;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+}
+
+.share-section h3 {
+  margin: 0 0 12px;
+  font-size: 17px;
+  color: #0f172a;
+}
+
+.share-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.share-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: white;
+  text-decoration: none;
+  font-family: inherit;
+}
+
+.share-btn:active {
+  transform: scale(0.97);
+}
+
+.share-whatsapp {
+  background: #25d366;
+}
+
+.share-whatsapp:hover {
+  background: #1da851;
+}
+
+.share-telegram {
+  background: #229ed9;
+}
+
+.share-telegram:hover {
+  background: #168ac2;
+}
+
+.share-copy {
+  background: #64748b;
+}
+
+.share-copy:hover {
+  background: #475569;
+}
+
+.share-copy.copied {
+  background: #16a34a;
+}
+
+.share-native {
+  background: #7c3aed;
+  grid-column: 1 / -1;
+}
+
+.share-native:hover {
+  background: #6d28d9;
+}
+
+@media (min-width: 601px) {
+  .share-buttons {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .share-native {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 400px) {
+  .share-buttons {
+    grid-template-columns: 1fr;
+  }
+  .share-native {
+    grid-column: auto;
+  }
+}
