@@ -5242,6 +5242,29 @@ img {
     margin: 0 0 10px !important;
   }
 
+   /* =========================================================
+   STICKY SEARCH BAR - CLOSE TO NAVBAR
+========================================================= */
+
+/* Desktop — navbar is 72px tall */
+.home-search-wrapper {
+  top: 72px !important;
+}
+
+/* Tablet & mobile — navbar shrinks to 58px */
+@media (max-width: 850px) {
+  .home-search-wrapper {
+    top: 58px !important;
+  }
+}
+
+/* Small phones — navbar shrinks to 55px */
+@media (max-width: 600px) {
+  .home-search-wrapper {
+    top: 55px !important;
+    padding: 8px 12px 10px !important;
+  }
+}
   .dashboard-view-btn {
     font-size: 12px !important;
     padding: 8px !important;
