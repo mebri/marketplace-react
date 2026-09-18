@@ -596,26 +596,27 @@ function PostAd() {
             </div>
           )}
 
-          <p className="image-count">
-            {images.length} / 10 images selected
-          </p>
-        </div>
+         </div>
 
-        {/* ACTION BUTTONS */}
-        <div className="post-form-buttons">
-          <button
-            type="button"
-            onClick={clearDraft}
-            className="clear-draft-btn"
-          >
-            🗑️ Clear Draft
-          </button>
+{/* PUBLISH BUTTON */}
+<button
+  type="submit"
+  disabled={uploading}
+  className="publish-ad-btn"
+>
+  {uploading
+    ? "⏳ Uploading images..."
+    : "📢 Publish Advertisement"}
+</button>
 
-          <button type="submit" disabled={uploading}>
-            {uploading
-              ? "⏳ Uploading images..."
-              : "📢 Publish Advertisement"}
-          </button>
+{/* CLEAR DRAFT (secondary) */}
+<button
+  type="button"
+  onClick={clearDraft}
+  className="clear-draft-btn-small"
+>
+  🗑️ Clear Draft
+</button>
         </div>
       </form>
     </div>
