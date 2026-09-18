@@ -608,6 +608,13 @@ function AdDetails() {
           <h3>Description</h3>
           <p>{ad.description || "No description available."}</p>
         </div>
+         {/* SHARE BUTTONS */}
+<ShareButtons
+  adId={id}
+  title={ad.title || "Advertisement"}
+  price={ad.price}
+  city={ad.city}
+/>
 
         <hr />
 
