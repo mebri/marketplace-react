@@ -4686,15 +4686,6 @@ img {
   margin: 0;
 }
 
-.views-count {
-  color: #64748b;
-  font-size: 14px;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
 /* =========================================================
    AD VIEW COUNTER
 ========================================================= */
