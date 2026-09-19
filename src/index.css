@@ -5571,3 +5571,153 @@ img {
     padding: 8px !important;
   }
 }
+
+/* =========================================================
+   SHARE AD BUTTON (Expandable)
+========================================================= */
+.share-section {
+  margin-top: 20px;
+}
+
+/* The big button that opens the options */
+.share-ad-btn {
+  display: block;
+  width: 100%;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #1976d2, #0d47a1);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  box-shadow: 0 4px 14px rgba(25, 118, 210, 0.3);
+}
+
+.share-ad-btn:hover {
+  background: linear-gradient(135deg, #0d47a1, #082c5e);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(25, 118, 210, 0.4);
+}
+
+.share-ad-btn:active {
+  transform: translateY(0);
+}
+
+/* Expanded panel with all options */
+.share-expanded {
+  padding: 18px;
+  background: #f8fafc;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  animation: shareFadeIn 0.2s ease;
+}
+
+@keyframes shareFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.share-expanded-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.share-expanded-header h3 {
+  margin: 0;
+  font-size: 17px;
+  color: #0f172a;
+}
+
+.share-close-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: #64748b;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+}
+
+.share-close-btn:hover {
+  background: #e2e8f0;
+}
+
+/* The 4 share buttons */
+.share-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.share-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: white;
+  text-decoration: none;
+  font-family: inherit;
+}
+
+.share-btn:active {
+  transform: scale(0.97);
+}
+
+.share-whatsapp { background: #25d366; }
+.share-whatsapp:hover { background: #1da851; }
+
+.share-telegram { background: #229ed9; }
+.share-telegram:hover { background: #168ac2; }
+
+.share-copy { background: #64748b; }
+.share-copy:hover { background: #475569; }
+.share-copy.copied { background: #16a34a; }
+
+.share-native {
+  background: #7c3aed;
+  grid-column: 1 / -1;
+}
+.share-native:hover { background: #6d28d9; }
+
+/* Desktop — 4 buttons in one row */
+@media (min-width: 601px) {
+  .share-buttons {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .share-native {
+    grid-column: auto;
+  }
+}
+
+/* Small phones — 1 column */
+@media (max-width: 400px) {
+  .share-buttons {
+    grid-template-columns: 1fr;
+  }
+  .share-native {
+    grid-column: auto;
+  }
+}
