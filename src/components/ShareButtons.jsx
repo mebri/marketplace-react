@@ -2,11 +2,26 @@ import { useState } from "react";
 
 function ShareButtons({ adId, title, price, city }) {
   const [copied, setCopied] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   const adUrl = `https://mebri.yegna.workers.dev/#/ad/${adId}`;
   const shareText = `🛒 ${title}\n💰 ETB ${Number(
     price || 0
   ).toLocaleString()}\n📍 ${city || "Ethiopia"}\n\nView on የኛ ገበያ:`;
+
+  const handleWhatsApp = () => {
+    const url = `https://wa.me/?text=${encodeURIComponent(
+      shareText + " " + adUrl
+    )}`;
+    window.open(url, "_blank");
+  };
+
+  const handleTelegram = () => {
+    const url = `https://t.me/share/url?url=${encodeURIComponent(
+      adUrl
+    )}&text=${encodeURIComponent(shareText)}`;
+    window.open(url, "_blank");
+  };
 
   const handleCopy = async () => {
     try {
@@ -25,8 +40,7 @@ function ShareButtons({ adId, title, price, city }) {
     }
   };
 
-  const handleShare = async () => {
-    // Try native share first (mobile — WhatsApp, Telegram, etc.)
+  const handleNativeShare = async () => {
     if (navigator.share) {
       try {
         await navigator.share({
@@ -34,32 +48,74 @@ function ShareButtons({ adId, title, price, city }) {
           text: shareText,
           url: adUrl,
         });
-        return;
       } catch (err) {
-        // User cancelled or share failed — try fallback below
+        // User cancelled — do nothing
       }
+    } else {
+      handleCopy();
     }
-
-    // Fallback for desktop or when native share isn't available:
-    // Open WhatsApp with the message
-    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(
-      shareText + " " + adUrl
-    )}`;
-    window.open(whatsappUrl, "_blank");
   };
 
   return (
     <div className="share-section">
-      <button
-        type="button"
-        onClick={handleShare}
-        className="share-ad-btn"
-      >
-        📤 Share This Ad
-      </button>
+      {!expanded ? (
+        <button
+          type="button"
+          onClick={() => setExpanded(true)}
+          className="share-ad-btn"
+        >
+          📤 Share This Ad
+        </button>
+      ) : (
+        <div className="share-expanded">
+          <div className="share-expanded-header">
+            <h3>📤 Share This Ad</h3>
+            <button
+              type="button"
+              onClick={() => setExpanded(false)}
+              className="share-close-btn"
+              aria-label="Close"
+            >
+              ✕
+            </button>
+          </div>
 
-      {copied && (
-        <p className="share-copied-msg">✅ Link copied!</p>
+          <div className="share-buttons">
+            <button
+              type="button"
+              onClick={handleWhatsApp}
+              className="share-btn share-whatsapp"
+            >
+              💬 WhatsApp
+            </button>
+
+            <button
+              type="button"
+              onClick={handleTelegram}
+              className="share-btn share-telegram"
+            >
+              ✈️ Telegram
+            </button>
+
+            <button
+              type="button"
+              onClick={handleCopy}
+              className={`share-btn share-copy ${copied ? "copied" : ""}`}
+            >
+              {copied ? "✅ Copied!" : "🔗 Copy Link"}
+            </button>
+
+            {typeof navigator !== "undefined" && navigator.share && (
+              <button
+                type="button"
+                onClick={handleNativeShare}
+                className="share-btn share-native"
+              >
+                📱 More
+              </button>
+            )}
+          </div>
+        </div>
       )}
     </div>
   );
