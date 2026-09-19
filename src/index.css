@@ -5721,3 +5721,67 @@ img {
     grid-column: auto;
   }
 }
+
+/* =========================================================
+   MY ADS - 3 COLUMN BUTTONS ON MOBILE (GREEN / YELLOW / RED)
+========================================================= */
+
+/* View Ads → GREEN */
+.view-ad-btn {
+  background: #16a34a !important;
+  color: white !important;
+}
+
+.view-ad-btn:hover {
+  background: #15803d !important;
+}
+
+/* Edit Ads → YELLOW */
+.edit-ad-btn {
+  background: #eab308 !important;
+  color: white !important;
+}
+
+.edit-ad-btn:hover {
+  background: #ca8a04 !important;
+}
+
+/* Delete Ads → RED */
+.delete-ad-btn {
+  background: #dc2626 !important;
+  color: white !important;
+}
+
+.delete-ad-btn:hover {
+  background: #b91c1c !important;
+}
+
+/* Force 3 columns on ALL screen sizes including mobile */
+@media (max-width: 600px) {
+  .my-ad-actions {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr 1fr !important;
+    gap: 6px !important;
+    margin-top: 14px !important;
+  }
+
+  .my-ad-actions button {
+    width: 100% !important;
+    height: 36px !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    white-space: nowrap !important;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+  }
+}
+
+/* Extra small phones — keep 3 columns but smaller */
+@media (max-width: 400px) {
+  .my-ad-actions button {
+    font-size: 10px !important;
+    height: 34px !important;
+  }
+}
