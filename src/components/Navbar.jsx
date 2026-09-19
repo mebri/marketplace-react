@@ -61,9 +61,17 @@ function Navbar() {
         {/* MOBILE QUICK ACTIONS */}
         <div className="mobile-quick-actions">
 
-          {/* IF LOGGED IN: Bell + Chat + Hamburger */}
+          {/* If logged in: My Ads + Bell + Chat + Hamburger */}
           {user ? (
             <>
+              <Link
+                to="/my-ads"
+                className="mobile-my-ads-btn"
+                onClick={closeMenu}
+              >
+                📢
+              </Link>
+
               <Link to="/notifications" className="icon-btn" onClick={closeMenu}>
                 🔔
                 {unreadCount > 0 && (
@@ -72,9 +80,11 @@ function Navbar() {
                   </span>
                 )}
               </Link>
+
               <Link to="/chats" className="icon-btn" onClick={closeMenu}>
                 💬
               </Link>
+
               <button
                 className="menu-toggle"
                 onClick={() => setMenuOpen(!menuOpen)}
@@ -84,7 +94,7 @@ function Navbar() {
               </button>
             </>
           ) : (
-            /* IF NOT LOGGED IN: Login + Register (visible) + Hamburger */
+            /* If not logged in: Login + Register + Hamburger */
             <>
               <Link to="/login" className="guest-login-btn" onClick={closeMenu}>
                 Login
@@ -143,10 +153,7 @@ function Navbar() {
 
       </div>
 
-      {/* =========================================================
-          MOBILE SECOND ROW - DASHBOARD + POST AD
-          (Only when logged in)
-      ========================================================= */}
+      {/* MOBILE SECOND ROW - DASHBOARD + POST AD */}
       {user && (
         <div className="mobile-second-row">
           <Link to="/dashboard" className="mobile-row-btn mobile-dashboard-btn">
@@ -158,9 +165,7 @@ function Navbar() {
         </div>
       )}
 
-      {/* =========================================================
-          MOBILE HAMBURGER MENU
-      ========================================================= */}
+      {/* MOBILE HAMBURGER MENU */}
       {menuOpen && (
         <div className="mobile-menu-dropdown">
           <Link to="/" onClick={closeMenu}>Home</Link>
@@ -172,12 +177,8 @@ function Navbar() {
           <Link to="/search?category=Electronics" onClick={closeMenu}>Electronics</Link>
           <Link to="/search?category=ምንአለሽ%20ተራ" onClick={closeMenu}>ምንአለሽ ተራ</Link>
 
-          {/* Only show footer actions if logged in (since login/register are already outside for guests) */}
           {user && (
             <div className="mobile-menu-footer">
-              <Link to="/my-ads" onClick={closeMenu} className="mobile-menu-myads">
-                📢 My Ads
-              </Link>
               <button onClick={handleLogout} className="mobile-menu-logout">
                 Logout
               </button>
