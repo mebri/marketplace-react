@@ -5526,6 +5526,46 @@ img {
     font-size: 11px !important;
   }
 
+   /* =========================================================
+   SHARE AD BUTTON (Single)
+========================================================= */
+.share-section {
+  margin-top: 20px;
+}
+
+.share-ad-btn {
+  display: block;
+  width: 100%;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #1976d2, #0d47a1);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  box-shadow: 0 4px 14px rgba(25, 118, 210, 0.3);
+}
+
+.share-ad-btn:hover {
+  background: linear-gradient(135deg, #0d47a1, #082c5e);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(25, 118, 210, 0.4);
+}
+
+.share-ad-btn:active {
+  transform: translateY(0);
+}
+
+.share-copied-msg {
+  margin: 10px 0 0;
+  text-align: center;
+  color: #16a34a;
+  font-size: 14px;
+  font-weight: 700;
+}
   .latest-view-button {
     font-size: 12px !important;
     padding: 8px !important;
