@@ -358,3 +358,26 @@
     display: none !important;
   }
 }
+
+/* =========================================================
+   MOBILE MY ADS BUTTON (ICON ONLY, NEXT TO BELL)
+========================================================= */
+@media (max-width: 850px) {
+  .mobile-my-ads-btn {
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f0f6ff;
+    color: #1976d2;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 18px;
+    transition: background 0.2s ease;
+  }
+
+  .mobile-my-ads-btn:hover {
+    background: #dbeafe;
+  }
+}
