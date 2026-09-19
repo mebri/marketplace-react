@@ -5785,3 +5785,90 @@ img {
     height: 34px !important;
   }
 }
+
+/* =========================================================
+   MY ADS BUTTONS - FINAL FORCE (GREEN / YELLOW / RED)
+   Must stay at the bottom so it wins over everything.
+========================================================= */
+
+/* Container — always 3 columns */
+.my-ad-actions {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr 1fr !important;
+  gap: 8px !important;
+  margin-top: 16px !important;
+}
+
+/* Wrapper links — make them plain blocks */
+.ad-action-link {
+  display: block !important;
+  text-decoration: none !important;
+  color: inherit !important;
+  width: 100% !important;
+}
+
+/* All buttons — base style */
+.my-ad-actions button,
+.my-ad-actions .view-ad-btn,
+.my-ad-actions .edit-ad-btn,
+.my-ad-actions .delete-ad-btn {
+  width: 100% !important;
+  height: 38px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  border-radius: 7px !important;
+  font-family: inherit !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* VIEW — GREEN */
+.my-ad-actions .view-ad-btn,
+.my-ad-actions button.view-ad-btn,
+.ad-action-link .view-ad-btn {
+  background: #16a34a !important;
+  background-color: #16a34a !important;
+}
+
+/* EDIT — YELLOW */
+.my-ad-actions .edit-ad-btn,
+.my-ad-actions button.edit-ad-btn,
+.ad-action-link .edit-ad-btn {
+  background: #eab308 !important;
+  background-color: #eab308 !important;
+}
+
+/* DELETE — RED */
+.my-ad-actions .delete-ad-btn,
+.my-ad-actions button.delete-ad-btn {
+  background: #dc2626 !important;
+  background-color: #dc2626 !important;
+}
+
+/* Small phones — keep 3 columns, tighter */
+@media (max-width: 600px) {
+  .my-ad-actions {
+    grid-template-columns: 1fr 1fr 1fr !important;
+    gap: 6px !important;
+  }
+
+  .my-ad-actions button {
+    height: 36px !important;
+    font-size: 11px !important;
+    padding: 0 4px !important;
+  }
+}
+
+@media (max-width: 400px) {
+  .my-ad-actions button {
+    font-size: 10px !important;
+    height: 34px !important;
+  }
+}
