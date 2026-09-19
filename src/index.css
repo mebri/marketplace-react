@@ -5869,3 +5869,74 @@ img {
     height: 34px !important;
   }
 }
+
+/* =========================================================
+   CARS / CATEGORY PAGE - BIGGER SEARCH & SORT
+========================================================= */
+
+/* Container for search + sort */
+.cars-controls {
+  gap: 16px !important;
+  max-width: 1000px !important;
+  margin: 0 auto 35px !important;
+}
+
+/* Search input — bigger */
+.car-search {
+  width: 100% !important;
+  max-width: 600px !important;
+  height: 60px !important;
+  padding: 0 24px !important;
+  font-size: 17px !important;
+  font-weight: 500 !important;
+  border-radius: 14px !important;
+  border: 2px solid #d7dce2 !important;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06) !important;
+  box-sizing: border-box !important;
+}
+
+.car-search:focus {
+  border-color: #1976d2 !important;
+  box-shadow: 0 0 0 4px rgba(25, 118, 210, 0.12) !important;
+}
+
+.car-search::placeholder {
+  font-size: 16px !important;
+  color: #94a3b8 !important;
+}
+
+/* Sort dropdown — bigger */
+.cars-controls select {
+  min-width: 220px !important;
+  height: 60px !important;
+  padding: 0 20px !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  border-radius: 14px !important;
+  border: 2px solid #d7dce2 !important;
+  background: #ffffff !important;
+  color: #0f172a !important;
+  cursor: pointer !important;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06) !important;
+  box-sizing: border-box !important;
+}
+
+.cars-controls select:focus {
+  border-color: #1976d2 !important;
+  box-shadow: 0 0 0 4px rgba(25, 118, 210, 0.12) !important;
+}
+
+/* Mobile — still big but full width */
+@media (max-width: 700px) {
+  .car-search {
+    height: 56px !important;
+    font-size: 16px !important;
+    padding: 0 18px !important;
+  }
+
+  .cars-controls select {
+    width: 100% !important;
+    height: 56px !important;
+    font-size: 15px !important;
+  }
+}
