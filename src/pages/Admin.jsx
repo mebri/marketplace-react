@@ -9,8 +9,6 @@ import {
   getDocFromServer,
   deleteDoc,
   updateDoc,
-  orderBy,
-  query,
 } from "firebase/firestore";
 
 function Admin() {
@@ -34,17 +32,12 @@ function Admin() {
       setUser(currentUser);
 
       try {
-        console.log("🔍 Checking admin for UID:", currentUser.uid);
         const userDoc = await getDocFromServer(
           doc(db, "users", currentUser.uid)
         );
-        console.log("📄 isAdmin value:", userDoc.data()?.isAdmin);
-
         if (userDoc.exists() && userDoc.data().isAdmin === true) {
           setIsAdmin(true);
           await loadData();
-        } else {
-          console.warn("⛔ Access denied — isAdmin !== true");
         }
       } catch (err) {
         console.error("❌ Admin check error:", err);
@@ -66,7 +59,6 @@ function Admin() {
       const chatsSnap = await getDocs(collection(db, "chats"));
       const chatsList = chatsSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
 
-      // LOAD REPORTS (no orderBy to avoid index requirement)
       const reportsSnap = await getDocs(collection(db, "reports"));
       const reportsList = reportsSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
 
@@ -90,6 +82,25 @@ function Admin() {
       console.error("Admin data load error:", err);
     } finally {
       setLoadingData(false);
+    }
+  };
+
+  // =========================
+  // TOGGLE FEATURED
+  // =========================
+  const toggleFeatured = async (adId, currentFeatured) => {
+    try {
+      await updateDoc(doc(db, "ads", adId), {
+        featured: !currentFeatured,
+      });
+      setAds((prev) =>
+        prev.map((a) =>
+          a.id === adId ? { ...a, featured: !currentFeatured } : a
+        )
+      );
+    } catch (err) {
+      console.error("Toggle featured error:", err);
+      alert("Could not update featured status: " + err.message);
     }
   };
 
@@ -122,14 +133,23 @@ function Admin() {
     if (!ts) return "—";
     const d = ts.toDate ? ts.toDate() : new Date(ts.seconds ? ts.seconds * 1000 : ts);
     if (Number.isNaN(d.getTime())) return "—";
-    return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+    return d.toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
   };
 
   const formatDateTime = (ts) => {
     if (!ts) return "—";
     const d = ts.toDate ? ts.toDate() : new Date(ts.seconds ? ts.seconds * 1000 : ts);
     if (Number.isNaN(d.getTime())) return "—";
-    return d.toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+    return d.toLocaleString("en-GB", {
+      day: "numeric",
+      month: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   const last24h = Date.now() - 24 * 60 * 60 * 1000;
@@ -137,6 +157,8 @@ function Admin() {
     const t = u.createdAt?.toMillis?.() || u.createdAt?.seconds * 1000 || 0;
     return t > last24h;
   }).length;
+
+  const featuredCount = ads.filter((a) => a.featured === true).length;
 
   if (checking) {
     return (
@@ -156,7 +178,9 @@ function Admin() {
           <div className="admin-denied-icon">🔒</div>
           <h1>Please Log In</h1>
           <p>You need to be logged in to access the admin panel.</p>
-          <Link to="/login" className="dashboard-primary-btn">Go to Login</Link>
+          <Link to="/login" className="dashboard-primary-btn">
+            Go to Login
+          </Link>
         </div>
       </div>
     );
@@ -169,7 +193,9 @@ function Admin() {
           <div className="admin-denied-icon">⛔</div>
           <h1>Access Denied</h1>
           <p>You do not have permission to view this page.</p>
-          <Link to="/" className="dashboard-primary-btn">← Back Home</Link>
+          <Link to="/" className="dashboard-primary-btn">
+            ← Back Home
+          </Link>
         </div>
       </div>
     );
@@ -182,7 +208,8 @@ function Admin() {
           <h1>🛡️ Admin Dashboard</h1>
           <p>Manage and monitor የኛ ገበያ</p>
         </div>
-                {/* ANALYTICS CARD */}
+
+        {/* ANALYTICS CARD */}
         <a
           href="https://dash.cloudflare.com/5baa331a0df687b57358a40f9a0eef68/analytics/web-analytics"
           target="_blank"
@@ -191,10 +218,12 @@ function Admin() {
         >
           <h3>📊 View Website Analytics</h3>
           <p>
-            See visitors, page views, top pages, countries, and traffic sources
-            in real-time.
+            See visitors, page views, top pages, countries, and traffic
+            sources in real-time.
           </p>
-          <span className="admin-analytics-btn">Open Cloudflare Analytics →</span>
+          <span className="admin-analytics-btn">
+            Open Cloudflare Analytics →
+          </span>
         </a>
 
         {loadingData ? (
@@ -236,20 +265,38 @@ function Admin() {
             </div>
 
             <div className="admin-tabs">
-              <button className={activeTab === "overview" ? "active" : ""} onClick={() => setActiveTab("overview")}>
+              <button
+                className={activeTab === "overview" ? "active" : ""}
+                onClick={() => setActiveTab("overview")}
+              >
                 📊 Overview
               </button>
-              <button className={activeTab === "users" ? "active" : ""} onClick={() => setActiveTab("users")}>
+              <button
+                className={activeTab === "users" ? "active" : ""}
+                onClick={() => setActiveTab("users")}
+              >
                 👥 Users
               </button>
-              <button className={activeTab === "ads" ? "active" : ""} onClick={() => setActiveTab("ads")}>
+              <button
+                className={activeTab === "ads" ? "active" : ""}
+                onClick={() => setActiveTab("ads")}
+              >
                 📢 Ads
               </button>
-              <button className={activeTab === "chats" ? "active" : ""} onClick={() => setActiveTab("chats")}>
+              <button
+                className={activeTab === "chats" ? "active" : ""}
+                onClick={() => setActiveTab("chats")}
+              >
                 💬 Chats
               </button>
-              <button className={activeTab === "reports" ? "active" : ""} onClick={() => setActiveTab("reports")}>
-                🚩 Reports {reports.length > 0 && <span className="admin-tab-badge">{reports.length}</span>}
+              <button
+                className={activeTab === "reports" ? "active" : ""}
+                onClick={() => setActiveTab("reports")}
+              >
+                🚩 Reports{" "}
+                {reports.length > 0 && (
+                  <span className="admin-tab-badge">{reports.length}</span>
+                )}
               </button>
             </div>
 
@@ -270,16 +317,24 @@ function Admin() {
                         <strong>{u.name || "Unnamed"}</strong>
                         <span>{u.email}</span>
                       </div>
-                      <span className="admin-row-time">{formatDate(u.createdAt)}</span>
+                      <span className="admin-row-time">
+                        {formatDate(u.createdAt)}
+                      </span>
                     </div>
                   ))}
-                  {users.length === 0 && <p className="admin-empty">No users yet.</p>}
+                  {users.length === 0 && (
+                    <p className="admin-empty">No users yet.</p>
+                  )}
                 </div>
 
                 <div className="admin-panel">
                   <h2>📢 Latest Ads</h2>
                   {ads.slice(0, 5).map((a) => (
-                    <Link to={`/ad/${a.id}`} className="admin-row clickable" key={a.id}>
+                    <Link
+                      to={`/ad/${a.id}`}
+                      className="admin-row clickable"
+                      key={a.id}
+                    >
                       <div className="admin-thumb">
                         {a.image || (a.images && a.images[0]) ? (
                           <img src={a.image || a.images[0]} alt={a.title} />
@@ -289,12 +344,18 @@ function Admin() {
                       </div>
                       <div className="admin-row-info">
                         <strong>{a.title || "Untitled"}</strong>
-                        <span>ETB {Number(a.price || 0).toLocaleString()}</span>
+                        <span>
+                          ETB {Number(a.price || 0).toLocaleString()}
+                        </span>
                       </div>
-                      <span className="admin-row-time">{formatDate(a.createdAt)}</span>
+                      <span className="admin-row-time">
+                        {formatDate(a.createdAt)}
+                      </span>
                     </Link>
                   ))}
-                  {ads.length === 0 && <p className="admin-empty">No ads yet.</p>}
+                  {ads.length === 0 && (
+                    <p className="admin-empty">No ads yet.</p>
+                  )}
                 </div>
               </div>
             )}
@@ -315,10 +376,16 @@ function Admin() {
                       <div className="admin-row-info">
                         <strong>{u.name || "Unnamed"}</strong>
                         <span>{u.email}</span>
-                        {u.city && <span className="admin-muted">📍 {u.city}</span>}
+                        {u.city && (
+                          <span className="admin-muted">📍 {u.city}</span>
+                        )}
                       </div>
-                      {u.isAdmin && <span className="admin-badge-admin">ADMIN</span>}
-                      <span className="admin-row-time">{formatDate(u.createdAt)}</span>
+                      {u.isAdmin && (
+                        <span className="admin-badge-admin">ADMIN</span>
+                      )}
+                      <span className="admin-row-time">
+                        {formatDate(u.createdAt)}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -327,24 +394,55 @@ function Admin() {
 
             {activeTab === "ads" && (
               <div className="admin-panel">
-                <h2>📢 All Ads ({ads.length})</h2>
+                <h2>
+                  📢 All Ads ({ads.length}) — ⭐ {featuredCount} Featured
+                </h2>
                 <div className="admin-table">
                   {ads.map((a) => (
-                    <Link to={`/ad/${a.id}`} className="admin-row clickable" key={a.id}>
-                      <div className="admin-thumb">
-                        {a.image || (a.images && a.images[0]) ? (
-                          <img src={a.image || a.images[0]} alt={a.title} />
-                        ) : (
-                          "📷"
-                        )}
-                      </div>
-                      <div className="admin-row-info">
-                        <strong>{a.title || "Untitled"}</strong>
-                        <span>{a.category} • ETB {Number(a.price || 0).toLocaleString()}</span>
-                        {a.city && <span className="admin-muted">📍 {a.city}</span>}
-                      </div>
-                      <span className="admin-row-time">{formatDateTime(a.createdAt)}</span>
-                    </Link>
+                    <div className="admin-ad-row" key={a.id}>
+                      <Link
+                        to={`/ad/${a.id}`}
+                        className="admin-ad-main"
+                      >
+                        <div className="admin-thumb">
+                          {a.image || (a.images && a.images[0]) ? (
+                            <img src={a.image || a.images[0]} alt={a.title} />
+                          ) : (
+                            "📷"
+                          )}
+                        </div>
+                        <div className="admin-row-info">
+                          <strong>{a.title || "Untitled"}</strong>
+                          <span>
+                            {a.category} • ETB{" "}
+                            {Number(a.price || 0).toLocaleString()}
+                          </span>
+                          {a.city && (
+                            <span className="admin-muted">📍 {a.city}</span>
+                          )}
+                        </div>
+                        <span className="admin-row-time">
+                          {formatDateTime(a.createdAt)}
+                        </span>
+                      </Link>
+
+                      <button
+                        type="button"
+                        className={`admin-feature-btn ${
+                          a.featured ? "active" : ""
+                        }`}
+                        onClick={() =>
+                          toggleFeatured(a.id, a.featured === true)
+                        }
+                        title={
+                          a.featured
+                            ? "Remove from featured"
+                            : "Mark as featured"
+                        }
+                      >
+                        {a.featured ? "⭐" : "☆"}
+                      </button>
+                    </div>
                   ))}
                 </div>
               </div>
@@ -354,17 +452,31 @@ function Admin() {
               <div className="admin-panel">
                 <h2>💬 Recent Chats ({chats.length})</h2>
                 {chats.slice(0, 30).map((c) => (
-                  <Link to={`/chat/${c.id}`} className="admin-row clickable" key={c.id}>
+                  <Link
+                    to={`/chat/${c.id}`}
+                    className="admin-row clickable"
+                    key={c.id}
+                  >
                     <div className="admin-thumb">💬</div>
                     <div className="admin-row-info">
                       <strong>{c.adTitle || "General inquiry"}</strong>
-                      <span>{c.buyerName} → {c.sellerName}</span>
-                      {c.lastMessage && <span className="admin-muted">"{c.lastMessage}"</span>}
+                      <span>
+                        {c.buyerName} → {c.sellerName}
+                      </span>
+                      {c.lastMessage && (
+                        <span className="admin-muted">
+                          "{c.lastMessage}"
+                        </span>
+                      )}
                     </div>
-                    <span className="admin-row-time">{formatDateTime(c.updatedAt)}</span>
+                    <span className="admin-row-time">
+                      {formatDateTime(c.updatedAt)}
+                    </span>
                   </Link>
                 ))}
-                {chats.length === 0 && <p className="admin-empty">No chats yet.</p>}
+                {chats.length === 0 && (
+                  <p className="admin-empty">No chats yet.</p>
+                )}
               </div>
             )}
 
@@ -379,20 +491,26 @@ function Admin() {
                       <div className="report-row" key={r.id}>
                         <div className="report-icon">🚩</div>
                         <div className="report-info">
-                          <Link to={`/ad/${r.adId}`} className="report-title">
+                          <Link
+                            to={`/ad/${r.adId}`}
+                            className="report-title"
+                          >
                             {r.adTitle || "Untitled ad"}
                           </Link>
                           <span className="report-reason">
                             Reason: <strong>{r.reason}</strong>
                           </span>
                           <span className="admin-muted">
-                            Reported by {r.reportedByEmail || "unknown"} • {formatDateTime(r.createdAt)}
+                            Reported by {r.reportedByEmail || "unknown"} •{" "}
+                            {formatDateTime(r.createdAt)}
                           </span>
                         </div>
                         <div className="report-actions">
                           <button
                             className="report-view-btn"
-                            onClick={() => window.open(`#/ad/${r.adId}`, "_blank")}
+                            onClick={() =>
+                              window.open(`#/ad/${r.adId}`, "_blank")
+                            }
                           >
                             View Ad
                           </button>
@@ -404,7 +522,9 @@ function Admin() {
                           </button>
                           <button
                             className="report-delete-btn"
-                            onClick={() => deleteReportedAd(r.id, r.adId)}
+                            onClick={() =>
+                              deleteReportedAd(r.id, r.adId)
+                            }
                           >
                             Delete Ad
                           </button>
