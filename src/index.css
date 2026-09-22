@@ -6277,3 +6277,149 @@ img {
     text-align: center;
   }
 }
+
+/* =========================================================
+   CATEGORY PAGE ADS - MATCH HOME STYLE
+========================================================= */
+
+/* Grid — same as Home (4 columns desktop) */
+.cars-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 22px !important;
+}
+
+/* Card — clean white rounded card */
+.car-card {
+  border-radius: 14px !important;
+  border: 1px solid #e5e7eb !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08) !important;
+  overflow: hidden !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+  background: white !important;
+}
+
+.car-card:hover {
+  transform: translateY(-5px) !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.13) !important;
+}
+
+/* Image */
+.listing-image {
+  height: 210px !important;
+  background: #eef1f5 !important;
+}
+
+.listing-photo {
+  object-fit: cover !important;
+}
+
+/* Info section — same padding as Home */
+.car-info {
+  padding: 18px !important;
+}
+
+/* Category label */
+.car-info .category,
+.category {
+  display: inline-block !important;
+  margin-bottom: 8px !important;
+  color: #1976d2 !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+}
+
+/* Title */
+.car-info h3 {
+  margin: 8px 0 !important;
+  font-size: 19px !important;
+  line-height: 1.3 !important;
+  color: #222 !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+}
+
+/* Price — same green */
+.car-info h2,
+.car-price {
+  margin: 0 0 8px !important;
+  color: #2e7d32 !important;
+  font-size: 20px !important;
+  font-weight: 800 !important;
+}
+
+/* Hide extra paragraphs on the card (city/condition shown in Home too — but keep small) */
+.car-info > p {
+  margin: 7px 0 !important;
+  color: #666 !important;
+  font-size: 14px !important;
+}
+
+/* View details button — match Home button */
+.car-details-button,
+.car-details-link {
+  display: block !important;
+  width: 100% !important;
+  margin-top: 14px !important;
+  padding: 11px !important;
+  background: #1976d2 !important;
+  color: white !important;
+  border-radius: 8px !important;
+  text-align: center !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  text-decoration: none !important;
+  transition: background 0.2s ease !important;
+}
+
+.car-details-button:hover,
+.car-details-link:hover {
+  background: #0d47a1 !important;
+}
+
+/* Tablet — 2 columns */
+@media (max-width: 1000px) {
+  .cars-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Mobile — 2 columns compact */
+@media (max-width: 600px) {
+  .cars-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+  }
+
+  .listing-image {
+    height: 130px !important;
+  }
+
+  .car-info {
+    padding: 10px !important;
+  }
+
+  .car-info h3 {
+    font-size: 14px !important;
+    margin: 4px 0 !important;
+  }
+
+  .car-info h2,
+  .car-price {
+    font-size: 15px !important;
+  }
+
+  .car-info > p {
+    font-size: 12px !important;
+    margin: 4px 0 !important;
+  }
+
+  .car-details-button,
+  .car-details-link {
+    font-size: 12px !important;
+    padding: 8px !important;
+    margin-top: 8px !important;
+  }
+}
