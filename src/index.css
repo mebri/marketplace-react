@@ -8,8 +8,7 @@
 }
 
 html {
-  scroll-behavior: auto;
-  width: 100%;
+  scroll-behavior: auto;width: 100%;
   min-width: 100%;
 }
 
@@ -6134,6 +6133,147 @@ img {
   .my-ads-account-header > div > a {
     width: 100%;
     box-sizing: border-box;
+    text-align: center;
+  }
+}
+
+/* =========================================================
+   MY ADS - HEADER (SIDE-BY-SIDE BUTTONS)
+========================================================= */
+
+.my-ads-account-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: white;
+  padding: 25px;
+  border-radius: 18px;
+  margin-bottom: 25px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.06);
+  flex-wrap: wrap;
+}
+
+/* Avatar */
+.my-ads-avatar {
+  width: 70px;
+  height: 70px;
+  min-width: 70px;
+  border-radius: 50%;
+  background: #1976d2;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  font-weight: 800;
+}
+
+/* Info container */
+.my-ads-account-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.my-ads-account-info h1 {
+  margin: 0 0 6px;
+  font-size: 26px;
+  color: #0f172a;
+}
+
+.my-ads-account-info p {
+  margin: 4px 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+/* Actions row — the 2 buttons side by side */
+.my-ads-account-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+/* View Public Profile button */
+.view-profile-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 18px;
+  background: #eaf3ff;
+  color: #1976d2;
+  border: 1.5px solid #1976d2;
+  border-radius: 10px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.view-profile-btn:hover {
+  background: #1976d2;
+  color: white;
+  transform: translateY(-1px);
+}
+
+/* Post New Ad wrapper */
+.post-new-btn-link {
+  display: inline-flex;
+  text-decoration: none;
+}
+
+/* Post New Ad button */
+.my-ads-account-actions .post-new-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 20px;
+  background: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.my-ads-account-actions .post-new-btn:hover {
+  background: #0d47a1;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .my-ads-account-header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 18px;
+    gap: 14px;
+  }
+
+  .my-ads-avatar {
+    width: 60px;
+    height: 60px;
+    min-width: 60px;
+    font-size: 26px;
+  }
+
+  .my-ads-account-info h1 {
+    font-size: 20px;
+  }
+
+  .my-ads-account-actions {
+    width: 100%;
+    gap: 8px;
+  }
+
+  .view-profile-btn,
+  .my-ads-account-actions .post-new-btn {
+    flex: 1;
+    padding: 10px 12px;
+    font-size: 12px;
     text-align: center;
   }
 }
