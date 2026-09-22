@@ -5940,3 +5940,84 @@ img {
     font-size: 15px !important;
   }
 }
+
+/* =========================================================
+   ADMIN - FEATURE TOGGLE BUTTON
+========================================================= */
+.admin-ad-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  border-radius: 10px;
+  background: #f8fafc;
+  transition: background 0.15s ease;
+}
+
+.admin-ad-row:hover {
+  background: #eaf3ff;
+}
+
+.admin-ad-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+  text-decoration: none;
+  color: inherit;
+}
+
+.admin-feature-btn {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  background: white;
+  color: #cbd5e1;
+  font-size: 22px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.admin-feature-btn:hover {
+  border-color: #f59e0b;
+  background: #fffbeb;
+  color: #f59e0b;
+  transform: scale(1.08);
+}
+
+.admin-feature-btn.active {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: white;
+  border-color: #f59e0b;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+}
+
+.admin-feature-btn.active:hover {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  transform: scale(1.08);
+}
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+  .admin-feature-btn {
+    width: 38px;
+    height: 38px;
+    font-size: 18px;
+  }
+
+  .admin-ad-row {
+    padding: 8px;
+    gap: 6px;
+  }
+
+  .admin-ad-main {
+    gap: 10px;
+  }
+}
