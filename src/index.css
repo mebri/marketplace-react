@@ -6021,3 +6021,119 @@ img {
     gap: 10px;
   }
 }
+
+/* =========================================================
+   MY ADS - ACCOUNT HEADER + VIEW PROFILE BUTTON
+========================================================= */
+
+/* Header container */
+.my-ads-account-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: white;
+  padding: 25px;
+  border-radius: 18px;
+  margin-bottom: 25px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.06);
+  flex-wrap: wrap;
+}
+
+/* Avatar circle */
+.my-ads-avatar {
+  width: 70px;
+  height: 70px;
+  min-width: 70px;
+  border-radius: 50%;
+  background: #1976d2;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  font-weight: 800;
+}
+
+/* Header text */
+.my-ads-account-header h1 {
+  margin: 0 0 6px;
+  font-size: 26px;
+  color: #0f172a;
+}
+
+.my-ads-account-header p {
+  margin: 4px 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+/* STYLE: "View Public Profile" link as a box button */
+.my-ads-account-header > div > a {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 10px 18px;
+  background: #eaf3ff;
+  color: #1976d2;
+  border: 1.5px solid #1976d2;
+  border-radius: 10px;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.my-ads-account-header > div > a:hover {
+  background: #1976d2;
+  color: white;
+  transform: translateY(-1px);
+}
+
+/* Post New Ad button alignment */
+.my-ads-account-header .post-new-btn {
+  margin-left: auto;
+  padding: 12px 22px;
+  background: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.my-ads-account-header .post-new-btn:hover {
+  background: #0d47a1;
+}
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+  .my-ads-account-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 18px;
+  }
+
+  .my-ads-avatar {
+    width: 60px;
+    height: 60px;
+    min-width: 60px;
+    font-size: 26px;
+  }
+
+  .my-ads-account-header h1 {
+    font-size: 20px;
+  }
+
+  .my-ads-account-header .post-new-btn {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .my-ads-account-header > div > a {
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+  }
+}
