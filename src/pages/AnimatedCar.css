@@ -73,7 +73,8 @@ export default function AnimatedCar() {
 
         .car-wrapper {
           position: absolute;
-          bottom: 15px;
+          /* 👇 CHANGED FROM 15px TO -10px (This puts it on the road) */
+          bottom: -10px; 
           left: -300px; /* Start from left */
           width: 240px; /* Size of the car */
           animation: driveAcross 5s linear infinite;
@@ -86,10 +87,6 @@ export default function AnimatedCar() {
           display: block;
           /* Adds a soft shadow underneath your car */
           filter: drop-shadow(0 10px 10px rgba(0, 0, 0, 0.3));
-          
-          /* ⚠️ IF YOUR CAR IS FACING LEFT BUT MOVING RIGHT: 
-             Remove the /* and */ below to flip it horizontally */
-          /* transform: scaleX(-1); */
         }
 
         /* Drive from Left to Right */
@@ -114,10 +111,11 @@ export default function AnimatedCar() {
           }
           .car-wrapper {
             width: 180px;
-            bottom: 10px;
+            /* 👇 CHANGED TO MATCH THE DESKTOP FIX */
+            bottom: -5px; 
           }
           .car-road {
-            height: 40px;
+            height: 40px; 
           }
           .road-line {
             bottom: 8px;
@@ -142,11 +140,10 @@ export default function AnimatedCar() {
 
         {/* 🚗 YOUR CUSTOM CAR IMAGE */}
         <div className="car-wrapper">
-          {/* 👇 CHANGE THE NAME BELOW TO YOUR ACTUAL FILE NAME 👇 */}
-          {/* If you renamed the file, use: src="/mycar.png" */}
-          {/* If you kept the space, use: src="/my car.png" */}
+          {/* 👇 FIX THE FILENAME HERE 👇 */}
+          {/* If you renamed it to 'mycar.png', change this to src="/mycar.png" */}
           <img 
-            src="/my car.png" 
+            src="/mycar.png" 
             alt="Toyota SUV" 
             className="car-image" 
           />
