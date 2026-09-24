@@ -6423,3 +6423,24 @@ img {
     margin-top: 8px !important;
   }
 }
+
+/* =========================================================
+   FIX HERO AND SEARCH BAR SPACING
+========================================================= */
+
+/* 1. Shrink the hero's top and bottom padding */
+.home-hero {
+  padding-top: 25px !important;     /* Was 65px — brings the text up */
+  padding-bottom: 20px !important;  /* Was 70px — shrinks the bottom */
+}
+
+/* 2. Pull the search bar up tightly */
+.home-search-wrapper {
+  margin-top: -15px !important;     /* Pulls the search bar closer to the hero/car */
+  padding-top: 0 !important;
+}
+
+/* 3. Remove the extra gap from the categories section below */
+.home-categories {
+  padding-top: 10px !important;     /* Was 40px — pulls categories up */
+}
