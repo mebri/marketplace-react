@@ -6444,3 +6444,32 @@ img {
 .home-categories {
   padding-top: 10px !important;     /* Was 40px — pulls categories up */
 }
+
+/* =========================================================
+   FINAL FIX - TIGHT SPACING (Must be at the very bottom)
+========================================================= */
+
+/* 1. Shrink the hero top and bottom */
+.home-hero {
+  padding-top: 30px !important;     /* Smaller top space */
+  padding-bottom: 20px !important;  /* Smaller bottom space */
+}
+
+/* 2. Pull the search bar up tightly */
+.home-search-wrapper {
+  margin-top: -20px !important;     /* Negative margin pulls it up */
+  padding-top: 0 !important;
+  padding-bottom: 8px !important;
+}
+
+/* 3. Pull the categories section up */
+.home-categories {
+  padding-top: 15px !important;     /* Was 40px */
+}
+
+/* 4. Make sure the animated car doesn't push things down */
+.car-animation-container {
+  height: 60px !important;          /* Shrink car container height */
+  margin-top: -30px !important;     /* Pull car up into the blue */
+  margin-bottom: -15px !important;  /* Remove gap below car */
+}
