@@ -7,79 +7,25 @@ export default function AnimatedCar() {
         .car-animation-container {
           position: relative;
           width: 100%;
-          height: 140px;
+          height: 90px; /* Smaller height since there's no sky/road */
           overflow: hidden;
-          /* ☀️ Bright sky background */
-          background: linear-gradient(to bottom, #87CEEB, #E0F6FF);
-          margin-top: 20px;
-          margin-bottom: 20px;
-          border-radius: 16px;
-          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+          
+          /* ✅ Sky and road removed - now transparent */
+          background: transparent; 
+          
+          /* ✅ Moved UP to fit in the blue corner */
+          margin-top: -40px; 
+          margin-bottom: 10px;
+          
+          /* Prevents the car from blocking clicks on buttons */
+          pointer-events: none; 
         }
-
-        /* ☁️ Clouds */
-        .cloud {
-          position: absolute;
-          background: rgba(255, 255, 255, 0.9);
-          border-radius: 50px;
-          animation: floatCloud 8s linear infinite;
-        }
-        .cloud::before, .cloud::after {
-          content: '';
-          position: absolute;
-          background: rgba(255, 255, 255, 0.9);
-          border-radius: 50%;
-        }
-        .cloud-1 {
-          width: 50px; height: 18px;
-          top: 15px; left: 10%;
-          animation-delay: 0s;
-        }
-        .cloud-1::before { width: 25px; height: 25px; top: -12px; left: 8px; }
-        .cloud-1::after { width: 18px; height: 18px; top: -8px; right: 8px; }
-        
-        .cloud-2 {
-          width: 70px; height: 22px;
-          top: 35px; left: 60%;
-          animation-delay: 3s;
-        }
-        .cloud-2::before { width: 35px; height: 35px; top: -18px; left: 12px; }
-        .cloud-2::after { width: 22px; height: 22px; top: -10px; right: 12px; }
-
-        /* Road */
-        .car-road {
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          width: 100%;
-          height: 30px;
-          background: #cfd8dc;
-          border-top: 2px solid #90a4ae;
-        }
-
-        .road-line {
-          position: absolute;
-          bottom: 14px;
-          width: 40px;
-          height: 3px;
-          background: #ffeb3b;
-          border-radius: 2px;
-          animation: roadMove 1.5s linear infinite;
-        }
-
-        .line-1 { left: 10%; animation-delay: 0s; }
-        .line-2 { left: 50%; animation-delay: 0.5s; }
-        .line-3 { left: 90%; animation-delay: 1s; }
 
         .car-wrapper {
           position: absolute;
-          /* 👇 CHANGE THIS VALUE TO MOVE THE CAR UP OR DOWN */
-          bottom: 0px; 
-          /* 👆 If the car is floating, make this smaller (e.g. -10px). 
-             If the car is sinking into the road, make this bigger (e.g. 15px). */
-          
+          bottom: 0px; /* Sits at the bottom of the 90px container */
           left: -300px; /* Start from left */
-          width: 240px;
+          width: 200px; /* Size of the car */
           animation: driveAcross 5s linear infinite;
         }
 
@@ -89,7 +35,7 @@ export default function AnimatedCar() {
           height: auto;
           display: block;
           /* Soft shadow underneath the car */
-          filter: drop-shadow(0 10px 10px rgba(0, 0, 0, 0.3));
+          filter: drop-shadow(0 8px 8px rgba(0, 0, 0, 0.4));
         }
 
         /* Drive from Left to Right */
@@ -98,50 +44,22 @@ export default function AnimatedCar() {
           100% { left: 100%; }
         }
 
-        @keyframes roadMove {
-          0% { transform: translateX(0); opacity: 1; }
-          100% { transform: translateX(-100px); opacity: 0.2; }
-        }
-
-        @keyframes floatCloud {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-150px); }
-        }
-
         @media (max-width: 600px) {
           .car-animation-container {
-            height: 100px;
+            height: 70px; /* Smaller on mobile */
+            margin-top: -20px; 
           }
           .car-wrapper {
-            width: 180px;
-            bottom: 0px; /* Keep this aligned with the main value */
+            width: 150px;
+            bottom: 0px;
           }
-          .car-road {
-            height: 20px;
-          }
-          .road-line {
-            bottom: 8px;
-            width: 30px;
-          }
-          .cloud-1 { top: 5px; }
-          .cloud-2 { top: 20px; }
         }
       `}</style>
 
       <div className="car-animation-container">
-        {/* ☁️ Clouds */}
-        <div className="cloud cloud-1"></div>
-        <div className="cloud cloud-2"></div>
-
-        {/* 🛣️ Road */}
-        <div className="car-road">
-          <div className="road-line line-1"></div>
-          <div className="road-line line-2"></div>
-          <div className="road-line line-3"></div>
-        </div>
-
         {/* 🚗 YOUR CUSTOM CAR IMAGE */}
         <div className="car-wrapper">
+          {/* 👇 CHANGE THE NAME IF YOUR FILE IS NAMED "my car.png" (with a space) */}
           <img 
             src="/mycar.png" 
             alt="Toyota SUV" 
