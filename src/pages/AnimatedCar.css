@@ -117,7 +117,7 @@ export default function AnimatedCar() {
             bottom: 10px;
           }
           .car-road {
-            height: 20px;
+            height: 40px;
           }
           .road-line {
             bottom: 8px;
