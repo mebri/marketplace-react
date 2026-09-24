@@ -9,6 +9,7 @@ export default function AnimatedCar() {
           width: 100%;
           height: 140px;
           overflow: hidden;
+          /* ☀️ Bright sky background */
           background: linear-gradient(to bottom, #87CEEB, #E0F6FF);
           margin-top: 20px;
           margin-bottom: 20px;
@@ -73,7 +74,7 @@ export default function AnimatedCar() {
         .car-wrapper {
           position: absolute;
           bottom: 15px;
-          left: 100%; /* Start from the right */
+          left: -300px; /* Start from the left */
           width: 240px;
           animation: driveAcross 5s linear infinite;
         }
@@ -81,9 +82,8 @@ export default function AnimatedCar() {
         .car-svg {
           width: 100%;
           height: auto;
-          /* Flip the car horizontally so it faces left */
-          transform: scaleX(-1);
           filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.25));
+          /* Removed the scaleX(-1) so the car faces forward (right) */
         }
 
         .wheel-spoke {
@@ -91,10 +91,10 @@ export default function AnimatedCar() {
           animation: spinWheel 0.8s linear infinite;
         }
 
-        /* Drive from Right to Left */
+        /* Drive from Left to Right */
         @keyframes driveAcross {
-          0% { left: 100%; }
-          100% { left: -300px; }
+          0% { left: -300px; }
+          100% { left: 100%; }
         }
 
         @keyframes roadMove {
@@ -104,7 +104,7 @@ export default function AnimatedCar() {
 
         @keyframes spinWheel {
           0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
+          100% { transform: rotate(360deg); } /* Spin clockwise (forward) */
         }
 
         @keyframes floatCloud {
