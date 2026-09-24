@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase/firebase";
+import AnimatedCar from "./AnimatedCar"; // 👈 Import added here
 
 function Home() {
   const [openCategory, setOpenCategory] = useState(null);
@@ -65,9 +66,6 @@ function Home() {
       const snapshot = await getDocs(collection(db, "ads"));
       const ads = snapshot.docs.map((document) => ({ id: document.id, ...document.data() }));
 
-      // =========================
-      // SORT: Featured first, then newest
-      // =========================
       ads.sort((a, b) => {
         const aFeat = a.featured ? 1 : 0;
         const bFeat = b.featured ? 1 : 0;
@@ -127,6 +125,9 @@ function Home() {
         <h2>Buy • Sell • Rent Across Ethiopia</h2>
         <p>Find cars, houses, rentals, electronics, furniture, labor and more anywhere in Ethiopia.</p>
       </section>
+
+      {/* 👇 ANIMATED CAR IS HERE 👇 */}
+      <AnimatedCar />
 
       <div className="home-search-wrapper">
         <div className="home-search">
@@ -265,7 +266,6 @@ function Home() {
                     {ad.condition && <p>🔄 {ad.condition}</p>}
                     {ad.subcategory && <p>📂 {ad.subcategory}</p>}
 
-                    {/* VIEW COUNT */}
                     <p className="latest-ad-views">👁 {ad.views || 0} views</p>
 
                     <p className="latest-ad-description">{shortDescription}</p>
