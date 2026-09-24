@@ -3230,3 +3230,126 @@ img { max-width: 100%; }
     flex-direction: column-reverse;
   }
 }
+
+/* =========================
+   MODERN CARD ANIMATION
+   ========================= */
+
+.latest-ad-card {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.08),
+    rgba(255, 255, 255, 0.03)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+  transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.45s ease, border-color 0.45s ease;
+  animation: cardFadeUp 0.6s ease both;
+  will-change: transform;
+}
+
+.latest-ad-card:hover {
+  transform: translateY(-10px) scale(1.02);
+  border-color: rgba(124, 77, 255, 0.55);
+  box-shadow: 0 25px 55px rgba(0, 0, 0, 0.3),
+    0 0 40px rgba(124, 77, 255, 0.25);
+}
+
+/* animated glow behind card */
+.latest-ad-card::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background: conic-gradient(
+    from 0deg,
+    #00e5ff,
+    #7c4dff,
+    #ff4081,
+    #00e5ff
+  );
+  filter: blur(50px);
+  opacity: 0;
+  z-index: 0;
+  transition: opacity 0.5s ease;
+  animation: cardSpin 8s linear infinite;
+  pointer-events: none;
+}
+
+.latest-ad-card:hover::before {
+  opacity: 0.35;
+}
+
+/* keep content above glow */
+.latest-ad-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* image zoom on hover */
+.latest-ad-image {
+  overflow: hidden;
+}
+
+.latest-ad-photo {
+  transition: transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.latest-ad-card:hover .latest-ad-photo {
+  transform: scale(1.08);
+}
+
+/* view button pulse */
+.latest-view-button {
+  transition: transform 0.3s ease, filter 0.3s ease, box-shadow 0.3s ease;
+}
+
+.latest-view-button:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.15);
+  box-shadow: 0 8px 20px rgba(124, 77, 255, 0.35);
+}
+
+/* =========================
+   KEYFRAMES
+   ========================= */
+
+@keyframes cardFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cardSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* stagger cards for a nicer entrance */
+.latest-ads-grid .latest-ad-card:nth-child(1) { animation-delay: 0.02s; }
+.latest-ads-grid .latest-ad-card:nth-child(2) { animation-delay: 0.06s; }
+.latest-ads-grid .latest-ad-card:nth-child(3) { animation-delay: 0.10s; }
+.latest-ads-grid .latest-ad-card:nth-child(4) { animation-delay: 0.14s; }
+.latest-ads-grid .latest-ad-card:nth-child(5) { animation-delay: 0.18s; }
+.latest-ads-grid .latest-ad-card:nth-child(6) { animation-delay: 0.22s; }
+.latest-ads-grid .latest-ad-card:nth-child(7) { animation-delay: 0.26s; }
+.latest-ads-grid .latest-ad-card:nth-child(8) { animation-delay: 0.30s; }
+
+/* accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .latest-ad-card,
+  .latest-ad-card::before,
+  .latest-ad-photo {
+    animation: none !important;
+    transition: none !important;
+  }
+}
