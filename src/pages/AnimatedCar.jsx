@@ -9,7 +9,6 @@ export default function AnimatedCar() {
           width: 100%;
           height: 140px;
           overflow: hidden;
-          /* ☀️ Bright sky background */
           background: linear-gradient(to bottom, #87CEEB, #E0F6FF);
           margin-top: 20px;
           margin-bottom: 20px;
@@ -74,14 +73,16 @@ export default function AnimatedCar() {
         .car-wrapper {
           position: absolute;
           bottom: 15px;
-          left: -300px;
-          width: 240px; /* SUV proportions */
+          left: 100%; /* Start from the right */
+          width: 240px;
           animation: driveAcross 5s linear infinite;
         }
 
         .car-svg {
           width: 100%;
           height: auto;
+          /* Flip the car horizontally so it faces left */
+          transform: scaleX(-1);
           filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.25));
         }
 
@@ -90,9 +91,10 @@ export default function AnimatedCar() {
           animation: spinWheel 0.8s linear infinite;
         }
 
+        /* Drive from Right to Left */
         @keyframes driveAcross {
-          0% { left: -300px; }
-          100% { left: 100%; }
+          0% { left: 100%; }
+          100% { left: -300px; }
         }
 
         @keyframes roadMove {
@@ -182,10 +184,9 @@ export default function AnimatedCar() {
 
             {/* 🛞 Front Wheel - Chunky SUV Tire */}
             <g transform="translate(65, 85)">
-              <circle cx="0" cy="0" r="22" fill="#111" /> {/* Tire */}
+              <circle cx="0" cy="0" r="22" fill="#111" />
               <g className="wheel-spoke">
-                <circle cx="0" cy="0" r="15" fill="#424242" /> {/* Rim */}
-                {/* SUV Spokes */}
+                <circle cx="0" cy="0" r="15" fill="#424242" />
                 <line x1="0" y1="-15" x2="0" y2="15" stroke="#b0bec5" strokeWidth="4" />
                 <line x1="-15" y1="0" x2="15" y2="0" stroke="#b0bec5" strokeWidth="4" />
                 <line x1="-10" y1="-10" x2="10" y2="10" stroke="#b0bec5" strokeWidth="4" />
@@ -197,10 +198,9 @@ export default function AnimatedCar() {
 
             {/* 🛞 Rear Wheel - Chunky SUV Tire */}
             <g transform="translate(255, 85)">
-              <circle cx="0" cy="0" r="22" fill="#111" /> {/* Tire */}
+              <circle cx="0" cy="0" r="22" fill="#111" />
               <g className="wheel-spoke">
-                <circle cx="0" cy="0" r="15" fill="#424242" /> {/* Rim */}
-                {/* SUV Spokes */}
+                <circle cx="0" cy="0" r="15" fill="#424242" />
                 <line x1="0" y1="-15" x2="0" y2="15" stroke="#b0bec5" strokeWidth="4" />
                 <line x1="-15" y1="0" x2="15" y2="0" stroke="#b0bec5" strokeWidth="4" />
                 <line x1="-10" y1="-10" x2="10" y2="10" stroke="#b0bec5" strokeWidth="4" />
