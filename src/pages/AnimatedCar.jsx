@@ -7,7 +7,7 @@ export default function AnimatedCar() {
         .car-animation-container {
           position: relative;
           width: 100%;
-          height: 130px;
+          height: 140px;
           overflow: hidden;
           /* ☀️ Bright sky background */
           background: linear-gradient(to bottom, #87CEEB, #E0F6FF);
@@ -75,7 +75,7 @@ export default function AnimatedCar() {
           position: absolute;
           bottom: 15px;
           left: -300px;
-          width: 240px; /* Made wider for the new car shape */
+          width: 240px; /* SUV proportions */
           animation: driveAcross 5s linear infinite;
         }
 
@@ -112,7 +112,7 @@ export default function AnimatedCar() {
 
         @media (max-width: 600px) {
           .car-animation-container {
-            height: 90px;
+            height: 100px;
           }
           .car-wrapper {
             width: 180px;
@@ -142,64 +142,72 @@ export default function AnimatedCar() {
           <div className="road-line line-3"></div>
         </div>
 
-        {/* 🚗 Modern Car */}
+        {/* 🚙 Red Toyota SUV */}
         <div className="car-wrapper">
-          <svg className="car-svg" viewBox="0 0 320 100" xmlns="http://www.w3.org/2000/svg">
+          <svg className="car-svg" viewBox="0 0 320 110" xmlns="http://www.w3.org/2000/svg">
             {/* Car Shadow */}
-            <ellipse cx="160" cy="92" rx="140" ry="8" fill="rgba(0,0,0,0.15)" />
+            <ellipse cx="160" cy="102" rx="140" ry="8" fill="rgba(0,0,0,0.15)" />
 
-            {/* Car Body - Sleek and Aerodynamic */}
-            <path d="M 20 75 L 20 55 Q 25 40 70 40 L 130 25 Q 190 15 250 35 L 290 50 Q 305 55 305 65 L 305 80 L 275 80 A 22 22 0 0 0 235 80 L 85 80 A 22 22 0 0 0 45 80 Z" fill="#1a1a1a" />
+            {/* Main SUV Body - Toyota Red */}
+            <path d="M 20 85 L 20 55 Q 25 40 50 35 L 90 30 Q 130 20 180 20 L 260 25 Q 295 30 305 50 L 305 85 L 280 85 A 24 24 0 0 0 230 85 L 90 85 A 24 24 0 0 0 40 85 Z" fill="#d32f2f" />
             
-            {/* Side Panel Accent / Door Line */}
-            <path d="M 120 40 L 120 75" stroke="#333" strokeWidth="2" />
-            <path d="M 220 35 L 220 75" stroke="#333" strokeWidth="2" />
+            {/* Roof Rails (Silver) */}
+            <path d="M 80 25 L 240 25" stroke="#b0bec5" strokeWidth="4" strokeLinecap="round" />
+            <path d="M 85 25 L 85 20" stroke="#b0bec5" strokeWidth="3" />
+            <path d="M 235 25 L 235 20" stroke="#b0bec5" strokeWidth="3" />
 
-            {/* Tinted Windows / Cabin */}
-            <path d="M 75 42 L 135 28 Q 185 20 240 38 L 255 44 Q 185 40 125 45 Z" fill="#222" />
-            <path d="M 140 28 L 140 42" stroke="#111" strokeWidth="2" /> {/* Window Divider */}
+            {/* Windows - Dark Tint */}
+            <path d="M 60 38 L 130 25 Q 180 20 230 25 L 260 38 Q 200 35 130 40 Z" fill="#263238" />
+            <path d="M 130 25 L 130 40" stroke="#d32f2f" strokeWidth="3" />
+            <path d="M 200 23 L 200 37" stroke="#d32f2f" strokeWidth="3" />
 
-            {/* Modern LED Headlight (Cyan) */}
-            <path d="M 295 58 L 305 63 L 305 68 L 295 65 Z" fill="#00e5ff" />
-            <path d="M 290 62 L 295 65" stroke="#00e5ff" strokeWidth="3" />
+            {/* Black Plastic Lower Cladding (SUV Trim) */}
+            <path d="M 20 70 L 305 70 L 305 85 L 280 85 A 24 24 0 0 0 230 85 L 90 85 A 24 24 0 0 0 40 85 Z" fill="#212121" />
 
-            {/* Modern LED Taillight (Red) */}
-            <path d="M 20 58 L 30 58 L 30 62 L 20 62 Z" fill="#ff0044" />
+            {/* Toyota-style Front Grille */}
+            <path d="M 290 55 L 305 55 L 305 68 L 285 68 Z" fill="#111" />
+            <path d="M 292 58 L 302 58" stroke="#424242" strokeWidth="2" />
+            <path d="M 292 62 L 302 62" stroke="#424242" strokeWidth="2" />
+
+            {/* Sharp LED Headlight */}
+            <path d="M 285 48 L 305 52 L 305 58 L 285 55 Z" fill="#fff" />
+            <path d="M 285 48 L 305 52" stroke="#00e5ff" strokeWidth="2" />
+
+            {/* Red LED Taillight */}
+            <path d="M 20 55 L 35 55 L 35 65 L 20 65 Z" fill="#b71c1c" />
+            <path d="M 20 60 L 35 60" stroke="#ff5252" strokeWidth="2" />
 
             {/* Side Mirror */}
-            <path d="M 130 42 L 120 36 L 135 38 Z" fill="#1a1a1a" />
+            <path d="M 115 40 L 105 34 L 120 36 Z" fill="#212121" />
 
-            {/* Aerodynamic Underbody Glow */}
-            <path d="M 45 80 L 85 80 L 95 75 L 225 75 L 235 80 L 275 80 L 275 85 L 45 85 Z" fill="#00e5ff" opacity="0.3" />
-
-            {/* 🛞 Front Wheel */}
-            <g transform="translate(65, 80)">
-              <circle cx="0" cy="0" r="20" fill="#111" />
+            {/* 🛞 Front Wheel - Chunky SUV Tire */}
+            <g transform="translate(65, 85)">
+              <circle cx="0" cy="0" r="22" fill="#111" /> {/* Tire */}
               <g className="wheel-spoke">
-                <circle cx="0" cy="0" r="14" fill="#222" />
-                {/* Modern Spokes */}
-                <line x1="0" y1="-14" x2="0" y2="14" stroke="#888" strokeWidth="3" />
-                <line x1="-14" y1="0" x2="14" y2="0" stroke="#888" strokeWidth="3" />
-                <line x1="-10" y1="-10" x2="10" y2="10" stroke="#888" strokeWidth="3" />
-                <line x1="-10" y1="10" x2="10" y2="-10" stroke="#888" strokeWidth="3" />
-                <circle cx="0" cy="0" r="5" fill="#00e5ff" />
+                <circle cx="0" cy="0" r="15" fill="#424242" /> {/* Rim */}
+                {/* SUV Spokes */}
+                <line x1="0" y1="-15" x2="0" y2="15" stroke="#b0bec5" strokeWidth="4" />
+                <line x1="-15" y1="0" x2="15" y2="0" stroke="#b0bec5" strokeWidth="4" />
+                <line x1="-10" y1="-10" x2="10" y2="10" stroke="#b0bec5" strokeWidth="4" />
+                <line x1="-10" y1="10" x2="10" y2="-10" stroke="#b0bec5" strokeWidth="4" />
+                <circle cx="0" cy="0" r="5" fill="#d32f2f" />
               </g>
-              <circle cx="0" cy="0" r="20" fill="none" stroke="#333" strokeWidth="2" />
+              <circle cx="0" cy="0" r="22" fill="none" stroke="#333" strokeWidth="3" />
             </g>
 
-            {/* 🛞 Rear Wheel */}
-            <g transform="translate(255, 80)">
-              <circle cx="0" cy="0" r="20" fill="#111" />
+            {/* 🛞 Rear Wheel - Chunky SUV Tire */}
+            <g transform="translate(255, 85)">
+              <circle cx="0" cy="0" r="22" fill="#111" /> {/* Tire */}
               <g className="wheel-spoke">
-                <circle cx="0" cy="0" r="14" fill="#222" />
-                {/* Modern Spokes */}
-                <line x1="0" y1="-14" x2="0" y2="14" stroke="#888" strokeWidth="3" />
-                <line x1="-14" y1="0" x2="14" y2="0" stroke="#888" strokeWidth="3" />
-                <line x1="-10" y1="-10" x2="10" y2="10" stroke="#888" strokeWidth="3" />
-                <line x1="-10" y1="10" x2="10" y2="-10" stroke="#888" strokeWidth="3" />
-                <circle cx="0" cy="0" r="5" fill="#00e5ff" />
+                <circle cx="0" cy="0" r="15" fill="#424242" /> {/* Rim */}
+                {/* SUV Spokes */}
+                <line x1="0" y1="-15" x2="0" y2="15" stroke="#b0bec5" strokeWidth="4" />
+                <line x1="-15" y1="0" x2="15" y2="0" stroke="#b0bec5" strokeWidth="4" />
+                <line x1="-10" y1="-10" x2="10" y2="10" stroke="#b0bec5" strokeWidth="4" />
+                <line x1="-10" y1="10" x2="10" y2="-10" stroke="#b0bec5" strokeWidth="4" />
+                <circle cx="0" cy="0" r="5" fill="#d32f2f" />
               </g>
-              <circle cx="0" cy="0" r="20" fill="none" stroke="#333" strokeWidth="2" />
+              <circle cx="0" cy="0" r="22" fill="none" stroke="#333" strokeWidth="3" />
             </g>
           </svg>
         </div>
