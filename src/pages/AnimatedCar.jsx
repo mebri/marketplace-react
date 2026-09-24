@@ -73,7 +73,11 @@ export default function AnimatedCar() {
 
         .car-wrapper {
           position: absolute;
-          bottom: 15px;
+          /* 👇 CHANGE THIS VALUE TO MOVE THE CAR UP OR DOWN */
+          bottom: 0px; 
+          /* 👆 If the car is floating, make this smaller (e.g. -10px). 
+             If the car is sinking into the road, make this bigger (e.g. 15px). */
+          
           left: -300px; /* Start from left */
           width: 240px;
           animation: driveAcross 5s linear infinite;
@@ -86,10 +90,6 @@ export default function AnimatedCar() {
           display: block;
           /* Soft shadow underneath the car */
           filter: drop-shadow(0 10px 10px rgba(0, 0, 0, 0.3));
-          
-          /* ⚠️ IF YOUR CAR IS FACING LEFT AND YOU WANT IT TO FACE RIGHT:
-             Remove the /* and */ below to flip it horizontally */
-          /* transform: scaleX(-1); */
         }
 
         /* Drive from Left to Right */
@@ -114,7 +114,7 @@ export default function AnimatedCar() {
           }
           .car-wrapper {
             width: 180px;
-            bottom: 10px;
+            bottom: 0px; /* Keep this aligned with the main value */
           }
           .car-road {
             height: 20px;
