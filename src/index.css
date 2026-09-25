@@ -6495,3 +6495,19 @@ img {
 .home-categories {
   padding-top: 10px !important;     /* Was 40px */
 }
+
+/* =========================================================
+   MOVE HERO TEXT A LITTLE UP
+========================================================= */
+
+.home-hero h1 {
+  margin-top: -10px !important; /* Moves the main title up */
+}
+
+.home-hero h2 {
+  margin-top: -5px !important;  /* Moves the subtitle up */
+}
+
+.home-hero p {
+  margin-top: -5px !important;  /* Moves the paragraph up */
+}
