@@ -18,6 +18,7 @@ import {
   where,
   getDocs,
   serverTimestamp,
+  limit, // 👈 Added limit for similar ads
 } from "firebase/firestore";
 
 import { db, auth } from "../firebase/firebase";
@@ -38,6 +39,10 @@ function AdDetails() {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [statusLoading, setStatusLoading] = useState(false);
   const [reportLoading, setReportLoading] = useState(false);
+
+  // 👈 Added state for similar ads
+  const [similarAds, setSimilarAds] = useState([]);
+  const [loadingSimilar, setLoadingSimilar] = useState(false);
 
   // =========================
   // LOAD ADVERTISEMENT
@@ -120,6 +125,38 @@ function AdDetails() {
       setLoading(false);
     }
   };
+
+  // =========================
+  // FETCH SIMILAR ADS
+  // =========================
+  useEffect(() => {
+    const fetchSimilarAds = async () => {
+      if (!ad || !ad.category) return;
+
+      try {
+        setLoadingSimilar(true);
+        const q = query(
+          collection(db, "ads"),
+          where("category", "==", ad.category),
+          limit(8) // Fetch a few to filter out the current one
+        );
+
+        const snapshot = await getDocs(q);
+        const adsList = snapshot.docs
+          .map((document) => ({ id: document.id, ...document.data() }))
+          .filter((item) => item.id !== ad.id) // Exclude the current ad
+          .slice(0, 4); // Keep only 4 similar ads
+
+        setSimilarAds(adsList);
+      } catch (error) {
+        console.error("Error fetching similar ads:", error);
+      } finally {
+        setLoadingSimilar(false);
+      }
+    };
+
+    fetchSimilarAds();
+  }, [ad]);
 
   // =========================
   // REPORT AD
@@ -608,13 +645,14 @@ function AdDetails() {
           <h3>Description</h3>
           <p>{ad.description || "No description available."}</p>
         </div>
-         {/* SHARE BUTTONS */}
-<ShareButtons
-  adId={id}
-  title={ad.title || "Advertisement"}
-  price={ad.price}
-  city={ad.city}
-/>
+        
+        {/* SHARE BUTTONS */}
+        <ShareButtons
+          adId={id}
+          title={ad.title || "Advertisement"}
+          price={ad.price}
+          city={ad.city}
+        />
 
         <hr />
 
@@ -688,6 +726,61 @@ function AdDetails() {
           </button>
         )}
       </div>
+
+      {/* =========================
+          SIMILAR ADS SECTION
+      ========================= */}
+      {similarAds.length > 0 && (
+        <section className="similar-ads-section">
+          <div className="similar-ads-header">
+            <h2>Similar Ads</h2>
+            <Link
+              to={`/search?category=${encodeURIComponent(ad.category)}`}
+              className="view-all-similar"
+            >
+              View All →
+            </Link>
+          </div>
+
+          <div className="similar-ads-grid">
+            {similarAds.map((item) => {
+              const image =
+                Array.isArray(item.images) && item.images.length > 0
+                  ? item.images[0]
+                  : item.image;
+              return (
+                <Link
+                  to={`/ad/${item.id}`}
+                  key={item.id}
+                  className="similar-ad-card"
+                >
+                  <div className="similar-ad-image">
+                    {image ? (
+                      <img
+                        src={image}
+                        alt={item.title || "Advertisement"}
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="no-image">📷 No Image</div>
+                    )}
+                  </div>
+                  <div className="similar-ad-info">
+                    <h3>{item.title || "Untitled"}</h3>
+                    <h4>
+                      ETB{" "}
+                      {Number(
+                        String(item.price || 0).replace(/,/g, "")
+                      ).toLocaleString("en-US")}
+                    </h4>
+                    {item.city && <p>📍 {item.city}</p>}
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {lightboxOpen && imageList.length > 0 && (
         <ImageLightbox
