@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase/firebase";
-import AnimatedCar from "./AnimatedCar"; // 👈 Import added here
+import AnimatedCar from "./AnimatedCar";
+import PromoBanner from "../components/PromoBanner"; // 👈 Added PromoBanner
 
 function Home() {
   const [openCategory, setOpenCategory] = useState(null);
@@ -160,6 +161,9 @@ function Home() {
           </button>
         </div>
       </div>
+
+      {/* 👇 PROMO BANNER IS HERE 👇 */}
+      <PromoBanner />
 
       <section className="home-categories">
         <h2 className="home-section-title">All Categories</h2>
