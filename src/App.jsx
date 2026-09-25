@@ -5,6 +5,7 @@ import {
 } from "react-router-dom";
 
 // COMPONENTS
+import ResetPassword from "./pages/ResetPassword";
 import Navbar from "./components/Navbar";
 import ScrollManager from "./components/ScrollManager";
 import NotificationPrompt from "./components/NotificationPrompt";
@@ -50,6 +51,8 @@ function App() {
       <Routes>
 
         <Route path="/" element={<Home />} />
+
+        <Route path="/reset-password" element={<ResetPassword />} />
 
         <Route path="/cars" element={<Cars />} />
         <Route path="/houses" element={<Houses />} />
