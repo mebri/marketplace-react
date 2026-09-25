@@ -18,7 +18,7 @@ import {
   where,
   getDocs,
   serverTimestamp,
-  limit, // 👈 Added limit for similar ads
+  limit, // 👈 Added for similar ads
 } from "firebase/firestore";
 
 import { db, auth } from "../firebase/firebase";
@@ -40,7 +40,7 @@ function AdDetails() {
   const [statusLoading, setStatusLoading] = useState(false);
   const [reportLoading, setReportLoading] = useState(false);
 
-  // 👈 Added state for similar ads
+  // 👈 State for similar ads
   const [similarAds, setSimilarAds] = useState([]);
   const [loadingSimilar, setLoadingSimilar] = useState(false);
 
@@ -127,7 +127,7 @@ function AdDetails() {
   };
 
   // =========================
-  // FETCH SIMILAR ADS
+  // FETCH SMART SIMILAR ADS
   // =========================
   useEffect(() => {
     const fetchSimilarAds = async () => {
@@ -135,19 +135,62 @@ function AdDetails() {
 
       try {
         setLoadingSimilar(true);
+        
+        // 1. Fetch a larger pool from the same category
         const q = query(
           collection(db, "ads"),
           where("category", "==", ad.category),
-          limit(8) // Fetch a few to filter out the current one
+          limit(25) 
         );
 
         const snapshot = await getDocs(q);
-        const adsList = snapshot.docs
+        const allAds = snapshot.docs
           .map((document) => ({ id: document.id, ...document.data() }))
-          .filter((item) => item.id !== ad.id) // Exclude the current ad
-          .slice(0, 4); // Keep only 4 similar ads
+          .filter((item) => item.id !== ad.id); // Exclude current ad
 
-        setSimilarAds(adsList);
+        // 2. Score each ad based on similarity
+        const scoredAds = allAds.map((item) => {
+          let score = 0;
+
+          // Match Subcategory / Type (Highest priority)
+          if (ad.subcategory && item.subcategory === ad.subcategory) score += 50;
+          if (ad.type && item.type === ad.type) score += 30;
+          if (ad.condition && item.condition === ad.condition) score += 20;
+
+          // Match Brand (if your database has a brand field)
+          if (ad.brand && item.brand && ad.brand.toLowerCase() === item.brand.toLowerCase()) {
+            score += 40;
+          }
+
+          // Match Title Keywords (e.g., "Toyota", "Corolla")
+          if (ad.title && item.title) {
+            const adWords = ad.title.toLowerCase().split(" ");
+            const itemWords = item.title.toLowerCase().split(" ");
+            const commonWords = adWords.filter(word => 
+              word.length > 3 && itemWords.includes(word)
+            );
+            score += commonWords.length * 15; // 15 points per matching word
+          }
+
+          // Match Price (Within 20% range)
+          const adPrice = Number(String(ad.price || 0).replace(/,/g, ""));
+          const itemPrice = Number(String(item.price || 0).replace(/,/g, ""));
+          if (adPrice > 0 && itemPrice > 0) {
+            const priceDiff = Math.abs(adPrice - itemPrice);
+            const pricePercentage = (priceDiff / adPrice) * 100;
+            if (pricePercentage <= 20) score += 25;
+            else if (pricePercentage <= 50) score += 10;
+          }
+
+          return { ...item, similarityScore: score };
+        });
+
+        // 3. Sort by highest score and take the top 4
+        const sortedAds = scoredAds
+          .sort((a, b) => b.similarityScore - a.similarityScore)
+          .slice(0, 4);
+
+        setSimilarAds(sortedAds);
       } catch (error) {
         console.error("Error fetching similar ads:", error);
       } finally {
