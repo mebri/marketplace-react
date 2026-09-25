@@ -127,7 +127,7 @@ function AdDetails() {
   };
 
   // =========================
-  // FETCH SMART SIMILAR ADS
+  // FETCH TIERED SIMILAR ADS
   // =========================
   useEffect(() => {
     const fetchSimilarAds = async () => {
@@ -135,58 +135,120 @@ function AdDetails() {
 
       try {
         setLoadingSimilar(true);
-        
+
         // 1. Fetch a larger pool from the same category
         const q = query(
           collection(db, "ads"),
           where("category", "==", ad.category),
-          limit(25) 
+          limit(30)
         );
 
         const snapshot = await getDocs(q);
         const allAds = snapshot.docs
           .map((document) => ({ id: document.id, ...document.data() }))
-          .filter((item) => item.id !== ad.id); // Exclude current ad
+          .filter((item) => item.id !== ad.id);
 
-        // 2. Score each ad based on similarity
+        // ================= HELPERS =================
+        const norm = (v) => String(v || "").trim().toLowerCase();
+
+        // Extract year from text (e.g. "Toyota Corolla 2015" → 2015)
+        const extractYear = (text) => {
+          const match = String(text || "").match(/\b(19|20)\d{2}\b/);
+          return match ? parseInt(match[0]) : null;
+        };
+
+        // Detect fuel type from any text
+        const detectFuel = (text) => {
+          const t = norm(text);
+          if (/\b(ev|electric)\b/.test(t)) return "electric";
+          if (/\bhybrid\b/.test(t)) return "hybrid";
+          if (/\bdiesel\b/.test(t)) return "diesel";
+          if (/\b(petrol|gasoline|benzine)\b/.test(t)) return "petrol";
+          return null;
+        };
+
+        // ================= CURRENT AD VALUES =================
+        const adFuel = norm(
+          ad.fuelType ||
+            ad.fuel ||
+            detectFuel(`${ad.title || ""} ${ad.description || ""}`)
+        );
+        const adBrand = norm(ad.brand);
+        const adName = norm(ad.name || ad.model);
+        const adYear =
+          parseInt(ad.year || ad.productionYear) || extractYear(ad.title);
+
+        // ================= SCORING =================
         const scoredAds = allAds.map((item) => {
           let score = 0;
 
-          // Match Subcategory / Type (Highest priority)
+          const itemFuel = norm(
+            item.fuelType ||
+              item.fuel ||
+              detectFuel(`${item.title || ""} ${item.description || ""}`)
+          );
+          const itemBrand = norm(item.brand);
+          const itemName = norm(item.name || item.model);
+          const itemYear =
+            parseInt(item.year || item.productionYear) ||
+            extractYear(item.title);
+
+          // STEP 1 — Fuel Type / EV (Highest priority)
+          if (adFuel && itemFuel && adFuel === itemFuel) score += 100;
+
+          // STEP 2 — Brand
+          if (adBrand && itemBrand && adBrand === itemBrand) score += 80;
+
+          // STEP 3 — Name / Model
+          if (adName && itemName && adName === itemName) score += 70;
+
+          // STEP 4 — Subcategory / Type
           if (ad.subcategory && item.subcategory === ad.subcategory) score += 50;
           if (ad.type && item.type === ad.type) score += 30;
+
+          // STEP 5 — Production Year
+          if (adYear && itemYear) {
+            const yearDiff = Math.abs(adYear - itemYear);
+            if (yearDiff === 0) score += 40;
+            else if (yearDiff === 1) score += 25;
+            else if (yearDiff <= 3) score += 10;
+          }
+
+          // STEP 6 — Title Keywords (each matching word > 3 letters)
+          if (ad.title && item.title) {
+            const adWords = norm(ad.title)
+              .split(/\s+/)
+              .filter((w) => w.length > 3);
+            const itemWords = norm(item.title).split(/\s+/);
+            const commonWords = adWords.filter((w) =>
+              itemWords.includes(w)
+            );
+            score += commonWords.length * 15;
+          }
+
+          // STEP 7 — Condition
           if (ad.condition && item.condition === ad.condition) score += 20;
 
-          // Match Brand (if your database has a brand field)
-          if (ad.brand && item.brand && ad.brand.toLowerCase() === item.brand.toLowerCase()) {
-            score += 40;
+          // STEP 8 — City
+          if (ad.city && item.city && norm(ad.city) === norm(item.city)) {
+            score += 15;
           }
 
-          // Match Title Keywords (e.g., "Toyota", "Corolla")
-          if (ad.title && item.title) {
-            const adWords = ad.title.toLowerCase().split(" ");
-            const itemWords = item.title.toLowerCase().split(" ");
-            const commonWords = adWords.filter(word => 
-              word.length > 3 && itemWords.includes(word)
-            );
-            score += commonWords.length * 15; // 15 points per matching word
-          }
-
-          // Match Price (Within 20% range)
+          // STEP 9 — Price Range
           const adPrice = Number(String(ad.price || 0).replace(/,/g, ""));
           const itemPrice = Number(String(item.price || 0).replace(/,/g, ""));
           if (adPrice > 0 && itemPrice > 0) {
-            const priceDiff = Math.abs(adPrice - itemPrice);
-            const pricePercentage = (priceDiff / adPrice) * 100;
-            if (pricePercentage <= 20) score += 25;
-            else if (pricePercentage <= 50) score += 10;
+            const diff = (Math.abs(adPrice - itemPrice) / adPrice) * 100;
+            if (diff <= 20) score += 25;
+            else if (diff <= 50) score += 10;
           }
 
           return { ...item, similarityScore: score };
         });
 
-        // 3. Sort by highest score and take the top 4
+        // 3. Sort by highest score, take top 4, skip ads with 0 score
         const sortedAds = scoredAds
+          .filter((item) => item.similarityScore > 0)
           .sort((a, b) => b.similarityScore - a.similarityScore)
           .slice(0, 4);
 
