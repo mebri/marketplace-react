@@ -6473,3 +6473,25 @@ img {
   margin-top: -30px !important;     /* Pull car up into the blue */
   margin-bottom: -15px !important;  /* Remove gap below car */
 }
+
+/* =========================================================
+   FINAL FIX - TIGHT HERO, CAR, AND SEARCH SPACING
+========================================================= */
+
+/* 1. Shrink the hero top and bottom padding */
+.home-hero {
+  padding-top: 20px !important;     /* Was 65px — much smaller */
+  padding-bottom: 15px !important;  /* Was 70px — much smaller */
+}
+
+/* 2. Pull the search bar up tightly */
+.home-search-wrapper {
+  margin-top: -10px !important;     /* Pulls the search bar up */
+  padding-top: 0 !important;
+  padding-bottom: 10px !important;
+}
+
+/* 3. Remove the extra space from the categories section */
+.home-categories {
+  padding-top: 10px !important;     /* Was 40px */
+}
