@@ -6511,3 +6511,124 @@ img {
 .home-hero p {
   margin-top: -5px !important;  /* Moves the paragraph up */
 }
+
+/* =========================================================
+   SIMILAR ADS SECTION (AD DETAILS PAGE)
+========================================================= */
+.similar-ads-section {
+  margin-top: 40px;
+  padding-top: 25px;
+  border-top: 2px solid #e5e7eb;
+}
+
+.similar-ads-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.similar-ads-header h2 {
+  font-size: 22px;
+  color: #0f172a;
+  margin: 0;
+}
+
+.view-all-similar {
+  color: #1976d2;
+  font-weight: 700;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.similar-ads-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+}
+
+.similar-ad-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.similar-ad-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.similar-ad-image {
+  width: 100%;
+  height: 140px;
+  background: #eef1f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.similar-ad-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.similar-ad-info {
+  padding: 12px;
+}
+
+.similar-ad-info h3 {
+  margin: 0 0 6px;
+  font-size: 14px;
+  color: #0f172a;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.similar-ad-info h4 {
+  margin: 0 0 6px;
+  font-size: 15px;
+  color: #2e7d32;
+  font-weight: 800;
+}
+
+.similar-ad-info p {
+  margin: 0;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/* Responsive */
+@media (max-width: 1000px) {
+  .similar-ads-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .similar-ads-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .similar-ad-image {
+    height: 110px;
+  }
+  .similar-ad-info {
+    padding: 10px;
+  }
+  .similar-ad-info h3 {
+    font-size: 12px;
+  }
+  .similar-ad-info h4 {
+    font-size: 13px;
+  }
+}
