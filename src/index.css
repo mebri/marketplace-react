@@ -6893,3 +6893,19 @@ img {
     font-size: 11px;
   }
 }
+
+/* =========================================================
+   HIDE DRAFT NOTIFICATIONS & CLEAR DRAFT BUTTON
+========================================================= */
+
+/* Hide draft notification banners */
+.draft-banner,
+.draft-restored,
+.draft-saved {
+  display: none !important;
+}
+
+/* Hide Clear Draft button */
+.clear-draft-btn-small {
+  display: none !important;
+}
