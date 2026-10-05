@@ -17,7 +17,6 @@ function PostAd() {
   const [description, setDescription] = useState("");
 
   const [phone, setPhone] = useState("");
-  const [whatsapp, setWhatsapp] = useState("");
   const [telegram, setTelegram] = useState("");
 
   const [images, setImages] = useState([]);
@@ -30,11 +29,6 @@ function PostAd() {
 
   const [uploading, setUploading] = useState(false);
 
-  // =========================
-  // DRAFT STATE
-  // =========================
-  const [draftRestored, setDraftRestored] = useState(false);
-  const [draftSaved, setDraftSaved] = useState(false);
   const saveTimerRef = useRef(null);
 
   // =========================
@@ -63,16 +57,12 @@ function PostAd() {
       if (draft.category) setCategory(draft.category);
       if (draft.description) setDescription(draft.description);
       if (draft.phone) setPhone(draft.phone);
-      if (draft.whatsapp) setWhatsapp(draft.whatsapp);
       if (draft.telegram) setTelegram(draft.telegram);
       if (draft.condition) setCondition(draft.condition);
       if (draft.subcategory) setSubcategory(draft.subcategory);
       if (draft.type) setType(draft.type);
       if (draft.furnitureType) setFurnitureType(draft.furnitureType);
       if (draft.laborType) setLaborType(draft.laborType);
-
-      setDraftRestored(true);
-      setTimeout(() => setDraftRestored(false), 5000);
     } catch (err) {
       console.error("Draft restore error:", err);
     }
@@ -98,7 +88,6 @@ function PostAd() {
           category,
           description,
           phone,
-          whatsapp,
           telegram,
           condition,
           subcategory,
@@ -109,9 +98,6 @@ function PostAd() {
         };
 
         localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
-
-        setDraftSaved(true);
-        setTimeout(() => setDraftSaved(false), 2000);
       } catch (err) {
         console.error("Draft save error:", err);
       }
@@ -125,7 +111,6 @@ function PostAd() {
     category,
     description,
     phone,
-    whatsapp,
     telegram,
     condition,
     subcategory,
@@ -133,36 +118,6 @@ function PostAd() {
     furnitureType,
     laborType,
   ]);
-
-  // =========================
-  // CLEAR DRAFT
-  // =========================
-  const clearDraft = () => {
-    if (!window.confirm("Clear your saved draft?")) return;
-
-    localStorage.removeItem(DRAFT_KEY);
-
-    setTitle("");
-    setPrice("");
-    setCity("");
-    setCategory("");
-    setDescription("");
-    setPhone("");
-    setWhatsapp("");
-    setTelegram("");
-    setImages([]);
-    setCondition("");
-    setSubcategory("");
-    setType("");
-    setFurnitureType("");
-    setLaborType("");
-
-    const fileInput = document.getElementById("ad-images");
-    if (fileInput) fileInput.value = "";
-
-    setDraftRestored(false);
-    setDraftSaved(false);
-  };
 
   // =========================
   // IMAGE SELECTION
@@ -277,7 +232,6 @@ function PostAd() {
         category,
         description: description.trim(),
         phone: phone.trim(),
-        whatsapp: whatsapp.trim(),
         telegram: telegram.trim(),
         image: imageUrls.length > 0 ? imageUrls[0] : "",
         images: imageUrls,
@@ -299,7 +253,6 @@ function PostAd() {
       setCategory("");
       setDescription("");
       setPhone("");
-      setWhatsapp("");
       setTelegram("");
       setImages([]);
       setCondition("");
@@ -310,9 +263,6 @@ function PostAd() {
 
       const fileInput = document.getElementById("ad-images");
       if (fileInput) fileInput.value = "";
-
-      setDraftRestored(false);
-      setDraftSaved(false);
     } catch (error) {
       console.error("Post advertisement error:", error);
       alert(
@@ -327,24 +277,6 @@ function PostAd() {
   return (
     <div className="post-ad-page">
       <h1>📢 Post Advertisement</h1>
-
-      {draftRestored && (
-        <div className="draft-banner draft-restored">
-          📝 Draft restored from your last session. Don't forget to re-select
-          your images!
-          <button
-            type="button"
-            className="draft-banner-close"
-            onClick={() => setDraftRestored(false)}
-          >
-            ✕
-          </button>
-        </div>
-      )}
-
-      {draftSaved && !draftRestored && (
-        <div className="draft-banner draft-saved">💾 Draft saved</div>
-      )}
 
       <form className="post-form" onSubmit={submitAd}>
         <input
@@ -515,23 +447,12 @@ function PostAd() {
           required
         />
 
-        <h3 className="contact-section-title">
-          📞 Seller Contact Information
-        </h3>
-
         <input
           type="tel"
           placeholder="📞 Phone Number (+251...)"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           required
-        />
-
-        <input
-          type="tel"
-          placeholder="💬 WhatsApp Number (+251...)"
-          value={whatsapp}
-          onChange={(e) => setWhatsapp(e.target.value)}
         />
 
         <input
@@ -596,14 +517,6 @@ function PostAd() {
           {uploading
             ? "⏳ Uploading images..."
             : "📢 Publish Advertisement"}
-        </button>
-
-        <button
-          type="button"
-          onClick={clearDraft}
-          className="clear-draft-btn-small"
-        >
-          🗑️ Clear Draft
         </button>
       </form>
     </div>
