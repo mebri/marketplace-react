@@ -1,257 +1,295 @@
-export default {
-  async fetch(request, env, ctx) {
-    const url = new URL(request.url);
 
-    if (url.pathname === "/test") {
-      const report = { envCheck: {} };
-      report.envCheck = {
-        hasTelegramToken: !!env.TELEGRAM_BOT_TOKEN,
-        hasServiceAccount: !!env.FIREBASE_SERVICE_ACCOUNT,
-        hasCloudName: !!env.CLOUDINARY_CLOUD_NAME,
-        hasUploadPreset: !!env.CLOUDINARY_UPLOAD_PRESET,
-      };
-      return jsonResponse(report);
-    }
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../firebase/firebase";
+import AnimatedCar from "./AnimatedCar";
+import PromoBanner from "../components/PromoBanner";
 
-    if (request.method !== "POST") {
-      return new Response("Bot is running ✅", { status: 200 });
-    }
+function Home() {
+  const [openCategory, setOpenCategory] = useState(null);
+  const [latestAds, setLatestAds] = useState([]);
+  const [adsLoading, setAdsLoading] = useState(true);
 
+  const categories = [
+    { id: "cars", icon: "🚗", title: "Cars", description: "New, used, electric cars and car rental", options: [
+      { name: "🚗 New Cars", link: "/cars?condition=new" },
+      { name: "🚙 Used Cars", link: "/cars?condition=used" },
+      { name: "⚡ Electric Cars", link: "/cars?condition=electric" },
+      { name: "🚘 Cars for Rent", link: "/cars?condition=rent" },
+    ]},
+    { id: "houses", icon: "🏠", title: "Houses", description: "Houses for sale and rent", options: [
+      { name: "🏠 Houses for Sale", link: "/houses?type=sale" },
+      { name: "🏠 Houses for Rent", link: "/houses?type=rent" },
+    ]},
+    { id: "rentals", icon: "🏢", title: "Rentals", description: "Apartments, shops and offices", options: [
+      { name: "🏢 Apartments", link: "/rentals?type=apartment" },
+      { name: "🏪 Shops", link: "/rentals?type=shop" },
+      { name: "🏢 Offices", link: "/rentals?type=office" },
+    ]},
+    { id: "electronics", icon: "📱", title: "Electronics", description: "Phones, computers, TVs and more", options: [
+      { name: "📱 New Phones", link: "/search?category=Electronics&subcategory=Phones&condition=new" },
+      { name: "📱 Used Phones", link: "/search?category=Electronics&subcategory=Phones&condition=used" },
+      { name: "💻 New Computers & Laptops", link: "/search?category=Electronics&subcategory=Computers&condition=new" },
+      { name: "💻 Used Computers & Laptops", link: "/search?category=Electronics&subcategory=Computers&condition=used" },
+      { name: "📺 New TVs", link: "/search?category=Electronics&subcategory=TVs&condition=new" },
+      { name: "📺 Used TVs", link: "/search?category=Electronics&subcategory=TVs&condition=used" },
+      { name: "🎧 Audio & Accessories", link: "/search?category=Electronics&subcategory=Audio" },
+      { name: "🔌 Other Electronics", link: "/search?category=Electronics&subcategory=Other" },
+    ]},
+    { id: "furniture", icon: "🛋️", title: "Furniture", description: "New and used furniture", options: [
+      { name: "🛋️ Sofas", link: "/search?category=Furniture&subcategory=Sofas" },
+      { name: "🛏️ Beds", link: "/search?category=Furniture&subcategory=Beds" },
+      { name: "🪑 Chairs & Tables", link: "/search?category=Furniture&subcategory=Chairs%20and%20Tables" },
+      { name: "🗄️ Cabinets", link: "/search?category=Furniture&subcategory=Cabinets" },
+      { name: "🪞 Other Furniture", link: "/search?category=Furniture&subcategory=Other" },
+    ]},
+    { id: "labor", icon: "👷", title: "Labor & Services", description: "Find skilled workers and services", options: [
+      { name: "👷 Construction Worker", link: "/search?category=Labor%20%26%20Services&subcategory=Construction" },
+      { name: "⚡ Electrician", link: "/search?category=Labor%20%26%20Services&subcategory=Electrician" },
+      { name: "🚰 Plumber", link: "/search?category=Labor%20%26%20Services&subcategory=Plumber" },
+      { name: "🎨 Painter", link: "/search?category=Labor%20%26%20Services&subcategory=Painter" },
+      { name: "🧹 Cleaning", link: "/search?category=Labor%20%26%20Services&subcategory=Cleaning" },
+      { name: "🚚 Moving & Transport", link: "/search?category=Labor%20%26%20Services&subcategory=Moving" },
+      { name: "🔧 Other Services", link: "/search?category=Labor%20%26%20Services&subcategory=Other" },
+    ]},
+    { id: "min-alish-tera", icon: "🏪", title: "ምንአለሽ ተራ", description: "Used and second-hand items", options: [
+      { name: "📦 Used Items", link: "/search?category=ምንአለሽ%20ተራ&subcategory=Items" },
+      { name: "♻️ Second-Hand Goods", link: "/search?category=ምንአለሽ%20ተራ&subcategory=Other" },
+    ]},
+  ];
+
+  useEffect(() => {
+    loadLatestAds();
+  }, []);
+
+  const loadLatestAds = async () => {
     try {
-      const update = await request.json();
-      const message = update.message || update.channel_post;
+      const snapshot = await getDocs(collection(db, "ads"));
+      const ads = snapshot.docs.map((document) => ({ id: document.id, ...document.data() }));
 
-      if (!message) return new Response("OK", { status: 200 });
-      const messageText = message.text || message.caption;
-      if (!messageText) return new Response("OK", { status: 200 });
-
-      // ============================================
-      // PARSE MESSAGE
-      // ============================================
-      const lines = messageText.split("\n").map((l) => l.trim()).filter(Boolean);
-      const title = lines[0] || "Untitled Ad";
-      let price = "";
-      let phone = "";
-      let city = "";
-
-      for (const line of lines) {
-        // ✅ ULTRA-SMART PRICE PARSER
-        const priceMatch = line.match(
-          /(?:price|peric|pris|ዋጋ|ETB|ብር)[\s:.]*([\d.,\s]+)\s*(MILLION|Million|BILLION|Billion|K\b|Thousand|THOUSAND|ሚሊዮን|ቢሊዮን|ሺህ)?/i
-        );
-        if (priceMatch && !price) {
-          const rawNum = priceMatch[1].trim();
-          const unit = (priceMatch[2] || "").toUpperCase();
-          const cleaned = rawNum.replace(/\s/g, "");
-          const thousandPattern = /^\d{1,3}([.,]\d{3})+$/;
-
-          let numVal;
-          if (thousandPattern.test(cleaned)) {
-            numVal = parseFloat(cleaned.replace(/[.,]/g, ""));
-          } else {
-            numVal = parseFloat(cleaned.replace(/,/g, ""));
-          }
-
-          if (unit.includes("MILLION") || unit.includes("ሚሊዮን")) {
-            if (numVal < 100000) numVal *= 1000000;
-          } else if (unit.includes("BILLION") || unit.includes("ቢሊዮን")) {
-            if (numVal < 100000) numVal *= 1000000000;
-          } else if (unit.includes("THOUSAND") || unit === "K" || unit.includes("ሺህ")) {
-            if (numVal < 1000) numVal *= 1000;
-          }
-
-          if (!isNaN(numVal) && numVal > 0) {
-            price = Math.round(numVal).toLocaleString("en-US");
-          }
-        }
-
-        // Phone
-        const phoneMatch = line.match(/(?:\+251|0)[\s-]?9[\d\s-]{7,}/);
-        if (phoneMatch && !phone) {
-          phone = phoneMatch[0].replace(/[\s-]/g, "");
-        }
-
-        // City
-        const cityMatch = line.match(/(?:city|location|ከተማ)[\s:]+(.+)/i);
-        if (cityMatch && !city) {
-          city = cityMatch[1].trim();
-        } else if (
-          /addis|ababa|adama|hawassa|bahir dar|mekelle|gondar|jimma|dire dawa|bishoftu/i.test(line) &&
-          !city
-        ) {
-          city = line.trim();
-        }
-      }
-
-      // ============================================
-      // UPLOAD IMAGE
-      // ============================================
-      let imageUrl = "";
-      let imageDebug = "";
-
-      if (message.photo && message.photo.length > 0) {
-        try {
-          imageDebug = "photo found. ";
-          const largest = message.photo[message.photo.length - 1];
-
-          const fileRes = await fetch(
-            `https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/getFile?file_id=${largest.file_id}`
-          );
-          const fileInfo = await fileRes.json();
-          imageDebug += "getFile=" + (fileInfo.ok ? "ok" : "fail") + ". ";
-
-          if (fileInfo.ok) {
-            const imgRes = await fetch(
-              `https://api.telegram.org/file/bot${env.TELEGRAM_BOT_TOKEN}/${fileInfo.result.file_path}`
-            );
-            imageDebug += "download=" + (imgRes.ok ? "ok" : "fail") + ". ";
-            const blob = await imgRes.blob();
-            imageDebug += "size=" + Math.round(blob.size / 1024) + "KB. ";
-
-            const formData = new FormData();
-            formData.append("file", blob);
-            formData.append("upload_preset", env.CLOUDINARY_UPLOAD_PRESET);
-
-            const cloudRes = await fetch(
-              `https://api.cloudinary.com/v1_1/${env.CLOUDINARY_CLOUD_NAME}/image/upload`,
-              { method: "POST", body: formData }
-            );
-            const cloudData = await cloudRes.json();
-            imageDebug += "cloud=" + cloudRes.status + ". ";
-
-            if (cloudData.secure_url) {
-              imageUrl = cloudData.secure_url;
-              imageDebug += "✅ uploaded";
-            } else {
-              imageDebug += "❌ " + (cloudData.error?.message || "unknown");
-            }
-          }
-        } catch (e) {
-          imageDebug += "exception: " + e.message;
-        }
-      } else {
-        imageDebug = "❌ no photo";
-      }
-
-      // ============================================
-      // SAVE TO FIREBASE — status "available" (no draft)
-      // ============================================
-      const token = await getFirebaseToken(env);
-      const sa = JSON.parse(atob(env.FIREBASE_SERVICE_ACCOUNT));
-
-      const adData = {
-        fields: {
-          title: { stringValue: title },
-          description: { stringValue: messageText },
-          price: { stringValue: price || "0" },
-          phone: { stringValue: phone },
-          city: { stringValue: city },
-          category: { stringValue: "Telegram" },
-          image: { stringValue: imageUrl },
-          images: {
-            arrayValue: imageUrl
-              ? { values: [{ stringValue: imageUrl }] }
-              : { values: [] },
-          },
-          status: { stringValue: "available" }, // ✅ Direct publish, no draft
-          source: { stringValue: "telegram" },
-          views: { integerValue: "0" },
-          createdAt: { timestampValue: new Date().toISOString() },
-        },
-      };
-
-      const fbUrl = `https://firestore.googleapis.com/v1/projects/${sa.project_id}/databases/(default)/documents/ads`;
-      const saveRes = await fetch(fbUrl, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(adData),
+      ads.sort((a, b) => {
+        const aFeat = a.featured ? 1 : 0;
+        const bFeat = b.featured ? 1 : 0;
+        if (aFeat !== bFeat) return bFeat - aFeat;
+        return getAdTime(b) - getAdTime(a);
       });
 
-      if (env.TELEGRAM_BOT_TOKEN && message.chat?.id) {
-        const replyText =
-          (saveRes.ok ? "✅ Ad posted to marketplace!\n" : "⚠️ Save failed.\n") +
-          "💰 Price: " + (price || "not found") + " ETB\n" +
-          "📞 Phone: " + (phone || "not found") + "\n" +
-          "📍 City: " + (city || "not found") + "\n" +
-          "📸 Image: " + imageDebug;
-
-        await fetch(
-          `https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ chat_id: message.chat.id, text: replyText }),
-          }
-        );
-      }
-
-      return new Response("OK", { status: 200 });
+      setLatestAds(ads);
     } catch (error) {
-      return new Response("Error: " + error.message, { status: 200 });
+      console.error("Error loading latest advertisements:", error);
+    } finally {
+      setAdsLoading(false);
     }
-  },
-};
-
-function jsonResponse(obj) {
-  return new Response(JSON.stringify(obj, null, 2), {
-    status: 200,
-    headers: { "Content-Type": "application/json" },
-  });
-}
-
-async function getFirebaseToken(env) {
-  const sa = JSON.parse(atob(env.FIREBASE_SERVICE_ACCOUNT));
-  const now = Math.floor(Date.now() / 1000);
-  const header = { alg: "RS256", typ: "JWT" };
-  const payload = {
-    iss: sa.client_email,
-    scope: "https://www.googleapis.com/auth/datastore",
-    aud: "https://oauth2.googleapis.com/token",
-    iat: now,
-    exp: now + 3600,
   };
 
-  const h = base64UrlEncodeString(JSON.stringify(header));
-  const p = base64UrlEncodeString(JSON.stringify(payload));
-  const signingInput = `${h}.${p}`;
+  const getAdTime = (ad) => {
+    if (!ad?.createdAt) return 0;
+    if (typeof ad.createdAt.toMillis === "function") return ad.createdAt.toMillis();
+    if (typeof ad.createdAt === "object" && ad.createdAt.seconds) return ad.createdAt.seconds * 1000;
+    if (ad.createdAt instanceof Date) return ad.createdAt.getTime();
+    const date = new Date(ad.createdAt).getTime();
+    return Number.isNaN(date) ? 0 : date;
+  };
 
-  const pem = sa.private_key
-    .replace("-----BEGIN PRIVATE KEY-----", "")
-    .replace("-----END PRIVATE KEY-----", "")
-    .replace(/\s/g, "");
-  const der = Uint8Array.from(atob(pem), (c) => c.charCodeAt(0));
-  const key = await crypto.subtle.importKey(
-    "pkcs8", der,
-    { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" },
-    false, ["sign"]
+  const getPostedTime = (createdAt) => {
+    if (!createdAt) return "";
+    let postedDate;
+    if (typeof createdAt.toDate === "function") postedDate = createdAt.toDate();
+    else if (createdAt.seconds) postedDate = new Date(createdAt.seconds * 1000);
+    else if (createdAt instanceof Date) postedDate = createdAt;
+    else postedDate = new Date(createdAt);
+    if (Number.isNaN(postedDate.getTime())) return "";
+
+    const now = new Date();
+    const difference = now.getTime() - postedDate.getTime();
+    const seconds = Math.floor(difference / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    if (difference < 0) return "Just now";
+    if (seconds < 60) return "Just now";
+    if (minutes < 60) return `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
+    if (hours < 24) return `${hours} hour${hours === 1 ? "" : "s"} ago`;
+    if (days < 7) return `${days} day${days === 1 ? "" : "s"} ago`;
+    return postedDate.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+  };
+
+  const toggleCategory = (id) => {
+    setOpenCategory(openCategory === id ? null : id);
+  };
+
+  return (
+    <main className="home-page">
+      <section className="home-hero">
+        <h1>የኛ ገበያ</h1>
+        <h2>Buy • Sell • Rent Across Ethiopia</h2>
+        <p>Find cars, houses, rentals, electronics, furniture, labor and more anywhere in Ethiopia.</p>
+      </section>
+
+      <AnimatedCar />
+
+      <div className="home-search-wrapper">
+        <div className="home-search">
+          <input
+            type="text"
+            placeholder="🔎 Search cars, houses, furniture, labor and more..."
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                const value = e.target.value.trim();
+                if (value) window.location.hash = `/search?search=${encodeURIComponent(value)}`;
+                else window.location.hash = "/search";
+              }
+            }}
+          />
+          <button
+            type="button"
+            className="home-search-icon"
+            onClick={() => {
+              const input = document.querySelector(".home-search input");
+              const value = input?.value.trim();
+              if (value) {
+                window.location.hash = `/search?search=${encodeURIComponent(value)}`;
+              } else {
+                window.location.hash = "/search";
+              }
+            }}
+            aria-label="Search"
+          >
+            🔎
+          </button>
+        </div>
+      </div>
+
+      <PromoBanner />
+
+      <section className="home-categories">
+        <h2 className="home-section-title">All Categories</h2>
+        <div className="home-category-scroll">
+          {categories
+            .filter((c) => ["cars", "houses", "rentals", "electronics", "furniture", "labor", "min-alish-tera"].includes(c.id))
+            .map((category) => (
+              <button
+                key={category.id}
+                type="button"
+                className={`home-category-circle-item ${openCategory === category.id ? "active" : ""}`}
+                onClick={() => toggleCategory(category.id)}
+              >
+                <div className="home-main-circle">{category.icon}</div>
+                <div className="home-main-category-name">{category.title}</div>
+              </button>
+            ))}
+        </div>
+
+        {openCategory && (
+          <div className="home-selected-options">
+            {categories.filter((c) => c.id === openCategory).map((category) => (
+              <div key={category.id} className="home-options-box">
+                <h3>{category.title}</h3>
+                <div className="home-options-list">
+                  {category.options.map((option) => (
+                    <Link key={option.name} to={option.link} className="home-option-button">{option.name}</Link>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section className="latest-ads-section">
+        <div className="latest-ads-header">
+          <div>
+            <h2>🆕 Latest Advertisements</h2>
+            <p>Recently posted items on የኛ ገበያ</p>
+          </div>
+          <Link to="/search" className="view-all-ads">View All →</Link>
+        </div>
+
+        {adsLoading ? (
+          <div className="latest-ads-grid">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+              <div className="skeleton-card" key={i}>
+                <div className="skeleton-img" />
+                <div className="skeleton-info">
+                  <div className="skeleton-line short" />
+                  <div className="skeleton-line long" />
+                  <div className="skeleton-line medium" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : latestAds.length === 0 ? (
+          <div className="latest-ads-empty">
+            <h3>No advertisements yet.</h3>
+            <p>Be the first person to post an advertisement.</p>
+            <Link to="/post-ad">📢 Post Advertisement</Link>
+          </div>
+        ) : (
+          <div className="latest-ads-grid">
+            {latestAds.map((ad) => {
+              const adImage = Array.isArray(ad.images) && ad.images.length > 0 ? ad.images[0] : ad.image;
+              const shortDescription = ad.description
+                ? ad.description.length > 100
+                  ? `${ad.description.substring(0, 100)}...`
+                  : ad.description
+                : "No description available.";
+              const postedTime = getPostedTime(ad.createdAt);
+              const isSold = ad.status === "sold";
+              const isFeatured = ad.featured === true;
+
+              return (
+                <div className="latest-ad-card" key={ad.id}>
+                  <Link to={`/ad/${ad.id}`} className="latest-ad-image-link">
+                    <div className="latest-ad-image">
+                      {isFeatured && <div className="card-featured-badge">⭐ FEATURED</div>}
+                      {isSold && <div className="card-sold-badge">SOLD</div>}
+                      {adImage ? (
+                        <img
+                          src={adImage}
+                          alt={ad.title || "Advertisement"}
+                          loading="lazy"
+                          className={`latest-ad-photo ${isSold ? "sold-card-image" : ""}`}
+                          onError={(e) => { e.currentTarget.style.display = "none"; }}
+                        />
+                      ) : (
+                        <div className="latest-no-image">📷 No Image</div>
+                      )}
+                    </div>
+                  </Link>
+
+                  <div className="latest-ad-info">
+                    <span className="latest-ad-category">{ad.category || "Advertisement"}</span>
+                    <h3>{ad.title || "Untitled Advertisement"}</h3>
+                    {/* ✅ Price fix — strips commas */}
+                    <h4>
+                      ETB{" "}
+                      {Number(String(ad.price || 0).replace(/,/g, "")).toLocaleString("en-US")}
+                    </h4>
+
+                    {postedTime && <p className="latest-ad-posted-time">🕒 Posted {postedTime}</p>}
+                    {ad.city && <p>📍 {ad.city}</p>}
+                    {ad.condition && <p>🔄 {ad.condition}</p>}
+                    {ad.subcategory && <p>📂 {ad.subcategory}</p>}
+
+                    <p className="latest-ad-views">👁 {ad.views || 0} views</p>
+
+                    <p className="latest-ad-description">{shortDescription}</p>
+
+                    {Array.isArray(ad.images) && ad.images.length > 1 && (
+                      <p className="image-count">🖼️ {ad.images.length} images</p>
+                    )}
+                    <Link to={`/ad/${ad.id}`} className="latest-view-button">👁 View Details</Link>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </section>
+    </main>
   );
-  const sigBuffer = await crypto.subtle.sign(
-    "RSASSA-PKCS1-v1_5", key,
-    new TextEncoder().encode(signingInput)
-  );
-  const signature = base64UrlEncodeBytes(new Uint8Array(sigBuffer));
-  const jwt = `${signingInput}.${signature}`;
-
-  const tokRes = await fetch("https://oauth2.googleapis.com/token", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: `grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=${jwt}`,
-  });
-  const tokData = await tokRes.json();
-  if (!tokData.access_token) throw new Error(JSON.stringify(tokData));
-  return tokData.access_token;
 }
 
-function base64UrlEncodeString(str) {
-  const base64 = btoa(unescape(encodeURIComponent(str)));
-  return base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-}
-
-function base64UrlEncodeBytes(bytes) {
-  let binary = "";
-  for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
-  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-}
+export default Home;
