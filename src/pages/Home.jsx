@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { collection, getDocs } from "firebase/firestore";
@@ -262,10 +261,8 @@ function Home() {
                   <div className="latest-ad-info">
                     <span className="latest-ad-category">{ad.category || "Advertisement"}</span>
                     <h3>{ad.title || "Untitled Advertisement"}</h3>
-                    {/* ✅ Price fix — strips commas */}
                     <h4>
-                      ETB{" "}
-                      {Number(String(ad.price || 0).replace(/,/g, "")).toLocaleString("en-US")}
+                      ETB {Number(String(ad.price || 0).replace(/,/g, "")).toLocaleString("en-US")}
                     </h4>
 
                     {postedTime && <p className="latest-ad-posted-time">🕒 Posted {postedTime}</p>}
