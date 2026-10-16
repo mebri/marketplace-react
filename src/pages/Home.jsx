@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase/firebase";
 import AnimatedCar from "./AnimatedCar";
-import PromoBanner from "../components/PromoBanner"; // 👈 Added PromoBanner
+import PromoBanner from "../components/PromoBanner";
 
 function Home() {
   const [openCategory, setOpenCategory] = useState(null);
@@ -65,7 +65,9 @@ function Home() {
   const loadLatestAds = async () => {
     try {
       const snapshot = await getDocs(collection(db, "ads"));
-      const ads = snapshot.docs.map((document) => ({ id: document.id, ...document.data() }));
+      const ads = snapshot.docs
+        .map((document) => ({ id: document.id, ...document.data() }))
+        .filter((ad) => ad.status !== "draft"); // ✅ Hide drafts from homepage
 
       ads.sort((a, b) => {
         const aFeat = a.featured ? 1 : 0;
@@ -263,7 +265,11 @@ function Home() {
                   <div className="latest-ad-info">
                     <span className="latest-ad-category">{ad.category || "Advertisement"}</span>
                     <h3>{ad.title || "Untitled Advertisement"}</h3>
-                    <h4>ETB {Number(ad.price || 0).toLocaleString()}</h4>
+                    {/* ✅ FIXED: Strip commas before converting */}
+                    <h4>
+                      ETB{" "}
+                      {Number(String(ad.price || 0).replace(/,/g, "")).toLocaleString("en-US")}
+                    </h4>
 
                     {postedTime && <p className="latest-ad-posted-time">🕒 Posted {postedTime}</p>}
                     {ad.city && <p>📍 {ad.city}</p>}
