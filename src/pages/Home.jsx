@@ -65,9 +65,7 @@ function Home() {
   const loadLatestAds = async () => {
     try {
       const snapshot = await getDocs(collection(db, "ads"));
-      const ads = snapshot.docs
-        .map((document) => ({ id: document.id, ...document.data() }))
-        .filter((ad) => ad.status !== "draft"); // ✅ Hide drafts from homepage
+      const ads = snapshot.docs.map((document) => ({ id: document.id, ...document.data() }));
 
       ads.sort((a, b) => {
         const aFeat = a.featured ? 1 : 0;
@@ -129,7 +127,6 @@ function Home() {
         <p>Find cars, houses, rentals, electronics, furniture, labor and more anywhere in Ethiopia.</p>
       </section>
 
-      {/* 👇 ANIMATED CAR IS HERE 👇 */}
       <AnimatedCar />
 
       <div className="home-search-wrapper">
@@ -164,7 +161,6 @@ function Home() {
         </div>
       </div>
 
-      {/* 👇 PROMO BANNER IS HERE 👇 */}
       <PromoBanner />
 
       <section className="home-categories">
@@ -265,7 +261,7 @@ function Home() {
                   <div className="latest-ad-info">
                     <span className="latest-ad-category">{ad.category || "Advertisement"}</span>
                     <h3>{ad.title || "Untitled Advertisement"}</h3>
-                    {/* ✅ FIXED: Strip commas before converting */}
+                    {/* ✅ Price fix — strips commas */}
                     <h4>
                       ETB{" "}
                       {Number(String(ad.price || 0).replace(/,/g, "")).toLocaleString("en-US")}
