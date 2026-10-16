@@ -65,7 +65,9 @@ function Home() {
   const loadLatestAds = async () => {
     try {
       const snapshot = await getDocs(collection(db, "ads"));
-      const ads = snapshot.docs.map((document) => ({ id: document.id, ...document.data() }));
+      const ads = snapshot.docs
+        .map((document) => ({ id: document.id, ...document.data() }))
+        .filter((ad) => ad.status !== "draft"); // ✅ Hide drafts from homepage
 
       ads.sort((a, b) => {
         const aFeat = a.featured ? 1 : 0;
@@ -261,10 +263,8 @@ function Home() {
                   <div className="latest-ad-info">
                     <span className="latest-ad-category">{ad.category || "Advertisement"}</span>
                     <h3>{ad.title || "Untitled Advertisement"}</h3>
-                    {/* ✅ Price fix — strips commas */}
                     <h4>
-                      ETB{" "}
-                      {Number(String(ad.price || 0).replace(/,/g, "")).toLocaleString("en-US")}
+                      ETB {Number(String(ad.price || 0).replace(/,/g, "")).toLocaleString("en-US")}
                     </h4>
 
                     {postedTime && <p className="latest-ad-posted-time">🕒 Posted {postedTime}</p>}
