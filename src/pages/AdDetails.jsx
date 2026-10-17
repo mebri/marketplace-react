@@ -10,7 +10,7 @@ import {
   getDoc,
   setDoc,
   updateDoc,
-  deleteDoc,
+  deleteDoc, // ✅ For deleting ads
   collection,
   addDoc,
   increment,
@@ -18,12 +18,15 @@ import {
   where,
   getDocs,
   serverTimestamp,
-  limit, // 👈 Added for similar ads
+  limit,
 } from "firebase/firestore";
 
 import { db, auth } from "../firebase/firebase";
 import ShareButtons from "../components/ShareButtons";
 import ImageLightbox from "../components/ImageLightbox";
+
+// 👇👇 CHANGE THIS TO YOUR ACTUAL LOGIN EMAIL 👇👇
+const ADMIN_EMAIL = "your-email@gmail.com"; 
 
 function AdDetails() {
   const { id } = useParams();
@@ -39,8 +42,8 @@ function AdDetails() {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [statusLoading, setStatusLoading] = useState(false);
   const [reportLoading, setReportLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
-  // 👈 State for similar ads
   const [similarAds, setSimilarAds] = useState([]);
   const [loadingSimilar, setLoadingSimilar] = useState(false);
 
@@ -99,23 +102,12 @@ function AdDetails() {
           }
         } catch (sellerError) {
           console.error("Seller profile error:", sellerError);
-          setSeller({
-            uid: adData.userId,
-            name: adData.userName || "",
-            city: adData.city || "",
-          });
         }
       }
 
       // CHECK FAVORITE
       if (auth.currentUser) {
-        const favoriteRef = doc(
-          db,
-          "users",
-          auth.currentUser.uid,
-          "favorites",
-          id
-        );
+        const favoriteRef = doc(db, "users", auth.currentUser.uid, "favorites", id);
         const favoriteSnap = await getDoc(favoriteRef);
         setIsFavorite(favoriteSnap.exists());
       }
@@ -123,6 +115,37 @@ function AdDetails() {
       console.error("Error loading advertisement:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // =========================
+  // DELETE AD (Owner or Admin)
+  // =========================
+  const handleDeleteAd = async () => {
+    if (!ad || !auth.currentUser) return;
+    
+    const isAdmin = auth.currentUser.email === ADMIN_EMAIL;
+    const isRealOwner = ad.userId === auth.currentUser.uid;
+
+    if (!isRealOwner && !(ad.source === "telegram" && isAdmin)) {
+      alert("Only the owner or admin can delete this ad.");
+      return;
+    }
+
+    if (!window.confirm("Are you sure you want to permanently delete this advertisement? This cannot be undone.")) {
+      return;
+    }
+
+    try {
+      setDeleteLoading(true);
+      await deleteDoc(doc(db, "ads", id));
+      alert("✅ Advertisement deleted successfully.");
+      navigate("/");
+    } catch (error) {
+      console.error("Delete error:", error);
+      alert("Failed to delete advertisement: " + error.message);
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -135,8 +158,6 @@ function AdDetails() {
 
       try {
         setLoadingSimilar(true);
-
-        // 1. Fetch a larger pool from the same category
         const q = query(
           collection(db, "ads"),
           where("category", "==", ad.category),
@@ -148,16 +169,11 @@ function AdDetails() {
           .map((document) => ({ id: document.id, ...document.data() }))
           .filter((item) => item.id !== ad.id);
 
-        // ================= HELPERS =================
         const norm = (v) => String(v || "").trim().toLowerCase();
-
-        // Extract year from text (e.g. "Toyota Corolla 2015" → 2015)
         const extractYear = (text) => {
           const match = String(text || "").match(/\b(19|20)\d{2}\b/);
           return match ? parseInt(match[0]) : null;
         };
-
-        // Detect fuel type from any text
         const detectFuel = (text) => {
           const t = norm(text);
           if (/\b(ev|electric)\b/.test(t)) return "electric";
@@ -167,46 +183,24 @@ function AdDetails() {
           return null;
         };
 
-        // ================= CURRENT AD VALUES =================
-        const adFuel = norm(
-          ad.fuelType ||
-            ad.fuel ||
-            detectFuel(`${ad.title || ""} ${ad.description || ""}`)
-        );
+        const adFuel = norm(ad.fuelType || ad.fuel || detectFuel(`${ad.title || ""} ${ad.description || ""}`));
         const adBrand = norm(ad.brand);
         const adName = norm(ad.name || ad.model);
-        const adYear =
-          parseInt(ad.year || ad.productionYear) || extractYear(ad.title);
+        const adYear = parseInt(ad.year || ad.productionYear) || extractYear(ad.title);
 
-        // ================= SCORING =================
         const scoredAds = allAds.map((item) => {
           let score = 0;
-
-          const itemFuel = norm(
-            item.fuelType ||
-              item.fuel ||
-              detectFuel(`${item.title || ""} ${item.description || ""}`)
-          );
+          const itemFuel = norm(item.fuelType || item.fuel || detectFuel(`${item.title || ""} ${item.description || ""}`));
           const itemBrand = norm(item.brand);
           const itemName = norm(item.name || item.model);
-          const itemYear =
-            parseInt(item.year || item.productionYear) ||
-            extractYear(item.title);
+          const itemYear = parseInt(item.year || item.productionYear) || extractYear(item.title);
 
-          // STEP 1 — Fuel Type / EV (Highest priority)
           if (adFuel && itemFuel && adFuel === itemFuel) score += 100;
-
-          // STEP 2 — Brand
           if (adBrand && itemBrand && adBrand === itemBrand) score += 80;
-
-          // STEP 3 — Name / Model
           if (adName && itemName && adName === itemName) score += 70;
-
-          // STEP 4 — Subcategory / Type
           if (ad.subcategory && item.subcategory === ad.subcategory) score += 50;
           if (ad.type && item.type === ad.type) score += 30;
 
-          // STEP 5 — Production Year
           if (adYear && itemYear) {
             const yearDiff = Math.abs(adYear - itemYear);
             if (yearDiff === 0) score += 40;
@@ -214,27 +208,16 @@ function AdDetails() {
             else if (yearDiff <= 3) score += 10;
           }
 
-          // STEP 6 — Title Keywords (each matching word > 3 letters)
           if (ad.title && item.title) {
-            const adWords = norm(ad.title)
-              .split(/\s+/)
-              .filter((w) => w.length > 3);
+            const adWords = norm(ad.title).split(/\s+/).filter((w) => w.length > 3);
             const itemWords = norm(item.title).split(/\s+/);
-            const commonWords = adWords.filter((w) =>
-              itemWords.includes(w)
-            );
+            const commonWords = adWords.filter((w) => itemWords.includes(w));
             score += commonWords.length * 15;
           }
 
-          // STEP 7 — Condition
           if (ad.condition && item.condition === ad.condition) score += 20;
+          if (ad.city && item.city && norm(ad.city) === norm(item.city)) score += 15;
 
-          // STEP 8 — City
-          if (ad.city && item.city && norm(ad.city) === norm(item.city)) {
-            score += 15;
-          }
-
-          // STEP 9 — Price Range
           const adPrice = Number(String(ad.price || 0).replace(/,/g, ""));
           const itemPrice = Number(String(item.price || 0).replace(/,/g, ""));
           if (adPrice > 0 && itemPrice > 0) {
@@ -246,7 +229,6 @@ function AdDetails() {
           return { ...item, similarityScore: score };
         });
 
-        // 3. Sort by highest score, take top 4, skip ads with 0 score
         const sortedAds = scoredAds
           .filter((item) => item.similarityScore > 0)
           .sort((a, b) => b.similarityScore - a.similarityScore)
@@ -278,21 +260,13 @@ function AdDetails() {
       return;
     }
 
-    const reason = window.prompt(
-      "Why are you reporting this ad?\n\nExamples: scam, wrong info, offensive, duplicate"
-    );
+    const reason = window.prompt("Why are you reporting this ad?\n\nExamples: scam, wrong info, offensive, duplicate");
     if (!reason || !reason.trim()) return;
 
     try {
       setReportLoading(true);
-
-      // Check for existing report from this user for this ad
       const reportsRef = collection(db, "reports");
-      const q = query(
-        reportsRef,
-        where("adId", "==", id),
-        where("reportedBy", "==", auth.currentUser.uid)
-      );
+      const q = query(reportsRef, where("adId", "==", id), where("reportedBy", "==", auth.currentUser.uid));
       const existing = await getDocs(q);
 
       if (!existing.empty) {
@@ -311,7 +285,6 @@ function AdDetails() {
         status: "pending",
         createdAt: serverTimestamp(),
       });
-
       alert("Thank you. We'll review this ad. ✅");
     } catch (err) {
       console.error("Report error:", err);
@@ -326,17 +299,16 @@ function AdDetails() {
   // =========================
   const toggleSoldStatus = async () => {
     if (!ad || !auth.currentUser) return;
-    if (ad.userId !== auth.currentUser.uid) {
-      alert("Only the owner can change this.");
+    const isAdmin = auth.currentUser.email === ADMIN_EMAIL;
+    const isRealOwner = ad.userId === auth.currentUser.uid;
+
+    if (!isRealOwner && !(ad.source === "telegram" && isAdmin)) {
+      alert("Only the owner or admin can change this.");
       return;
     }
 
     const newStatus = ad.status === "sold" ? "available" : "sold";
-    const confirmMsg =
-      newStatus === "sold"
-        ? "Mark this advertisement as SOLD?"
-        : "Mark this advertisement as AVAILABLE again?";
-
+    const confirmMsg = newStatus === "sold" ? "Mark this advertisement as SOLD?" : "Mark this advertisement as AVAILABLE again?";
     if (!window.confirm(confirmMsg)) return;
 
     try {
@@ -345,13 +317,8 @@ function AdDetails() {
         status: newStatus,
         soldAt: newStatus === "sold" ? new Date() : null,
       });
-
       setAd((prev) => ({ ...prev, status: newStatus }));
-      alert(
-        newStatus === "sold"
-          ? "Marked as SOLD ✅"
-          : "Marked as AVAILABLE ✅"
-      );
+      alert(newStatus === "sold" ? "Marked as SOLD ✅" : "Marked as AVAILABLE ✅");
     } catch (err) {
       console.error("Status update error:", err);
       alert("Could not update status: " + err.message);
@@ -372,13 +339,7 @@ function AdDetails() {
 
     try {
       setFavoriteLoading(true);
-      const favoriteRef = doc(
-        db,
-        "users",
-        auth.currentUser.uid,
-        "favorites",
-        id
-      );
+      const favoriteRef = doc(db, "users", auth.currentUser.uid, "favorites", id);
 
       if (isFavorite) {
         await deleteDoc(favoriteRef);
@@ -391,18 +352,9 @@ function AdDetails() {
           price: ad.price || "",
           city: ad.city || "",
           category: ad.category || "",
-          description: ad.description || "",
           image: ad.image || "",
           images: ad.images || [],
-          phone: ad.phone || "",
-          whatsapp: ad.whatsapp || "",
-          telegram: ad.telegram || "",
-          userEmail: ad.userEmail || "",
-          condition: ad.condition || "",
-          type: ad.type || "",
-          subcategory: ad.subcategory || "",
           userId: ad.userId || "",
-          userName: seller?.name || ad.userName || "",
           savedAt: new Date(),
         });
         setIsFavorite(true);
@@ -426,7 +378,6 @@ function AdDetails() {
       return;
     }
     if (!ad) return;
-
     if (ad.userId === auth.currentUser.uid) {
       alert("This is your advertisement. You cannot chat with yourself.");
       return;
@@ -436,17 +387,9 @@ function AdDetails() {
       setChatLoading(true);
       const buyerId = auth.currentUser.uid;
       const sellerId = ad.userId;
+      if (!sellerId) return;
 
-      if (!sellerId) {
-        alert("Seller information is not available.");
-        return;
-      }
-
-      const chatId =
-        buyerId < sellerId
-          ? `${buyerId}_${sellerId}_${id}`
-          : `${sellerId}_${buyerId}_${id}`;
-
+      const chatId = buyerId < sellerId ? `${buyerId}_${sellerId}_${id}` : `${sellerId}_${buyerId}_${id}`;
       const chatRef = doc(db, "chats", chatId);
       const chatSnap = await getDoc(chatRef);
 
@@ -457,14 +400,8 @@ function AdDetails() {
           sellerId,
           adId: id,
           adTitle: ad.title || "",
-          adImage:
-            Array.isArray(ad.images) && ad.images.length > 0
-              ? ad.images[0]
-              : ad.image || "",
-          buyerName:
-            auth.currentUser.displayName ||
-            auth.currentUser.email ||
-            "Buyer",
+          adImage: Array.isArray(ad.images) && ad.images.length > 0 ? ad.images[0] : ad.image || "",
+          buyerName: auth.currentUser.displayName || auth.currentUser.email || "Buyer",
           sellerName: seller?.name || ad.userName || "Seller",
           createdAt: new Date(),
           updatedAt: new Date(),
@@ -474,178 +411,63 @@ function AdDetails() {
         await addDoc(collection(db, "users", sellerId, "notifications"), {
           type: "chat",
           title: "New chat request 💬",
-          message: `${
-            auth.currentUser.displayName ||
-            auth.currentUser.email ||
-            "Someone"
-          } wants to chat with you about "${ad.title}".`,
+          message: `${auth.currentUser.displayName || auth.currentUser.email || "Someone"} wants to chat with you about "${ad.title}".`,
           adId: id,
           chatId,
-          fromUserId: buyerId,
-          fromUserName:
-            auth.currentUser.displayName ||
-            auth.currentUser.email ||
-            "Buyer",
           read: false,
           createdAt: new Date(),
         });
       }
-
       navigate(`/chat/${chatId}`);
     } catch (error) {
       console.error("Chat error:", error);
-      alert(error.message || "Could not start chat.");
     } finally {
       setChatLoading(false);
     }
   };
 
-  // =========================
-  // POSTED TIME
-  // =========================
   const getPostedTime = (createdAt) => {
     if (!createdAt) return "";
     let date;
     if (typeof createdAt.toDate === "function") date = createdAt.toDate();
-    else if (typeof createdAt.seconds === "number")
-      date = new Date(createdAt.seconds * 1000);
-    else if (createdAt instanceof Date) date = createdAt;
+    else if (typeof createdAt.seconds === "number") date = new Date(createdAt.seconds * 1000);
     else date = new Date(createdAt);
-
     if (Number.isNaN(date.getTime())) return "";
 
     const difference = Date.now() - date.getTime();
-    const seconds = Math.floor(difference / 1000);
-    const minutes = Math.floor(seconds / 60);
-    const hours = Math.floor(minutes / 60);
-    const days = Math.floor(hours / 24);
-
-    if (difference < 0 || seconds < 60) return "Just now";
-    if (minutes < 60)
-      return `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
-    if (hours < 24) return `${hours} hour${hours === 1 ? "" : "s"} ago`;
-    if (days < 7) return `${days} day${days === 1 ? "" : "s"} ago`;
-
-    return date.toLocaleString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-    });
+    const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+    if (days < 1) return "Today";
+    return `${days} day${days === 1 ? "" : "s"} ago`;
   };
 
-  if (loading) {
-    return (
-      <div className="details-page">
-        <h2>Loading...</h2>
-      </div>
-    );
-  }
+  if (loading) return <div className="details-page"><h2>Loading...</h2></div>;
+  if (!ad) return <div className="details-page"><h2>Advertisement not found.</h2><Link to="/">← Back Home</Link></div>;
 
-  if (!ad) {
-    return (
-      <div className="details-page">
-        <h2>Advertisement not found.</h2>
-        <Link to="/">← Back Home</Link>
-      </div>
-    );
-  }
-
-  const imageList =
-    Array.isArray(ad.images) && ad.images.length > 0
-      ? ad.images
-      : ad.image
-      ? [ad.image]
-      : [];
-
-  const nextImage = () => {
-    if (imageList.length === 0) return;
-    setCurrentImage((current) =>
-      current === imageList.length - 1 ? 0 : current + 1
-    );
-  };
-
-  const previousImage = () => {
-    if (imageList.length === 0) return;
-    setCurrentImage((current) =>
-      current === 0 ? imageList.length - 1 : current - 1
-    );
-  };
-
+  const imageList = Array.isArray(ad.images) && ad.images.length > 0 ? ad.images : ad.image ? [ad.image] : [];
   const phoneNumber = ad.phone || "";
-  const whatsappNumber = (ad.whatsapp || phoneNumber || "").replace(/\D/g, "");
-  const telegramValue = ad.telegram || "";
-  const telegramUsername = telegramValue.trim().replace(/^@/, "");
-
-  const sellerName = seller?.name || ad.userName || "Seller";
+  const sellerName = seller?.name || ad.userName || "Telegram Seller";
   const sellerCity = seller?.city || ad.city || "";
-  const sellerAvatar = sellerName ? sellerName.charAt(0).toUpperCase() : "👤";
-  const postedTime = getPostedTime(ad.createdAt);
-
-  const isOwner = ad.userId === auth.currentUser?.uid;
+  
+  const isAdmin = auth.currentUser?.email === ADMIN_EMAIL;
+  const isOwner = ad.userId === auth.currentUser?.uid || (ad.source === "telegram" && isAdmin);
   const isSold = ad.status === "sold";
 
   return (
     <div className="details-page">
       <div className="details-image">
         {imageList.length > 0 ? (
-          <>
-            <img
-              src={imageList[currentImage]}
-              alt={ad.title || "Advertisement"}
-              className="details-photo"
-              onClick={() => setLightboxOpen(true)}
-              style={{ cursor: "zoom-in" }}
-            />
-            {isSold && <div className="sold-overlay-big">SOLD</div>}
-            {imageList.length > 1 && (
-              <>
-                <button
-                  type="button"
-                  className="gallery-button gallery-prev"
-                  onClick={previousImage}
-                >
-                  ❮
-                </button>
-                <button
-                  type="button"
-                  className="gallery-button gallery-next"
-                  onClick={nextImage}
-                >
-                  ❯
-                </button>
-                <div className="image-counter">
-                  {currentImage + 1} / {imageList.length}
-                </div>
-              </>
-            )}
-          </>
+          <img
+            src={imageList[currentImage]}
+            alt={ad.title || "Advertisement"}
+            className="details-photo"
+            onClick={() => setLightboxOpen(true)}
+            style={{ cursor: "zoom-in" }}
+          />
         ) : (
           <div className="no-details-image">📷 No Image Available</div>
         )}
+        {isSold && <div className="sold-overlay-big">SOLD</div>}
       </div>
-
-      {imageList.length > 1 && (
-        <div className="image-thumbnails">
-          {imageList.map((image, index) => (
-            <img
-              key={index}
-              src={image}
-              alt={`${ad.title || "Advertisement"} ${index + 1}`}
-              className={
-                index === currentImage
-                  ? "thumbnail active-thumbnail"
-                  : "thumbnail"
-              }
-              onClick={() => {
-                setCurrentImage(index);
-                setLightboxOpen(true);
-              }}
-            />
-          ))}
-        </div>
-      )}
 
       <div className="details-info">
         <span className={`status-badge ${isSold ? "sold" : "available"}`}>
@@ -653,38 +475,44 @@ function AdDetails() {
         </span>
 
         <div className="details-meta-row">
-          {postedTime && (
-            <span className="posted-time">🕒 Posted {postedTime}</span>
-          )}
+          <span className="posted-time">🕒 Posted {getPostedTime(ad.createdAt)}</span>
           <span className="views-count">👁 {ad.views || 0} views</span>
         </div>
 
-        <span className="details-category">
-          {ad.category || "Advertisement"}
-        </span>
-
+        <span className="details-category">{ad.category || "Advertisement"}</span>
         <h1>{ad.title || "Untitled Advertisement"}</h1>
-
-        <h2>
-          ETB{" "}
-          {Number(String(ad.price || 0).replace(/,/g, "")).toLocaleString(
-            "en-US"
-          )}
-        </h2>
+        <h2>ETB {ad.price}</h2>
 
         {isOwner && (
-          <button
-            type="button"
-            onClick={toggleSoldStatus}
-            disabled={statusLoading}
-            className={`mark-sold-btn ${isSold ? "active" : ""}`}
-          >
-            {statusLoading
-              ? "Updating..."
-              : isSold
-              ? "↩️ Mark as Available Again"
-              : "✅ Mark as Sold Out"}
-          </button>
+          <div style={{ display: "flex", gap: "10px", marginTop: "15px" }}>
+            <button
+              type="button"
+              onClick={toggleSoldStatus}
+              disabled={statusLoading}
+              className={`mark-sold-btn ${isSold ? "active" : ""}`}
+              style={{ flex: 1 }}
+            >
+              {statusLoading ? "Updating..." : isSold ? "↩️ Mark Available" : "✅ Mark Sold"}
+            </button>
+            
+            {/* ✅ DELETE BUTTON */}
+            <button
+              type="button"
+              onClick={handleDeleteAd}
+              disabled={deleteLoading}
+              style={{ 
+                flex: 1, 
+                background: "#dc2626", 
+                color: "white", 
+                border: "none", 
+                borderRadius: "10px", 
+                fontWeight: "bold", 
+                cursor: "pointer" 
+              }}
+            >
+              {deleteLoading ? "Deleting..." : "🗑️ Delete Ad"}
+            </button>
+          </div>
         )}
 
         <div className="details-actions-row">
@@ -692,18 +520,12 @@ function AdDetails() {
             type="button"
             onClick={toggleFavorite}
             disabled={favoriteLoading}
-            className={`action-btn favorite-action ${
-              isFavorite ? "active" : ""
-            }`}
+            className={`action-btn favorite-action ${isFavorite ? "active" : ""}`}
           >
-            {favoriteLoading
-              ? "Saving..."
-              : isFavorite
-              ? "❤️ Saved"
-              : "🤍 Save Ad"}
+            {favoriteLoading ? "Saving..." : isFavorite ? "❤️ Saved" : "🤍 Save Ad"}
           </button>
 
-          {!isOwner && (
+          {!isOwner && ad.userId && (
             <button
               type="button"
               onClick={startChat}
@@ -715,61 +537,30 @@ function AdDetails() {
           )}
         </div>
 
-        {ad.city && (
-          <p>
-            <strong>📍 City:</strong> {ad.city}
-          </p>
-        )}
-        {ad.condition && (
-          <p>
-            <strong>🔄 Condition:</strong> {ad.condition}
-          </p>
-        )}
-        {ad.type && (
-          <p>
-            <strong>🏷️ Type:</strong> {ad.type}
-          </p>
-        )}
-        {ad.subcategory && (
-          <p>
-            <strong>📂 Type:</strong> {ad.subcategory}
-          </p>
-        )}
-        {ad.furnitureType && (
-          <p>
-            <strong>🛋️ Furniture:</strong> {ad.furnitureType}
-          </p>
-        )}
-        {ad.laborType && (
-          <p>
-            <strong>👷 Service:</strong> {ad.laborType}
-          </p>
-        )}
+        {ad.city && <p><strong>📍 City:</strong> {ad.city}</p>}
+        {ad.condition && <p><strong>🔄 Condition:</strong> {ad.condition}</p>}
+        {ad.type && <p><strong>🏷️ Type:</strong> {ad.type}</p>}
+        {ad.subcategory && <p><strong>📂 Category:</strong> {ad.subcategory}</p>}
+        {ad.furnitureType && <p><strong>🛋️ Furniture:</strong> {ad.furnitureType}</p>}
+        {ad.laborType && <p><strong>👷 Service:</strong> {ad.laborType}</p>}
 
         <div className="details-description">
           <h3>Description</h3>
           <p>{ad.description || "No description available."}</p>
         </div>
-        
-        {/* SHARE BUTTONS */}
-        <ShareButtons
-          adId={id}
-          title={ad.title || "Advertisement"}
-          price={ad.price}
-          city={ad.city}
-        />
+
+        <ShareButtons adId={id} title={ad.title || "Advertisement"} price={ad.price} city={ad.city} />
 
         <hr />
 
         <div className="seller-information">
           <h3>👤 Seller Information</h3>
-
           <div className="seller-profile-card">
             <div className="seller-avatar">
               {seller?.imageUrl ? (
-                <img src={seller.imageUrl} alt={sellerName || "Seller"} />
+                <img src={seller.imageUrl} alt={sellerName} />
               ) : (
-                sellerAvatar
+                sellerName.charAt(0).toUpperCase()
               )}
             </div>
             <div className="seller-profile-details">
@@ -785,41 +576,14 @@ function AdDetails() {
           )}
 
           <h3 className="seller-contact-title">📞 Contact Seller</h3>
-
           {phoneNumber && (
             <a href={`tel:${phoneNumber}`} className="phone-link">
               📞 Call Seller
               <span>{phoneNumber}</span>
             </a>
           )}
-          {whatsappNumber && (
-            <a
-              href={`https://wa.me/${whatsappNumber}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="whatsapp-btn"
-            >
-              💬 WhatsApp Seller
-            </a>
-          )}
-          {telegramUsername && (
-            <a
-              href={`https://t.me/${telegramUsername}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="telegram-btn"
-            >
-              ✈️ Contact on Telegram
-            </a>
-          )}
-          {!phoneNumber && !whatsappNumber && !telegramUsername && (
-            <p>Seller contact information is not available.</p>
-          )}
         </div>
 
-        {/* =========================
-            REPORT AD BUTTON
-        ========================= */}
         {!isOwner && (
           <button
             type="button"
@@ -832,52 +596,27 @@ function AdDetails() {
         )}
       </div>
 
-      {/* =========================
-          SIMILAR ADS SECTION
-      ========================= */}
+      {/* SIMILAR ADS SECTION */}
       {similarAds.length > 0 && (
         <section className="similar-ads-section">
           <div className="similar-ads-header">
             <h2>Similar Ads</h2>
-            <Link
-              to={`/search?category=${encodeURIComponent(ad.category)}`}
-              className="view-all-similar"
-            >
+            <Link to={`/search?category=${encodeURIComponent(ad.category)}`} className="view-all-similar">
               View All →
             </Link>
           </div>
 
           <div className="similar-ads-grid">
             {similarAds.map((item) => {
-              const image =
-                Array.isArray(item.images) && item.images.length > 0
-                  ? item.images[0]
-                  : item.image;
+              const image = Array.isArray(item.images) && item.images.length > 0 ? item.images[0] : item.image;
               return (
-                <Link
-                  to={`/ad/${item.id}`}
-                  key={item.id}
-                  className="similar-ad-card"
-                >
+                <Link to={`/ad/${item.id}`} key={item.id} className="similar-ad-card">
                   <div className="similar-ad-image">
-                    {image ? (
-                      <img
-                        src={image}
-                        alt={item.title || "Advertisement"}
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div className="no-image">📷 No Image</div>
-                    )}
+                    {image ? <img src={image} alt={item.title} loading="lazy" /> : <div className="no-image">📷 No Image</div>}
                   </div>
                   <div className="similar-ad-info">
                     <h3>{item.title || "Untitled"}</h3>
-                    <h4>
-                      ETB{" "}
-                      {Number(
-                        String(item.price || 0).replace(/,/g, "")
-                      ).toLocaleString("en-US")}
-                    </h4>
+                    <h4>ETB {item.price}</h4>
                     {item.city && <p>📍 {item.city}</p>}
                   </div>
                 </Link>
@@ -888,11 +627,7 @@ function AdDetails() {
       )}
 
       {lightboxOpen && imageList.length > 0 && (
-        <ImageLightbox
-          images={imageList}
-          startIndex={currentImage}
-          onClose={() => setLightboxOpen(false)}
-        />
+        <ImageLightbox images={imageList} startIndex={currentImage} onClose={() => setLightboxOpen(false)} />
       )}
     </div>
   );
