@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { collection, getDocs } from "firebase/firestore";
+// ✅ Added onSnapshot and query for real-time updates
+import { collection, query, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase/firebase";
 import AnimatedCar from "./AnimatedCar"; 
 
@@ -57,13 +58,12 @@ function Home() {
     ]},
   ];
 
+  // ✅ REAL-TIME LISTENER (Updates instantly when Telegram bot adds a new ad)
   useEffect(() => {
-    loadLatestAds();
-  }, []);
-
-  const loadLatestAds = async () => {
-    try {
-      const snapshot = await getDocs(collection(db, "ads"));
+    const q = query(collection(db, "ads"));
+    
+    // onSnapshot listens for changes in real-time
+    const unsubscribe = onSnapshot(q, (snapshot) => {
       const ads = snapshot.docs.map((document) => ({ id: document.id, ...document.data() }));
 
       ads.sort((a, b) => {
@@ -74,12 +74,15 @@ function Home() {
       });
 
       setLatestAds(ads);
-    } catch (error) {
-      console.error("Error loading latest advertisements:", error);
-    } finally {
       setAdsLoading(false);
-    }
-  };
+    }, (error) => {
+      console.error("Error listening to ads:", error);
+      setAdsLoading(false);
+    });
+
+    // Cleanup listener when user leaves the page
+    return () => unsubscribe();
+  }, []);
 
   const getAdTime = (ad) => {
     if (!ad?.createdAt) return 0;
