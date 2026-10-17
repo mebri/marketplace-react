@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase/firebase";
-import AnimatedCar from "./AnimatedCar";
-import PromoBanner from "../components/PromoBanner";
+import AnimatedCar from "./AnimatedCar"; 
 
 function Home() {
   const [openCategory, setOpenCategory] = useState(null);
@@ -161,8 +160,6 @@ function Home() {
         </div>
       </div>
 
-      <PromoBanner />
-
       <section className="home-categories">
         <h2 className="home-section-title">All Categories</h2>
         <div className="home-category-scroll">
@@ -261,9 +258,7 @@ function Home() {
                   <div className="latest-ad-info">
                     <span className="latest-ad-category">{ad.category || "Advertisement"}</span>
                     <h3>{ad.title || "Untitled Advertisement"}</h3>
-                    <h4>
-                      ETB {Number(String(ad.price || 0).replace(/,/g, "")).toLocaleString("en-US")}
-                    </h4>
+                    <h4>ETB {ad.price}</h4>
 
                     {postedTime && <p className="latest-ad-posted-time">🕒 Posted {postedTime}</p>}
                     {ad.city && <p>📍 {ad.city}</p>}
