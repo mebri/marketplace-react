@@ -10,7 +10,7 @@ import {
   getDoc,
   setDoc,
   updateDoc,
-  deleteDoc, // ✅ For deleting ads
+  deleteDoc,
   collection,
   addDoc,
   increment,
@@ -25,8 +25,8 @@ import { db, auth } from "../firebase/firebase";
 import ShareButtons from "../components/ShareButtons";
 import ImageLightbox from "../components/ImageLightbox";
 
-// 👇👇 CHANGE THIS TO YOUR ACTUAL LOGIN EMAIL 👇👇
-const ADMIN_EMAIL = "marbatu1@gmail.com"; 
+// ✅ YOUR EXACT EMAIL
+const ADMIN_EMAIL = "marbat1@gmail.com"; 
 
 function AdDetails() {
   const { id } = useParams();
@@ -124,9 +124,11 @@ function AdDetails() {
   const handleDeleteAd = async () => {
     if (!ad || !auth.currentUser) return;
     
-    const isAdmin = auth.currentUser.email === ADMIN_EMAIL;
+    // ✅ CASE-INSENSITIVE CHECK
+    const isAdmin = auth.currentUser?.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase();
     const isRealOwner = ad.userId === auth.currentUser.uid;
 
+    // If it's a Telegram ad, the admin can delete it. Otherwise, must be the real owner.
     if (!isRealOwner && !(ad.source === "telegram" && isAdmin)) {
       alert("Only the owner or admin can delete this ad.");
       return;
@@ -299,7 +301,9 @@ function AdDetails() {
   // =========================
   const toggleSoldStatus = async () => {
     if (!ad || !auth.currentUser) return;
-    const isAdmin = auth.currentUser.email === ADMIN_EMAIL;
+    
+    // ✅ CASE-INSENSITIVE CHECK
+    const isAdmin = auth.currentUser?.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase();
     const isRealOwner = ad.userId === auth.currentUser.uid;
 
     if (!isRealOwner && !(ad.source === "telegram" && isAdmin)) {
@@ -448,8 +452,10 @@ function AdDetails() {
   const sellerName = seller?.name || ad.userName || "Telegram Seller";
   const sellerCity = seller?.city || ad.city || "";
   
-  const isAdmin = auth.currentUser?.email === ADMIN_EMAIL;
+  // ✅ CASE-INSENSITIVE CHECK FOR UI
+  const isAdmin = auth.currentUser?.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase();
   const isOwner = ad.userId === auth.currentUser?.uid || (ad.source === "telegram" && isAdmin);
+  
   const isSold = ad.status === "sold";
 
   return (
@@ -483,6 +489,7 @@ function AdDetails() {
         <h1>{ad.title || "Untitled Advertisement"}</h1>
         <h2>ETB {ad.price}</h2>
 
+        {/* ✅ ADMIN/OWNER BUTTONS */}
         {isOwner && (
           <div style={{ display: "flex", gap: "10px", marginTop: "15px" }}>
             <button
@@ -495,7 +502,6 @@ function AdDetails() {
               {statusLoading ? "Updating..." : isSold ? "↩️ Mark Available" : "✅ Mark Sold"}
             </button>
             
-            {/* ✅ DELETE BUTTON */}
             <button
               type="button"
               onClick={handleDeleteAd}
