@@ -26,7 +26,7 @@ import ShareButtons from "../components/ShareButtons";
 import ImageLightbox from "../components/ImageLightbox";
 
 // 👇👇 CHANGE THIS TO YOUR ACTUAL LOGIN EMAIL 👇👇
-const ADMIN_EMAIL = "your-email@gmail.com"; 
+const ADMIN_EMAIL = "marbatu1@gmail.com"; 
 
 function AdDetails() {
   const { id } = useParams();
