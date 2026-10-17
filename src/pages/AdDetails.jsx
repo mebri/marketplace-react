@@ -25,7 +25,7 @@ import { db, auth } from "../firebase/firebase";
 import ShareButtons from "../components/ShareButtons";
 import ImageLightbox from "../components/ImageLightbox";
 
-// ✅ YOUR EXACT EMAIL
+// ✅ YOUR EXACT EMAIL (ALL LOWERCASE)
 const ADMIN_EMAIL = "marbat1@gmail.com"; 
 
 function AdDetails() {
@@ -124,12 +124,11 @@ function AdDetails() {
   const handleDeleteAd = async () => {
     if (!ad || !auth.currentUser) return;
     
-    // ✅ CASE-INSENSITIVE CHECK
-    const isAdmin = auth.currentUser?.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+    const isAdmin = auth.currentUser?.email?.toLowerCase() === ADMIN_EMAIL;
     const isRealOwner = ad.userId === auth.currentUser.uid;
 
-    // If it's a Telegram ad, the admin can delete it. Otherwise, must be the real owner.
-    if (!isRealOwner && !(ad.source === "telegram" && isAdmin)) {
+    // Admin can delete ANY ad. Normal users can only delete their own.
+    if (!isRealOwner && !isAdmin) {
       alert("Only the owner or admin can delete this ad.");
       return;
     }
@@ -302,11 +301,10 @@ function AdDetails() {
   const toggleSoldStatus = async () => {
     if (!ad || !auth.currentUser) return;
     
-    // ✅ CASE-INSENSITIVE CHECK
-    const isAdmin = auth.currentUser?.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+    const isAdmin = auth.currentUser?.email?.toLowerCase() === ADMIN_EMAIL;
     const isRealOwner = ad.userId === auth.currentUser.uid;
 
-    if (!isRealOwner && !(ad.source === "telegram" && isAdmin)) {
+    if (!isRealOwner && !isAdmin) {
       alert("Only the owner or admin can change this.");
       return;
     }
@@ -452,9 +450,10 @@ function AdDetails() {
   const sellerName = seller?.name || ad.userName || "Telegram Seller";
   const sellerCity = seller?.city || ad.city || "";
   
-  // ✅ CASE-INSENSITIVE CHECK FOR UI
-  const isAdmin = auth.currentUser?.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase();
-  const isOwner = ad.userId === auth.currentUser?.uid || (ad.source === "telegram" && isAdmin);
+  // ✅ BULLETPROOF ADMIN CHECK
+  const isAdmin = auth.currentUser?.email?.toLowerCase() === ADMIN_EMAIL;
+  // If you are admin, you own ALL ads.
+  const isOwner = ad.userId === auth.currentUser?.uid || isAdmin; 
   
   const isSold = ad.status === "sold";
 
