@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-// ✅ Added onSnapshot and query for real-time updates
 import { collection, query, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase/firebase";
 import AnimatedCar from "./AnimatedCar"; 
@@ -43,6 +42,13 @@ function Home() {
       { name: "🗄️ Cabinets", link: "/search?category=Furniture&subcategory=Cabinets" },
       { name: "🪞 Other Furniture", link: "/search?category=Furniture&subcategory=Other" },
     ]},
+    // ✅ NEW CLOTHES CATEGORY ADDED HERE
+    { id: "clothes", icon: "👗", title: "Clothes", description: "Men's and Women's fashion", options: [
+      { name: "👕 Men's Clothing", link: "/search?category=Clothes&subcategory=Men" },
+      { name: "👗 Women's Clothing", link: "/search?category=Clothes&subcategory=Women" },
+      { name: "👟 Shoes", link: "/search?category=Clothes&subcategory=Shoes" },
+      { name: "👜 Bags & Accessories", link: "/search?category=Clothes&subcategory=Accessories" },
+    ]},
     { id: "labor", icon: "👷", title: "Labor & Services", description: "Find skilled workers and services", options: [
       { name: "👷 Construction Worker", link: "/search?category=Labor%20%26%20Services&subcategory=Construction" },
       { name: "⚡ Electrician", link: "/search?category=Labor%20%26%20Services&subcategory=Electrician" },
@@ -62,7 +68,6 @@ function Home() {
   useEffect(() => {
     const q = query(collection(db, "ads"));
     
-    // onSnapshot listens for changes in real-time
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const ads = snapshot.docs.map((document) => ({ id: document.id, ...document.data() }));
 
@@ -80,7 +85,6 @@ function Home() {
       setAdsLoading(false);
     });
 
-    // Cleanup listener when user leaves the page
     return () => unsubscribe();
   }, []);
 
@@ -167,7 +171,8 @@ function Home() {
         <h2 className="home-section-title">All Categories</h2>
         <div className="home-category-scroll">
           {categories
-            .filter((c) => ["cars", "houses", "rentals", "electronics", "furniture", "labor", "min-alish-tera"].includes(c.id))
+            // ✅ ADDED "clothes" TO THIS LIST
+            .filter((c) => ["cars", "houses", "rentals", "electronics", "furniture", "clothes", "labor", "min-alish-tera"].includes(c.id))
             .map((category) => (
               <button
                 key={category.id}
