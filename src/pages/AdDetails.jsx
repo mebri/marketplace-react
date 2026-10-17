@@ -124,10 +124,9 @@ function AdDetails() {
   const handleDeleteAd = async () => {
     if (!ad || !auth.currentUser) return;
     
-    const isAdmin = auth.currentUser?.email?.toLowerCase() === ADMIN_EMAIL;
+    const isAdmin = auth.currentUser?.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase();
     const isRealOwner = ad.userId === auth.currentUser.uid;
 
-    // Admin can delete ANY ad. Normal users can only delete their own.
     if (!isRealOwner && !isAdmin) {
       alert("Only the owner or admin can delete this ad.");
       return;
@@ -301,7 +300,7 @@ function AdDetails() {
   const toggleSoldStatus = async () => {
     if (!ad || !auth.currentUser) return;
     
-    const isAdmin = auth.currentUser?.email?.toLowerCase() === ADMIN_EMAIL;
+    const isAdmin = auth.currentUser?.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase();
     const isRealOwner = ad.userId === auth.currentUser.uid;
 
     if (!isRealOwner && !isAdmin) {
@@ -428,6 +427,9 @@ function AdDetails() {
     }
   };
 
+  // =========================
+  // POSTED TIME (UPDATED FOR HOURS/MINUTES)
+  // =========================
   const getPostedTime = (createdAt) => {
     if (!createdAt) return "";
     let date;
@@ -437,9 +439,17 @@ function AdDetails() {
     if (Number.isNaN(date.getTime())) return "";
 
     const difference = Date.now() - date.getTime();
-    const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-    if (days < 1) return "Today";
-    return `${days} day${days === 1 ? "" : "s"} ago`;
+    const seconds = Math.floor(difference / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    if (difference < 0 || seconds < 60) return "Just now";
+    if (minutes < 60) return `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
+    if (hours < 24) return `${hours} hour${hours === 1 ? "" : "s"} ago`;
+    if (days < 7) return `${days} day${days === 1 ? "" : "s"} ago`;
+    
+    return date.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
   };
 
   if (loading) return <div className="details-page"><h2>Loading...</h2></div>;
@@ -450,8 +460,7 @@ function AdDetails() {
   const sellerName = seller?.name || ad.userName || "Telegram Seller";
   const sellerCity = seller?.city || ad.city || "";
   
-  // ✅ BULLETPROOF ADMIN CHECK
-  const isAdmin = auth.currentUser?.email?.toLowerCase() === ADMIN_EMAIL;
+  const isAdmin = auth.currentUser?.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase();
   const isOwner = ad.userId === auth.currentUser?.uid || isAdmin; 
   
   const isSold = ad.status === "sold";
@@ -487,7 +496,6 @@ function AdDetails() {
         <h1>{ad.title || "Untitled Advertisement"}</h1>
         <h2>ETB {ad.price}</h2>
 
-        {/* ✅ ADMIN/OWNER BUTTONS */}
         {isOwner && (
           <div style={{ display: "flex", gap: "10px", marginTop: "15px" }}>
             <button
