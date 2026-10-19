@@ -6,6 +6,7 @@ function VideoCall() {
 
   return (
     <div style={{ height: "100vh", width: "100vw", display: "flex", flexDirection: "column" }}>
+      {/* Top Bar */}
       <div style={{ padding: "10px", background: "#1976d2", color: "white", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <button 
           onClick={() => navigate(-1)} 
@@ -16,6 +17,7 @@ function VideoCall() {
         <span style={{ fontWeight: "bold" }}>Magna Gebeya Video Call</span>
       </div>
 
+      {/* Jitsi iframe */}
       <div style={{ flex: 1 }}>
         <iframe
           src={`https://meet.jit.si/${roomId}#config.prejoinPageEnabled=false`}
