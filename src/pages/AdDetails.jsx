@@ -594,7 +594,7 @@ function AdDetails() {
           <button
             type="button"
             onClick={() => {
-              const roomId = `MagnaGebeya-${id}-${Math.floor(Math.random() * 1000)}`;
+              const roomId = `YegnaGebeya-${id}-${Math.floor(Math.random() * 1000)}`;
               navigate(`/video-call/${roomId}`);
             }}
             style={{
