@@ -67,7 +67,6 @@ function AdDetails() {
       const adData = { id: docSnap.id, ...docSnap.data() };
       setAd(adData);
 
-      // INCREMENT VIEW COUNT
       try {
         const viewerId = auth.currentUser?.uid || "guest";
         const sessionKey = `viewed_${id}_${viewerId}`;
@@ -86,7 +85,6 @@ function AdDetails() {
         console.error("View count error:", viewErr);
       }
 
-      // LOAD SELLER
       if (adData.userId) {
         try {
           const sellerRef = doc(db, "users", adData.userId);
@@ -105,7 +103,6 @@ function AdDetails() {
         }
       }
 
-      // CHECK FAVORITE
       if (auth.currentUser) {
         const favoriteRef = doc(db, "users", auth.currentUser.uid, "favorites", id);
         const favoriteSnap = await getDoc(favoriteRef);
@@ -428,7 +425,7 @@ function AdDetails() {
   };
 
   // =========================
-  // POSTED TIME (UPDATED FOR HOURS/MINUTES)
+  // POSTED TIME
   // =========================
   const getPostedTime = (createdAt) => {
     if (!createdAt) return "";
@@ -588,11 +585,39 @@ function AdDetails() {
           )}
 
           <h3 className="seller-contact-title">📞 Contact Seller</h3>
+          
           {phoneNumber && (
-            <a href={`tel:${phoneNumber}`} className="phone-link">
-              📞 Call Seller
-              <span>{phoneNumber}</span>
-            </a>
+            <>
+              <a href={`tel:${phoneNumber}`} className="phone-link" style={{ marginBottom: "10px" }}>
+                📞 Call Seller
+                <span>{phoneNumber}</span>
+              </a>
+
+              {/* ✅ VIDEO CALL BUTTON */}
+              <button
+                type="button"
+                onClick={() => {
+                  const roomId = `MagnaGebeya-${id}-${Math.floor(Math.random() * 1000)}`;
+                  navigate(`/video-call/${roomId}`);
+                }}
+                style={{
+                  display: "block",
+                  width: "100%",
+                  padding: "14px",
+                  background: "#16a34a",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "10px",
+                  fontSize: "16px",
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                  marginBottom: "15px",
+                  textAlign: "center"
+                }}
+              >
+                🎥 Start Video Call
+              </button>
+            </>
           )}
         </div>
 
