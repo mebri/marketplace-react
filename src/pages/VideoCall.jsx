@@ -14,13 +14,14 @@ function VideoCall() {
         >
           ← End Call
         </button>
-        <span style={{ fontWeight: "bold" }}>Magna Gebeya Video Call</span>
+        {/* ✅ Changed to Amharic */}
+        <span style={{ fontWeight: "bold" }}>የኛ ገበያ Video Call</span>
       </div>
 
-      {/* Jitsi iframe */}
+      {/* Jitsi iframe - Auto-join configuration added */}
       <div style={{ flex: 1 }}>
         <iframe
-          src={`https://meet.jit.si/${roomId}#config.prejoinPageEnabled=false`}
+          src={`https://meet.jit.si/${roomId}#config.prejoinPageEnabled=false&config.prejoinConfig.enabled=false&config.startWithAudioMuted=false&config.startWithVideoMuted=false`}
           allow="camera; microphone; fullscreen; display-capture; autoplay"
           style={{ width: "100%", height: "100%", border: "none" }}
           title="Video Call"
