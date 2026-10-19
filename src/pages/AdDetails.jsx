@@ -584,38 +584,36 @@ function AdDetails() {
           <h3 className="seller-contact-title">📞 Contact Seller</h3>
           
           {phoneNumber && (
-            <>
-              <a href={`tel:${phoneNumber}`} className="phone-link" style={{ marginBottom: "10px" }}>
-                📞 Call Seller
-                <span>{phoneNumber}</span>
-              </a>
-
-              {/* ✅ VIDEO CALL BUTTON */}
-              <button
-                type="button"
-                onClick={() => {
-                  const roomId = `MagnaGebeya-${id}-${Math.floor(Math.random() * 1000)}`;
-                  navigate(`/video-call/${roomId}`);
-                }}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  padding: "14px",
-                  background: "#16a34a",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "10px",
-                  fontSize: "16px",
-                  fontWeight: "bold",
-                  cursor: "pointer",
-                  marginBottom: "15px",
-                  textAlign: "center"
-                }}
-              >
-                🎥 Start Video Call
-              </button>
-            </>
+            <a href={`tel:${phoneNumber}`} className="phone-link" style={{ marginBottom: "10px" }}>
+              📞 Call Seller
+              <span>{phoneNumber}</span>
+            </a>
           )}
+
+          {/* ✅ VIDEO CALL BUTTON (ALWAYS SHOWS) */}
+          <button
+            type="button"
+            onClick={() => {
+              const roomId = `MagnaGebeya-${id}-${Math.floor(Math.random() * 1000)}`;
+              navigate(`/video-call/${roomId}`);
+            }}
+            style={{
+              display: "block",
+              width: "100%",
+              padding: "14px",
+              background: "#16a34a",
+              color: "white",
+              border: "none",
+              borderRadius: "10px",
+              fontSize: "16px",
+              fontWeight: "bold",
+              cursor: "pointer",
+              marginBottom: "15px",
+              textAlign: "center"
+            }}
+          >
+            🎥 Start Video Call
+          </button>
         </div>
 
         {!isOwner && (
