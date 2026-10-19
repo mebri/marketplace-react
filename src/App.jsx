@@ -1,89 +1,54 @@
-import {
-  HashRouter,
-  Routes,
-  Route,
-} from "react-router-dom";
-
-// COMPONENTS
-import ResetPassword from "./pages/ResetPassword";
-import Navbar from "./components/Navbar";
-import ScrollManager from "./components/ScrollManager";
-import NotificationPrompt from "./components/NotificationPrompt";
-
-// PAGES
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
-import Cars from "./pages/Cars";
-import Houses from "./pages/Houses";
-import Rentals from "./pages/Rentals";
-
-import Search from "./pages/Search";
-import AdDetails from "./pages/AdDetails";
-
-import PostAd from "./pages/PostAd";
-import EditAd from "./pages/EditAd";
-
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-
+import Profile from "./pages/Profile";
+import PostAd from "./pages/PostAd";
+import AdDetails from "./pages/AdDetails";
+import Search from "./pages/Search";
 import Dashboard from "./pages/Dashboard";
 import MyAds from "./pages/MyAds";
-
-import Contact from "./pages/Contact";
-
-import Profile from "./pages/Profile";
-import UserProfile from "./pages/UserProfile";
-
-import Admin from "./pages/Admin";
-
-// CHAT + NOTIFICATIONS
 import Chats from "./pages/Chats";
 import ChatRoom from "./pages/ChatRoom";
 import Notifications from "./pages/Notifications";
+import Admin from "./pages/Admin";
+import PublicProfile from "./pages/PublicProfile";
+import EditAd from "./pages/EditAd";
+import Cars from "./pages/Cars";
+import ResetPassword from "./pages/ResetPassword";
+import VideoCall from "./pages/VideoCall"; // ✅ Added VideoCall
+
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 
 function App() {
   return (
-    <HashRouter>
-
-      <ScrollManager />
+    <Router>
       <Navbar />
-      <NotificationPrompt />
-
       <Routes>
-
         <Route path="/" element={<Home />} />
-
-        <Route path="/reset-password" element={<ResetPassword />} />
-
-        <Route path="/cars" element={<Cars />} />
-        <Route path="/houses" element={<Houses />} />
-        <Route path="/rentals" element={<Rentals />} />
-
-        <Route path="/search" element={<Search />} />
-        <Route path="/ad/:id" element={<AdDetails />} />
-
-        <Route path="/post-ad" element={<PostAd />} />
-        <Route path="/edit-ad/:id" element={<EditAd />} />
-
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/my-ads" element={<MyAds />} />
-
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-
         <Route path="/profile" element={<Profile />} />
-        <Route path="/user/:uid" element={<UserProfile />} />
-
-        <Route path="/contact" element={<Contact />} />
-
+        <Route path="/user/:id" element={<PublicProfile />} />
+        <Route path="/post-ad" element={<PostAd />} />
+        <Route path="/ad/:id" element={<AdDetails />} />
+        <Route path="/search" element={<Search />} />
+        <Route path="/cars" element={<Cars />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/my-ads" element={<MyAds />} />
+        <Route path="/edit-ad/:id" element={<EditAd />} />
         <Route path="/chats" element={<Chats />} />
         <Route path="/chat/:chatId" element={<ChatRoom />} />
-
         <Route path="/notifications" element={<Notifications />} />
-
         <Route path="/admin" element={<Admin />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        
+        {/* ✅ Added Video Call Route */}
+        <Route path="/video-call/:roomId" element={<VideoCall />} />
       </Routes>
-
-    </HashRouter>
+      <Footer />
+    </Router>
   );
 }
 
