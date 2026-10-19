@@ -424,9 +424,6 @@ function AdDetails() {
     }
   };
 
-  // =========================
-  // POSTED TIME
-  // =========================
   const getPostedTime = (createdAt) => {
     if (!createdAt) return "";
     let date;
@@ -593,7 +590,7 @@ function AdDetails() {
                 <span>{phoneNumber}</span>
               </a>
 
-              {/* ✅ VIDEO CALL BUTTON */}
+              {/* ✅ VIDEO CALL BUTTON IS HERE */}
               <button
                 type="button"
                 onClick={() => {
