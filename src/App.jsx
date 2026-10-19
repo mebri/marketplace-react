@@ -1,4 +1,6 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+// ✅ IMPORTANT: We use HashRouter instead of BrowserRouter for static hosting
+import { HashRouter as Router, Routes, Route } from "react-router-dom";
+
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -16,7 +18,7 @@ import PublicProfile from "./pages/PublicProfile";
 import EditAd from "./pages/EditAd";
 import Cars from "./pages/Cars";
 import ResetPassword from "./pages/ResetPassword";
-import VideoCall from "./pages/VideoCall"; // ✅ Added VideoCall
+import VideoCall from "./pages/VideoCall"; // ✅ Added
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -44,7 +46,7 @@ function App() {
         <Route path="/admin" element={<Admin />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         
-        {/* ✅ Added Video Call Route */}
+        {/* ✅ Video Call Route */}
         <Route path="/video-call/:roomId" element={<VideoCall />} />
       </Routes>
       <Footer />
