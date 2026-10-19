@@ -590,7 +590,7 @@ function AdDetails() {
                 <span>{phoneNumber}</span>
               </a>
 
-              {/* ✅ VIDEO CALL BUTTON IS HERE */}
+              {/* ✅ VIDEO CALL BUTTON */}
               <button
                 type="button"
                 onClick={() => {
