@@ -14,7 +14,7 @@ import Chats from "./pages/Chats";
 import ChatRoom from "./pages/ChatRoom";
 import Notifications from "./pages/Notifications";
 import Admin from "./pages/Admin";
-import PublicProfile from "./pages/PublicProfile";
+// import PublicProfile from "./pages/PublicProfile"; // ❌ REMOVED (File is missing)
 import EditAd from "./pages/EditAd";
 import Cars from "./pages/Cars";
 import ResetPassword from "./pages/ResetPassword";
@@ -32,7 +32,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="/user/:id" element={<PublicProfile />} />
+        {/* <Route path="/user/:id" element={<PublicProfile />} /> ❌ REMOVED */}
         <Route path="/post-ad" element={<PostAd />} />
         <Route path="/ad/:id" element={<AdDetails />} />
         <Route path="/search" element={<Search />} />
