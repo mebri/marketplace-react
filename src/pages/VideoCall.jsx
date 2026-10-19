@@ -1,22 +1,8 @@
-import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { JitsiMeeting } from "@jitsi/react-sdk";
 
 function VideoCall() {
   const { roomId } = useParams();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-
-  const displayName = "User " + Math.floor(Math.random() * 1000);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (loading) {
-    return <div style={{ textAlign: "center", padding: "50px" }}>Starting Video Call... 🎥</div>;
-  }
 
   return (
     <div style={{ height: "100vh", width: "100vw", display: "flex", flexDirection: "column" }}>
@@ -31,32 +17,11 @@ function VideoCall() {
       </div>
 
       <div style={{ flex: 1 }}>
-        <JitsiMeeting
-          domain="meet.jit.si"
-          roomName={roomId}
-          configOverwrite={{
-            startWithAudioMuted: false,
-            startWithVideoMuted: false,
-            prejoinPageEnabled: false,
-          }}
-          interfaceConfigOverwrite={{
-            SHOW_JITSI_WATERMARK: false,
-            DEFAULT_BACKGROUND: "#111111",
-          }}
-          userInfo={{
-            displayName: displayName,
-            email: "",
-          }}
-          onApiReady={(externalApi) => {
-            externalApi.addListener("videoConferenceLeft", () => {
-              navigate(-1);
-            });
-          }}
-          getIFrameRef={(iframeRef) => {
-            iframeRef.style.height = "100%";
-            iframeRef.style.width = "100%";
-            iframeRef.style.border = "none";
-          }}
+        <iframe
+          src={`https://meet.jit.si/${roomId}#config.prejoinPageEnabled=false`}
+          allow="camera; microphone; fullscreen; display-capture; autoplay"
+          style={{ width: "100%", height: "100%", border: "none" }}
+          title="Video Call"
         />
       </div>
     </div>
