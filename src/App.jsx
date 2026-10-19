@@ -16,7 +16,7 @@ import Admin from "./pages/Admin";
 import EditAd from "./pages/EditAd";
 import Cars from "./pages/Cars";
 import ResetPassword from "./pages/ResetPassword";
-import VideoCall from "./pages/VideoCall"; // ✅ Added
+import VideoCall from "./pages/VideoCall";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -42,8 +42,6 @@ function App() {
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-        
-        {/* ✅ Video Call Route */}
         <Route path="/video-call/:roomId" element={<VideoCall />} />
       </Routes>
       <Footer />
