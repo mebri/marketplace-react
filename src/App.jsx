@@ -1,5 +1,5 @@
+// ✅ Changed to HashRouter for Cloudflare hosting
 import { HashRouter as Router, Routes, Route } from "react-router-dom";
-
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -13,10 +13,11 @@ import Chats from "./pages/Chats";
 import ChatRoom from "./pages/ChatRoom";
 import Notifications from "./pages/Notifications";
 import Admin from "./pages/Admin";
+// ❌ REMOVED: import PublicProfile from "./pages/PublicProfile"; (File is missing, breaks the build)
 import EditAd from "./pages/EditAd";
 import Cars from "./pages/Cars";
 import ResetPassword from "./pages/ResetPassword";
-import VideoCall from "./pages/VideoCall";
+import VideoCall from "./pages/VideoCall"; // ✅ Added VideoCall
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -30,6 +31,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/profile" element={<Profile />} />
+        {/* ❌ REMOVED: <Route path="/user/:id" element={<PublicProfile />} /> */}
         <Route path="/post-ad" element={<PostAd />} />
         <Route path="/ad/:id" element={<AdDetails />} />
         <Route path="/search" element={<Search />} />
@@ -42,6 +44,8 @@ function App() {
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        
+        {/* ✅ Added Video Call Route */}
         <Route path="/video-call/:roomId" element={<VideoCall />} />
       </Routes>
       <Footer />
