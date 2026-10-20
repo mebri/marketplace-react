@@ -6909,28 +6909,43 @@ img {
 .clear-draft-btn-small {
   display: none !important;
 }
-/* ✅ Scrolling Text Effect */
-.marquee-container {
+/* ✅ HERO SCROLLING TEXT (Right to Left) */
+.hero-marquee {
   width: 100%;
   overflow: hidden;
   white-space: nowrap;
   display: flex;
+}
+
+.hero-marquee-content {
+  display: flex;
   align-items: center;
+  gap: 40px; /* Space between the texts */
+  padding-left: 100%; /* Starts completely off-screen to the right */
+  animation: scrollHero 20s linear infinite;
 }
 
-.marquee-text {
+/* We make the text inline so it stays on one line */
+.hero-marquee-content h1,
+.hero-marquee-content h2,
+.hero-marquee-content p {
+  margin: 0;
   display: inline-block;
-  padding-left: 100%; /* Start off-screen */
-  animation: scroll-left 15s linear infinite;
-  font-weight: bold;
-  font-size: 16px;
+  color: white;
 }
 
-@keyframes scroll-left {
+@keyframes scrollHero {
   0% {
     transform: translateX(0);
   }
   100% {
     transform: translateX(-100%);
+  }
+}
+
+/* Optional: Slow down the animation on mobile so it's easy to read */
+@media (max-width: 600px) {
+  .hero-marquee-content {
+    animation: scrollHero 25s linear infinite;
   }
 }
