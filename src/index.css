@@ -6949,3 +6949,39 @@ img {
     animation: scrollHero 25s linear infinite;
   }
 }
+
+/* =========================================================
+   FIX NAVBAR OVERLAP & SPACING
+========================================================= */
+
+/* 1. Push the page down so the sticky navbar doesn't cover the hero */
+.home-page {
+  padding-top: 10px !important; 
+}
+
+.home-hero {
+  margin-top: 0 !important;
+  padding-top: 30px !important;
+  padding-bottom: 30px !important;
+}
+
+/* 2. Force the Latest Ads header to be side-by-side */
+.latest-ads-header {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 15px !important;
+  margin-bottom: 20px !important;
+}
+
+.latest-ads-header h2 {
+  margin: 0 !important;
+  font-size: 24px !important;
+}
+
+.view-all-ads {
+  margin: 0 !important;
+  white-space: nowrap !important;
+}
