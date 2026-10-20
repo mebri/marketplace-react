@@ -63,7 +63,6 @@ function Home() {
     ]},
   ];
 
-  // ✅ REAL-TIME LISTENER
   useEffect(() => {
     const q = query(collection(db, "ads"));
     
@@ -205,20 +204,11 @@ function Home() {
         )}
       </section>
 
-      <section className="latest-ads-section" style={{ marginTop: "20px" }}>
-        {/* ✅ SPACES ARRANGED HERE: Header is now centered vertically */}
-        <div 
-          className="latest-ads-header" 
-          style={{ 
-            display: "flex", 
-            justifyContent: "space-between", 
-            alignItems: "center", 
-            marginBottom: "20px",
-            paddingBottom: "10px"
-          }}
-        >
-          <h2 style={{ margin: 0, fontSize: "26px" }}>🆕 Latest Advertisements</h2>
-          <Link to="/search" className="view-all-ads" style={{ margin: 0, fontWeight: "bold" }}>View All →</Link>
+      <section className="latest-ads-section">
+        {/* ✅ SPACES ARRANGED HERE */}
+        <div className="latest-ads-header">
+          <h2>🆕 Latest Advertisements</h2>
+          <Link to="/search" className="view-all-ads">View All →</Link>
         </div>
 
         {adsLoading ? (
