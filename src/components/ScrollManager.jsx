@@ -31,7 +31,9 @@ const getMaxScroll = () => {
 
 function ScrollManager() {
   const location = useLocation();
-  const key = location.key;
+  
+  // ✅ FIX: Use pathname instead of key so it survives page refresh
+  const key = location.pathname + location.search; 
 
   useEffect(() => {
     if ("scrollRestoration" in window.history) {
@@ -113,6 +115,7 @@ function ScrollManager() {
         }
       }
 
+      // 150 attempts * 100ms = 15 seconds (plenty of time for Firebase to load ads)
       if (attempts < 150) {
         timer = setTimeout(tryRestore, 100);
       }
