@@ -63,6 +63,7 @@ function Home() {
     ]},
   ];
 
+  // ✅ REAL-TIME LISTENER
   useEffect(() => {
     const q = query(collection(db, "ads"));
     
@@ -204,8 +205,19 @@ function Home() {
         )}
       </section>
 
+      {/* ✅ NEW ADVERTISING BANNER SPACE */}
+      <section className="promoted-ad-section">
+        <Link to="/post-ad" className="promoted-ad-banner">
+          <div className="promoted-ad-content">
+            <h3>📢 Want to sell something fast?</h3>
+            <p>Post your ad on የኛ ገበያ today and reach thousands of buyers across Ethiopia!</p>
+            <span className="promoted-ad-btn">Post Free Ad Now →</span>
+          </div>
+          <div className="promoted-ad-icon">🚀</div>
+        </Link>
+      </section>
+
       <section className="latest-ads-section">
-        {/* ✅ SPACES ARRANGED HERE */}
         <div className="latest-ads-header">
           <h2>🆕 Latest Advertisements</h2>
           <Link to="/search" className="view-all-ads">View All →</Link>
