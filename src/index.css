@@ -6985,3 +6985,70 @@ img {
   margin: 0 !important;
   white-space: nowrap !important;
 }
+
+/* ✅ PROMOTED AD BANNER */
+.promoted-ad-section {
+  width: 92%;
+  max-width: 1200px;
+  margin: 10px auto 30px auto;
+}
+
+.promoted-ad-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, #1976d2, #0d47a1);
+  color: white;
+  padding: 20px 25px;
+  border-radius: 16px;
+  text-decoration: none;
+  box-shadow: 0 8px 25px rgba(25, 118, 210, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.promoted-ad-banner:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(25, 118, 210, 0.4);
+}
+
+.promoted-ad-content h3 {
+  margin: 0 0 5px 0;
+  font-size: 20px;
+  color: white;
+}
+
+.promoted-ad-content p {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  opacity: 0.9;
+  color: white;
+}
+
+.promoted-ad-btn {
+  display: inline-block;
+  background: #ffeb3b;
+  color: #0d47a1;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.promoted-ad-icon {
+  font-size: 50px;
+  opacity: 0.9;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 600px) {
+  .promoted-ad-banner {
+    flex-direction: column;
+    text-align: center;
+    padding: 20px;
+    gap: 15px;
+  }
+  
+  .promoted-ad-icon {
+    display: none; /* Hide icon on small screens to save space */
+  }
+}
