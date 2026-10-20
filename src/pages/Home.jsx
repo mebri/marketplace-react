@@ -42,7 +42,6 @@ function Home() {
       { name: "🗄️ Cabinets", link: "/search?category=Furniture&subcategory=Cabinets" },
       { name: "🪞 Other Furniture", link: "/search?category=Furniture&subcategory=Other" },
     ]},
-    // ✅ NEW CLOTHES CATEGORY ADDED HERE
     { id: "clothes", icon: "👗", title: "Clothes", description: "Men's and Women's fashion", options: [
       { name: "👕 Men's Clothing", link: "/search?category=Clothes&subcategory=Men" },
       { name: "👗 Women's Clothing", link: "/search?category=Clothes&subcategory=Women" },
@@ -64,7 +63,7 @@ function Home() {
     ]},
   ];
 
-  // ✅ REAL-TIME LISTENER (Updates instantly when Telegram bot adds a new ad)
+  // ✅ REAL-TIME LISTENER
   useEffect(() => {
     const q = query(collection(db, "ads"));
     
@@ -127,7 +126,7 @@ function Home() {
 
   return (
     <main className="home-page">
-      {/* ✅ UPDATED BLUE HERO SECTION WITH SCROLLING TEXT */}
+      {/* ✅ BLUE HERO SECTION WITH SCROLLING TEXT */}
       <section className="home-hero" style={{ overflow: "hidden", padding: "20px 0" }}>
         <div className="hero-marquee">
           <div className="hero-marquee-content">
@@ -176,7 +175,6 @@ function Home() {
         <h2 className="home-section-title">All Categories</h2>
         <div className="home-category-scroll">
           {categories
-            // ✅ ADDED "clothes" TO THIS LIST
             .filter((c) => ["cars", "houses", "rentals", "electronics", "furniture", "clothes", "labor", "min-alish-tera"].includes(c.id))
             .map((category) => (
               <button
@@ -210,7 +208,7 @@ function Home() {
       <section className="latest-ads-section">
         <div className="latest-ads-header">
           <div>
-            <h2>🆕 Latest Advertisements</h2>
+            {/* ✅ REMOVED ONLY THIS H2 TEXT */}
             <p>Recently posted items on የኛ ገበያ</p>
           </div>
           <Link to="/search" className="view-all-ads">View All →</Link>
