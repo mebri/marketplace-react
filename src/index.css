@@ -7073,3 +7073,29 @@ img {
     padding-bottom: 10px !important;
   }
 }
+
+/* ✅ INCREASE HERO TEXT FONT SIZE */
+.hero-marquee-content p {
+  font-size: 22px !important; /* Increase this number to make it bigger */
+  font-weight: 600 !important; /* Makes the text a bit bolder */
+  margin: 0 20px !important; /* Adds a little space between the scrolling texts */
+}
+
+/* You can also increase the title (የኛ ገበያ) and subtitle if you want */
+.hero-marquee-content h1 {
+  font-size: 38px !important;
+}
+
+.hero-marquee-content h2 {
+  font-size: 24px !important;
+}
+
+/* Adjust for mobile screens so it doesn't get too huge */
+@media (max-width: 600px) {
+  .hero-marquee-content p {
+    font-size: 18px !important;
+  }
+  .hero-marquee-content h1 {
+    font-size: 30px !important;
+  }
+}
