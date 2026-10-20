@@ -3,6 +3,7 @@ import {
   Link,
   useNavigate,
   useParams,
+  Navigate, // ✅ Added Navigate for auto-redirect
 } from "react-router-dom";
 
 import {
@@ -447,7 +448,9 @@ function AdDetails() {
   };
 
   if (loading) return <div className="details-page"><h2>Loading...</h2></div>;
-  if (!ad) return <div className="details-page"><h2>Advertisement not found.</h2><Link to="/">← Back Home</Link></div>;
+  
+  // ✅ Automatically redirect to Home if the ad doesn't exist
+  if (!ad) return <Navigate to="/" replace />;
 
   const imageList = Array.isArray(ad.images) && ad.images.length > 0 ? ad.images : ad.image ? [ad.image] : [];
   const phoneNumber = ad.phone || "";
