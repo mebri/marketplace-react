@@ -8,17 +8,14 @@ import "./Navbar.css";
 
 function Navbar() {
   const [user, setUser] = useState(null);
-  const [menuOpen, setMenuOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
-  
-  // ✅ NEW: Loading state to stop fluctuation
   const [authLoading, setAuthLoading] = useState(true);
 
   // AUTH LISTENER
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
-      setAuthLoading(false); // ✅ Firebase has finished checking
+      setAuthLoading(false); 
     });
     return () => unsubscribe();
   }, []);
@@ -40,21 +37,18 @@ function Navbar() {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      setMenuOpen(false);
       alert("Logged out successfully!");
     } catch (error) {
       alert(error.message);
     }
   };
 
-  const closeMenu = () => setMenuOpen(false);
-
   return (
     <nav className="navbar">
       <div className="navbar-container">
 
         {/* LOGO */}
-        <Link to="/" className="navbar-brand" onClick={closeMenu}>
+        <Link to="/" className="navbar-brand">
           <img
             src={`${import.meta.env.BASE_URL}logo.png`}
             alt="የኛ ገበያ"
@@ -64,20 +58,15 @@ function Navbar() {
 
         {/* MOBILE QUICK ACTIONS */}
         <div className="mobile-quick-actions">
-          {/* ✅ CHECK LOADING STATE FIRST */}
           {authLoading ? (
-            <div style={{ width: "80px" }}></div> // Empty space while loading to prevent jumping
+            <div style={{ width: "80px" }}></div> 
           ) : user ? (
             <>
-              <Link
-                to="/my-ads"
-                className="mobile-my-ads-btn"
-                onClick={closeMenu}
-              >
+              <Link to="/my-ads" className="mobile-my-ads-btn">
                 📢
               </Link>
 
-              <Link to="/notifications" className="icon-btn" onClick={closeMenu}>
+              <Link to="/notifications" className="icon-btn">
                 🔔
                 {unreadCount > 0 && (
                   <span className="notification-badge">
@@ -86,54 +75,38 @@ function Navbar() {
                 )}
               </Link>
 
-              <Link to="/chats" className="icon-btn" onClick={closeMenu}>
+              <Link to="/chats" className="icon-btn">
                 💬
               </Link>
-
-              <button
-                className="menu-toggle"
-                onClick={() => setMenuOpen(!menuOpen)}
-                aria-label="Open menu"
-              >
-                {menuOpen ? "✕" : "☰"}
-              </button>
             </>
           ) : (
             <>
-              <Link to="/login" className="guest-login-btn" onClick={closeMenu}>
+              <Link to="/login" className="guest-login-btn">
                 Login
               </Link>
-              <Link to="/register" className="guest-register-btn" onClick={closeMenu}>
+              <Link to="/register" className="guest-register-btn">
                 Register
               </Link>
-              <button
-                className="menu-toggle"
-                onClick={() => setMenuOpen(!menuOpen)}
-                aria-label="Open menu"
-              >
-                {menuOpen ? "✕" : "☰"}
-              </button>
             </>
           )}
         </div>
 
         {/* DESKTOP MAIN NAVIGATION */}
         <div className="navbar-nav">
-          <Link to="/" onClick={closeMenu}>Home</Link>
-          <Link to="/cars" onClick={closeMenu}>Cars</Link>
-          <Link to="/houses" onClick={closeMenu}>Houses</Link>
-          <Link to="/rentals" onClick={closeMenu}>Rentals</Link>
-          <Link to="/spare-parts" onClick={closeMenu}>Spare Parts</Link>
-          <Link to="/building-materials" onClick={closeMenu}>Building Materials</Link>
-          <Link to="/search?category=Electronics" onClick={closeMenu}>Electronics</Link>
-          <Link to="/search?category=ምንአለሽ%20ተራ" onClick={closeMenu}>ምንአለሽ ተራ</Link>
+          <Link to="/">Home</Link>
+          <Link to="/cars">Cars</Link>
+          <Link to="/houses">Houses</Link>
+          <Link to="/rentals">Rentals</Link>
+          <Link to="/spare-parts">Spare Parts</Link>
+          <Link to="/building-materials">Building Materials</Link>
+          <Link to="/search?category=Electronics">Electronics</Link>
+          <Link to="/search?category=ምንአለሽ%20ተራ">ምንአለሽ ተራ</Link>
         </div>
 
         {/* DESKTOP USER AREA */}
         <div className="navbar-actions desktop-user">
-          {/* ✅ CHECK LOADING STATE FIRST */}
           {authLoading ? (
-            <div style={{ width: "150px" }}></div> // Empty space while loading
+            <div style={{ width: "150px" }}></div> 
           ) : !user ? (
             <>
               <Link to="/login" className="login-btn">Login</Link>
@@ -172,27 +145,6 @@ function Navbar() {
         </div>
       )}
 
-      {/* MOBILE HAMBURGER MENU */}
-      {menuOpen && (
-        <div className="mobile-menu-dropdown">
-          <Link to="/" onClick={closeMenu}>Home</Link>
-          <Link to="/cars" onClick={closeMenu}>Cars</Link>
-          <Link to="/houses" onClick={closeMenu}>Houses</Link>
-          <Link to="/rentals" onClick={closeMenu}>Rentals</Link>
-          <Link to="/spare-parts" onClick={closeMenu}>Spare Parts</Link>
-          <Link to="/building-materials" onClick={closeMenu}>Building Materials</Link>
-          <Link to="/search?category=Electronics" onClick={closeMenu}>Electronics</Link>
-          <Link to="/search?category=ምንአለሽ%20ተራ" onClick={closeMenu}>ምንአለሽ ተራ</Link>
-
-          {user && !authLoading && (
-            <div className="mobile-menu-footer">
-              <button onClick={handleLogout} className="mobile-menu-logout">
-                Logout
-              </button>
-            </div>
-          )}
-        </div>
-      )}
     </nav>
   );
 }
