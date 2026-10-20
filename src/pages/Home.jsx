@@ -206,10 +206,10 @@ function Home() {
       </section>
 
       <section className="latest-ads-section">
+        {/* ✅ KEPT "LATEST ADVERTISEMENTS" BUT REMOVED THE TEXT BELOW IT */}
         <div className="latest-ads-header">
           <div>
-            {/* ✅ REMOVED ONLY THIS H2 TEXT */}
-            <p>Recently posted items on የኛ ገበያ</p>
+            <h2>🆕 Latest Advertisements</h2>
           </div>
           <Link to="/search" className="view-all-ads">View All →</Link>
         </div>
