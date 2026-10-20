@@ -7052,3 +7052,24 @@ img {
     display: none; /* Hide icon on small screens to save space */
   }
 }
+
+/* ✅ PULL BANNER UP TO REDUCE SPACE */
+.promoted-ad-section {
+  margin-top: -30px !important; /* Pulls the banner up */
+  margin-bottom: 20px !important;
+}
+
+/* Reduce the bottom padding of the categories section */
+.home-categories {
+  padding-bottom: 15px !important; 
+}
+
+/* On mobile, pull it up even more */
+@media (max-width: 600px) {
+  .promoted-ad-section {
+    margin-top: -20px !important;
+  }
+  .home-categories {
+    padding-bottom: 10px !important;
+  }
+}
