@@ -10,11 +10,15 @@ function Navbar() {
   const [user, setUser] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  
+  // ✅ NEW: Loading state to stop fluctuation
+  const [authLoading, setAuthLoading] = useState(true);
 
   // AUTH LISTENER
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
+      setAuthLoading(false); // ✅ Firebase has finished checking
     });
     return () => unsubscribe();
   }, []);
@@ -60,9 +64,10 @@ function Navbar() {
 
         {/* MOBILE QUICK ACTIONS */}
         <div className="mobile-quick-actions">
-
-          {/* If logged in: My Ads + Bell + Chat + Hamburger */}
-          {user ? (
+          {/* ✅ CHECK LOADING STATE FIRST */}
+          {authLoading ? (
+            <div style={{ width: "80px" }}></div> // Empty space while loading to prevent jumping
+          ) : user ? (
             <>
               <Link
                 to="/my-ads"
@@ -94,7 +99,6 @@ function Navbar() {
               </button>
             </>
           ) : (
-            /* If not logged in: Login + Register + Hamburger */
             <>
               <Link to="/login" className="guest-login-btn" onClick={closeMenu}>
                 Login
@@ -127,7 +131,10 @@ function Navbar() {
 
         {/* DESKTOP USER AREA */}
         <div className="navbar-actions desktop-user">
-          {!user ? (
+          {/* ✅ CHECK LOADING STATE FIRST */}
+          {authLoading ? (
+            <div style={{ width: "150px" }}></div> // Empty space while loading
+          ) : !user ? (
             <>
               <Link to="/login" className="login-btn">Login</Link>
               <Link to="/register" className="register-btn">Register</Link>
@@ -154,7 +161,7 @@ function Navbar() {
       </div>
 
       {/* MOBILE SECOND ROW - DASHBOARD + POST AD */}
-      {user && (
+      {user && !authLoading && (
         <div className="mobile-second-row">
           <Link to="/dashboard" className="mobile-row-btn mobile-dashboard-btn">
             📊 Dashboard
@@ -177,7 +184,7 @@ function Navbar() {
           <Link to="/search?category=Electronics" onClick={closeMenu}>Electronics</Link>
           <Link to="/search?category=ምንአለሽ%20ተራ" onClick={closeMenu}>ምንአለሽ ተራ</Link>
 
-          {user && (
+          {user && !authLoading && (
             <div className="mobile-menu-footer">
               <button onClick={handleLogout} className="mobile-menu-logout">
                 Logout
