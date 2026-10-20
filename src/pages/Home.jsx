@@ -127,10 +127,15 @@ function Home() {
 
   return (
     <main className="home-page">
-      <section className="home-hero">
-        <h1>የኛ ገበያ</h1>
-        <h2>Buy • Sell • Rent Across Ethiopia</h2>
-        <p>Find cars, houses, rentals, electronics, furniture, labor and more anywhere in Ethiopia.</p>
+      {/* ✅ UPDATED BLUE HERO SECTION WITH SCROLLING TEXT */}
+      <section className="home-hero" style={{ overflow: "hidden", padding: "20px 0" }}>
+        <div className="hero-marquee">
+          <div className="hero-marquee-content">
+            <h1>የኛ ገበያ</h1>
+            <h2>Buy • Sell • Rent Across Ethiopia</h2>
+            <p>Find cars, houses, rentals, electronics, furniture, labor and more anywhere in Ethiopia.</p>
+          </div>
+        </div>
       </section>
 
       <AnimatedCar />
