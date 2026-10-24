@@ -31,7 +31,8 @@ import MyAds from "./pages/MyAds";
 import Contact from "./pages/Contact";
 
 import Profile from "./pages/Profile";
-import UserProfile from "./pages/UserProfile"; // ✅ FIXED HERE
+// ✅ FIXED: Using UserProfile instead of PublicProfile
+import UserProfile from "./pages/UserProfile";
 
 import Admin from "./pages/Admin";
 
@@ -75,7 +76,7 @@ function App() {
 
         <Route path="/profile" element={<Profile />} />
         
-        {/* ✅ FIXED HERE */}
+        {/* ✅ FIXED: Using UserProfile */}
         <Route path="/user/:uid" element={<UserProfile />} />
 
         <Route path="/contact" element={<Contact />} />
