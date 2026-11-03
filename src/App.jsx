@@ -13,7 +13,7 @@ import Navbar from "./components/Navbar";
 // =========================
 // PAGES
 // =========================
-
+import Chat from "./pages/Chat";
 import Home from "./pages/Home";
 import Cars from "./pages/Cars";
 import Houses from "./pages/Houses";
