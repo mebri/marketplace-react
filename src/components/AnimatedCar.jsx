@@ -1,135 +1,154 @@
-import React, { useState } from "react";
+import React from "react";
 
-export default React.memo(function AnimatedCar({ speed = 6 }) {
-  const [imageFailed, setImageFailed] = useState(false);
-
-  // 👈 This uses Vite's BASE_URL so it works no matter where you deploy it
-  const carImagePath = `${import.meta.env.BASE_URL}mycar.png`.replace('//', '/');
-
+export default function AnimatedCar() {
   return (
-    <div className="car-animation-container" aria-hidden="true">
+    <>
       <style>{`
         .car-animation-container {
           position: relative;
           width: 100%;
-          height: 65px;
+          height: 140px;
           overflow: hidden;
-          background: transparent;
-          margin-top: -10px;
-          margin-bottom: 10px;
-          pointer-events: none;
+          /* ☀️ Bright sky background */
+          background: linear-gradient(to bottom, #87CEEB, #E0F6FF);
+          margin-top: 20px;
+          margin-bottom: 20px;
+          border-radius: 16px;
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
-        /* 60 FPS GPU Acceleration */
+        /* ☁️ Clouds */
+        .cloud {
+          position: absolute;
+          background: rgba(255, 255, 255, 0.9);
+          border-radius: 50px;
+          animation: floatCloud 8s linear infinite;
+        }
+        .cloud::before, .cloud::after {
+          content: '';
+          position: absolute;
+          background: rgba(255, 255, 255, 0.9);
+          border-radius: 50%;
+        }
+        .cloud-1 {
+          width: 50px; height: 18px;
+          top: 15px; left: 10%;
+          animation-delay: 0s;
+        }
+        .cloud-1::before { width: 25px; height: 25px; top: -12px; left: 8px; }
+        .cloud-1::after { width: 18px; height: 18px; top: -8px; right: 8px; }
+        
+        .cloud-2 {
+          width: 70px; height: 22px;
+          top: 35px; left: 60%;
+          animation-delay: 3s;
+        }
+        .cloud-2::before { width: 35px; height: 35px; top: -18px; left: 12px; }
+        .cloud-2::after { width: 22px; height: 22px; top: -10px; right: 12px; }
+
+        /* Road */
+        .car-road {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          height: 30px;
+          background: #cfd8dc;
+          border-top: 2px solid #90a4ae;
+        }
+
+        .road-line {
+          position: absolute;
+          bottom: 14px;
+          width: 40px;
+          height: 3px;
+          background: #ffeb3b;
+          border-radius: 2px;
+          animation: roadMove 1.5s linear infinite;
+        }
+
+        .line-1 { left: 10%; animation-delay: 0s; }
+        .line-2 { left: 50%; animation-delay: 0.5s; }
+        .line-3 { left: 90%; animation-delay: 1s; }
+
         .car-wrapper {
           position: absolute;
-          bottom: 2px;
-          left: 0;
-          width: 170px;
-          will-change: transform;
-          transform: translate3d(-200px, 0, 0);
-          animation: driveAcrossGPU ${speed}s linear infinite;
+          /* 👇 CHANGE THIS VALUE TO MOVE THE CAR UP OR DOWN */
+          bottom: 0px; 
+          /* 👆 If the car is floating, make this smaller (e.g. -10px). 
+             If the car is sinking into the road, make this bigger (e.g. 15px). */
+          
+          left: -300px; /* Start from left */
+          width: 240px;
+          animation: driveAcross 5s linear infinite;
         }
 
-        .car-img {
+        /* 🔥 Styling for YOUR custom image */
+        .car-image {
           width: 100%;
           height: auto;
           display: block;
-          filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.45));
+          /* Soft shadow underneath the car */
+          filter: drop-shadow(0 10px 10px rgba(0, 0, 0, 0.3));
         }
 
-        @keyframes driveAcrossGPU {
-          0% {
-            transform: translate3d(-200px, 0, 0);
-          }
-          100% {
-            transform: translate3d(calc(100vw + 200px), 0, 0);
-          }
+        /* Drive from Left to Right */
+        @keyframes driveAcross {
+          0% { left: -300px; }
+          100% { left: 100%; }
         }
 
-        @keyframes spinWheels {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
+        @keyframes roadMove {
+          0% { transform: translateX(0); opacity: 1; }
+          100% { transform: translateX(-100px); opacity: 0.2; }
         }
 
-        .spin-wheel {
-          transform-origin: center;
-          animation: spinWheels 0.65s linear infinite;
+        @keyframes floatCloud {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-150px); }
         }
 
-        @media (max-width: 640px) {
+        @media (max-width: 600px) {
           .car-animation-container {
-            height: 50px;
+            height: 100px;
           }
           .car-wrapper {
-            width: 130px;
+            width: 180px;
+            bottom: 0px; /* Keep this aligned with the main value */
           }
+          .car-road {
+            height: 20px;
+          }
+          .road-line {
+            bottom: 8px;
+            width: 30px;
+          }
+          .cloud-1 { top: 5px; }
+          .cloud-2 { top: 20px; }
         }
       `}</style>
 
-      {/* Road line */}
-      <div 
-        style={{
-          position: "absolute",
-          bottom: "3px",
-          left: 0,
-          right: 0,
-          height: "2px",
-          background: "linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.3), rgba(6, 182, 212, 0.4), transparent)"
-        }} 
-      />
+      <div className="car-animation-container">
+        {/* ☁️ Clouds */}
+        <div className="cloud cloud-1"></div>
+        <div className="cloud cloud-2"></div>
 
-      {/* Moving Car */}
-      <div className="car-wrapper">
-        {!imageFailed ? (
-          <img
-            src={carImagePath}
-            alt="Toyota SUV"
-            loading="eager"
-            decoding="async"
-            className="car-img"
-            onError={() => setImageFailed(true)}
+        {/* 🛣️ Road */}
+        <div className="car-road">
+          <div className="road-line line-1"></div>
+          <div className="road-line line-2"></div>
+          <div className="road-line line-3"></div>
+        </div>
+
+        {/* 🚗 YOUR CUSTOM CAR IMAGE */}
+        <div className="car-wrapper">
+          <img 
+            src="/mycar.png" 
+            alt="Toyota SUV" 
+            className="car-image" 
           />
-        ) : (
-          /* Automatic Toyota SUV SVG fallback */
-          <svg viewBox="0 0 280 100" className="car-img" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <ellipse cx="140" cy="92" rx="120" ry="6" fill="rgba(0,0,0,0.4)" />
-            <path
-              d="M20 70 L30 50 C38 42 55 35 75 35 L165 35 C185 35 210 42 225 50 L255 58 C265 62 270 70 268 76 L262 82 C260 84 256 84 250 84 L216 84 C214 74 205 66 194 66 C183 66 174 74 172 84 L108 84 C106 74 97 66 86 66 C75 66 66 74 64 84 L25 84 C22 84 20 80 20 76 Z"
-              fill="url(#toyotaGradient)"
-              stroke="#94a3b8"
-              strokeWidth="1.5"
-            />
-            <path d="M78 32 L172 32" stroke="#64748b" strokeWidth="2.5" strokeLinecap="round" />
-            <path d="M75 38 L115 38 L115 54 L62 54 C66 48 70 42 75 38 Z" fill="#0f172a" stroke="#475569" />
-            <path d="M120 38 L160 38 C175 38 190 42 198 52 L198 54 L120 54 Z" fill="#0f172a" stroke="#475569" />
-            <path d="M245 60 L260 63 L255 68 L240 66 Z" fill="#38bdf8" />
-            <circle cx="258" cy="64" r="3" fill="#ffffff" />
-            <path d="M21 62 L32 60 L30 68 L22 70 Z" fill="#ef4444" />
-            
-            <g className="spin-wheel" style={{ transformOrigin: "86px 84px" }}>
-              <circle cx="86" cy="84" r="16" fill="#1e293b" stroke="#475569" strokeWidth="2" />
-              <circle cx="86" cy="84" r="9" fill="#94a3b8" stroke="#334155" strokeWidth="1.5" />
-              <line x1="86" y1="75" x2="86" y2="93" stroke="#e2e8f0" strokeWidth="1.5" />
-              <line x1="77" y1="84" x2="95" y2="84" stroke="#e2e8f0" strokeWidth="1.5" />
-            </g>
-            <g className="spin-wheel" style={{ transformOrigin: "194px 84px" }}>
-              <circle cx="194" cy="84" r="16" fill="#1e293b" stroke="#475569" strokeWidth="2" />
-              <circle cx="194" cy="84" r="9" fill="#94a3b8" stroke="#334155" strokeWidth="1.5" />
-              <line x1="194" y1="75" x2="194" y2="93" stroke="#e2e8f0" strokeWidth="1.5" />
-              <line x1="185" y1="84" x2="203" y2="84" stroke="#e2e8f0" strokeWidth="1.5" />
-            </g>
-
-            <defs>
-              <linearGradient id="toyotaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor="#ffffff" />
-                <stop offset="40%" stopColor="#e2e8f0" />
-                <stop offset="100%" stopColor="#94a3b8" />
-              </linearGradient>
-            </defs>
-          </svg>
-        )}
+        </div>
       </div>
-    </div>
+    </>
   );
-});
+}
