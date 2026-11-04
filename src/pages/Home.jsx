@@ -6,9 +6,6 @@ import {
 } from "firebase/firestore";
 import { db } from "../firebase/firebase";
 
-// 👈 1. IMPORT ADDED HERE
-import AnimatedCar from "../components/AnimatedCar";
-
 function Home() {
   const [openCategory, setOpenCategory] =
     useState(null);
@@ -623,13 +620,6 @@ function Home() {
   )}
 
 </section>
-
-      {/* =========================================
-          🚗 2. ANIMATED CAR ADDED HERE
-          ========================================= */}
-      <div style={{ marginTop: "15px", marginBottom: "-5px" }}>
-        <AnimatedCar speed={6} />
-      </div>
 
       {/* =========================
           LATEST ADS
