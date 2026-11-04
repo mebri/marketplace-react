@@ -73,13 +73,10 @@ export default function AnimatedCar() {
 
         .car-wrapper {
           position: absolute;
-          /* 👇 CHANGE THIS VALUE TO MOVE THE CAR UP OR DOWN */
-          bottom: 0px; 
-          /* 👆 If the car is floating, make this smaller (e.g. -10px). 
-             If the car is sinking into the road, make this bigger (e.g. 15px). */
-          
+          /* 👇 CHANGED FROM 15px TO -10px (This puts it on the road) */
+          bottom: -10px; 
           left: -300px; /* Start from left */
-          width: 240px;
+          width: 240px; /* Size of the car */
           animation: driveAcross 5s linear infinite;
         }
 
@@ -88,7 +85,7 @@ export default function AnimatedCar() {
           width: 100%;
           height: auto;
           display: block;
-          /* Soft shadow underneath the car */
+          /* Adds a soft shadow underneath your car */
           filter: drop-shadow(0 10px 10px rgba(0, 0, 0, 0.3));
         }
 
@@ -114,10 +111,11 @@ export default function AnimatedCar() {
           }
           .car-wrapper {
             width: 180px;
-            bottom: 0px; /* Keep this aligned with the main value */
+            /* 👇 CHANGED TO MATCH THE DESKTOP FIX */
+            bottom: -5px; 
           }
           .car-road {
-            height: 20px;
+            height: 40px; 
           }
           .road-line {
             bottom: 8px;
@@ -142,6 +140,8 @@ export default function AnimatedCar() {
 
         {/* 🚗 YOUR CUSTOM CAR IMAGE */}
         <div className="car-wrapper">
+          {/* 👇 FIX THE FILENAME HERE 👇 */}
+          {/* If you renamed it to 'mycar.png', change this to src="/mycar.png" */}
           <img 
             src="/mycar.png" 
             alt="Toyota SUV" 
