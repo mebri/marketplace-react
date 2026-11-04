@@ -9,6 +9,7 @@ import {
 // =========================
 
 import Navbar from "./components/Navbar";
+import ScrollingText from "./components/ScrollingText"; // 👈 Added ScrollingText
 
 // =========================
 // PAGES
@@ -45,6 +46,12 @@ function App() {
       ========================= */}
 
       <Navbar />
+
+      {/* 👈 Added Scrolling Text right below Navbar */}
+      <ScrollingText 
+        text="🚗 Welcome to Yegna Gebeya! • Best Cars, Houses & Properties in Ethiopia • Post your ad today! • " 
+        speed={25} 
+      />
 
       {/* =========================
           ROUTES
