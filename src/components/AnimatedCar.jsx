@@ -3,6 +3,9 @@ import React, { useState } from "react";
 export default React.memo(function AnimatedCar({ speed = 6 }) {
   const [imageFailed, setImageFailed] = useState(false);
 
+  // 👈 This uses Vite's BASE_URL so it works no matter where you deploy it
+  const carImagePath = `${import.meta.env.BASE_URL}mycar.png`.replace('//', '/');
+
   return (
     <div className="car-animation-container" aria-hidden="true">
       <style>{`
@@ -80,7 +83,7 @@ export default React.memo(function AnimatedCar({ speed = 6 }) {
       <div className="car-wrapper">
         {!imageFailed ? (
           <img
-            src="/mycar.png"
+            src={carImagePath}
             alt="Toyota SUV"
             loading="eager"
             decoding="async"
