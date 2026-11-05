@@ -76,6 +76,10 @@ function Home() {
         </div>
       </section>
 
+      <div style={{ marginTop: "15px", marginBottom: "-5px" }}>
+        <AnimatedCar speed={6} />
+      </div>
+
       <section className="home-categories">
         <h2 className="home-section-title">All Categories</h2>
         <div className="home-category-scroll">
@@ -99,10 +103,6 @@ function Home() {
           </div>
         )}
       </section>
-
-      <div style={{ marginTop: "15px", marginBottom: "-5px" }}>
-        <AnimatedCar speed={6} />
-      </div>
 
       <section className="latest-ads-section">
         <div className="latest-ads-header">
