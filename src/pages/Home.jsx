@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { collection, query, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase/firebase";
-import AnimatedCar from "./AnimatedCar"; 
+
+// ✅ FIXED: Changed "./AnimatedCar" to "../components/AnimatedCar"
+import AnimatedCar from "../components/AnimatedCar"; 
 
 function Home() {
   const [openCategory, setOpenCategory] = useState(null);
@@ -63,7 +65,6 @@ function Home() {
     ]},
   ];
 
-  // ✅ REAL-TIME LISTENER
   useEffect(() => {
     const q = query(collection(db, "ads"));
     
@@ -126,7 +127,6 @@ function Home() {
 
   return (
     <main className="home-page">
-      {/* ✅ BLUE HERO SECTION */}
       <section className="home-hero" style={{ overflow: "hidden", padding: "20px 0" }}>
         <div className="hero-marquee">
           <div className="hero-marquee-content">
@@ -206,7 +206,6 @@ function Home() {
       </section>
 
       <section className="latest-ads-section" style={{ marginTop: "20px" }}>
-        {/* ✅ SPACES ARRANGED HERE: Header is now centered vertically */}
         <div 
           className="latest-ads-header" 
           style={{ 
