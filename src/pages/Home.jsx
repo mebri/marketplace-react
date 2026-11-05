@@ -1,131 +1,319 @@
-/* =========================================================
-   HERO MARQUEE (Right to Left)
-========================================================= */
-.home-hero {
-  width: 100%;
-  background: linear-gradient(135deg, #1976d2, #0d47a1);
-  padding: 18px 0; /* Slimmer padding for the scrolling text */
-  margin: 0;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { collection, query, onSnapshot } from "firebase/firestore";
+import { db } from "../firebase/firebase";
+
+// 👈 IMPORT THE ANIMATED CAR
+import AnimatedCar from "../components/AnimatedCar"; 
+
+function Home() {
+  const [openCategory, setOpenCategory] = useState(null);
+  const [latestAds, setLatestAds] = useState([]);
+  const [adsLoading, setAdsLoading] = useState(true);
+
+  const categories = [
+    { id: "cars", icon: "🚗", title: "Cars", description: "New, used, electric cars and car rental", options: [
+      { name: "🚗 New Cars", link: "/cars?condition=new" },
+      { name: "🚙 Used Cars", link: "/cars?condition=used" },
+      { name: "⚡ Electric Cars", link: "/cars?condition=electric" },
+      { name: "🚘 Cars for Rent", link: "/cars?condition=rent" },
+    ]},
+    { id: "houses", icon: "🏠", title: "Houses", description: "Houses for sale and rent", options: [
+      { name: "🏠 Houses for Sale", link: "/houses?type=sale" },
+      { name: "🏠 Houses for Rent", link: "/houses?type=rent" },
+    ]},
+    { id: "rentals", icon: "🏢", title: "Rentals", description: "Apartments, shops and offices", options: [
+      { name: "🏢 Apartments", link: "/rentals?type=apartment" },
+      { name: "🏪 Shops", link: "/rentals?type=shop" },
+      { name: "🏢 Offices", link: "/rentals?type=office" },
+    ]},
+    { id: "electronics", icon: "📱", title: "Electronics", description: "Phones, computers, TVs and more", options: [
+      { name: "📱 New Phones", link: "/search?category=Electronics&subcategory=Phones&condition=new" },
+      { name: "📱 Used Phones", link: "/search?category=Electronics&subcategory=Phones&condition=used" },
+      { name: "💻 New Computers & Laptops", link: "/search?category=Electronics&subcategory=Computers&condition=new" },
+      { name: "💻 Used Computers & Laptops", link: "/search?category=Electronics&subcategory=Computers&condition=used" },
+      { name: "📺 New TVs", link: "/search?category=Electronics&subcategory=TVs&condition=new" },
+      { name: "📺 Used TVs", link: "/search?category=Electronics&subcategory=TVs&condition=used" },
+      { name: "🎧 Audio & Accessories", link: "/search?category=Electronics&subcategory=Audio" },
+      { name: "🔌 Other Electronics", link: "/search?category=Electronics&subcategory=Other" },
+    ]},
+    { id: "furniture", icon: "🛋️", title: "Furniture", description: "New and used furniture", options: [
+      { name: "🛋️ Sofas", link: "/search?category=Furniture&subcategory=Sofas" },
+      { name: "🛏️ Beds", link: "/search?category=Furniture&subcategory=Beds" },
+      { name: "🪑 Chairs & Tables", link: "/search?category=Furniture&subcategory=Chairs%20and%20Tables" },
+      { name: "🗄️ Cabinets", link: "/search?category=Furniture&subcategory=Cabinets" },
+      { name: "🪞 Other Furniture", link: "/search?category=Furniture&subcategory=Other" },
+    ]},
+    { id: "clothes", icon: "👗", title: "Clothes", description: "Men's and Women's fashion", options: [
+      { name: "👕 Men's Clothing", link: "/search?category=Clothes&subcategory=Men" },
+      { name: "👗 Women's Clothing", link: "/search?category=Clothes&subcategory=Women" },
+      { name: "👟 Shoes", link: "/search?category=Clothes&subcategory=Shoes" },
+      { name: "👜 Bags & Accessories", link: "/search?category=Clothes&subcategory=Accessories" },
+    ]},
+    { id: "labor", icon: "👷", title: "Labor & Services", description: "Find skilled workers and services", options: [
+      { name: "👷 Construction Worker", link: "/search?category=Labor%20%26%20Services&subcategory=Construction" },
+      { name: "⚡ Electrician", link: "/search?category=Labor%20%26%20Services&subcategory=Electrician" },
+      { name: "🚰 Plumber", link: "/search?category=Labor%20%26%20Services&subcategory=Plumber" },
+      { name: "🎨 Painter", link: "/search?category=Labor%20%26%20Services&subcategory=Painter" },
+      { name: "🧹 Cleaning", link: "/search?category=Labor%20%26%20Services&subcategory=Cleaning" },
+      { name: "🚚 Moving & Transport", link: "/search?category=Labor%20%26%20Services&subcategory=Moving" },
+      { name: "🔧 Other Services", link: "/search?category=Labor%20%26%20Services&subcategory=Other" },
+    ]},
+    { id: "min-alish-tera", icon: "🏪", title: "ምንአለሽ ተራ", description: "Used and second-hand items", options: [
+      { name: "📦 Used Items", link: "/search?category=ምንአለሽ%20ተራ&subcategory=Items" },
+      { name: "♻️ Second-Hand Goods", link: "/search?category=ምንአለሽ%20ተራ&subcategory=Other" },
+    ]},
+  ];
+
+  // ✅ REAL-TIME LISTENER FOR ADS
+  useEffect(() => {
+    const q = query(collection(db, "ads"));
+    
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const ads = snapshot.docs.map((document) => ({ id: document.id, ...document.data() }));
+
+      ads.sort((a, b) => {
+        const aFeat = a.featured ? 1 : 0;
+        const bFeat = b.featured ? 1 : 0;
+        if (aFeat !== bFeat) return bFeat - aFeat;
+        return getAdTime(b) - getAdTime(a);
+      });
+
+      setLatestAds(ads);
+      setAdsLoading(false);
+    }, (error) => {
+      console.error("Error listening to ads:", error);
+      setAdsLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const getAdTime = (ad) => {
+    if (!ad?.createdAt) return 0;
+    if (typeof ad.createdAt.toMillis === "function") return ad.createdAt.toMillis();
+    if (typeof ad.createdAt === "object" && ad.createdAt.seconds) return ad.createdAt.seconds * 1000;
+    if (ad.createdAt instanceof Date) return ad.createdAt.getTime();
+    const date = new Date(ad.createdAt).getTime();
+    return Number.isNaN(date) ? 0 : date;
+  };
+
+  const getPostedTime = (createdAt) => {
+    if (!createdAt) return "";
+    let postedDate;
+    if (typeof createdAt.toDate === "function") postedDate = createdAt.toDate();
+    else if (createdAt.seconds) postedDate = new Date(createdAt.seconds * 1000);
+    else if (createdAt instanceof Date) postedDate = createdAt;
+    else postedDate = new Date(createdAt);
+    if (Number.isNaN(postedDate.getTime())) return "";
+
+    const now = new Date();
+    const difference = now.getTime() - postedDate.getTime();
+    const seconds = Math.floor(difference / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    if (difference < 0) return "Just now";
+    if (seconds < 60) return "Just now";
+    if (minutes < 60) return `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
+    if (hours < 24) return `${hours} hour${hours === 1 ? "" : "s"} ago`;
+    if (days < 7) return `${days} day${days === 1 ? "" : "s"} ago`;
+    return postedDate.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+  };
+
+  const toggleCategory = (id) => {
+    setOpenCategory(openCategory === id ? null : id);
+  };
+
+  return (
+    <main className="home-page">
+      
+      {/* ✅ BLUE HERO SECTION (Right to Left Scrolling Text) */}
+      <section className="home-hero">
+        <div className="hero-marquee">
+          <div className="hero-marquee-content">
+            <span className="hero-text">የኛ ገበያ</span>
+            <span className="hero-dot">•</span>
+            <span className="hero-text">Buy • Sell • Rent Across Ethiopia</span>
+            <span className="hero-dot">•</span>
+            <span className="hero-text">Find cars, houses, rentals, electronics, furniture, labor and more anywhere in Ethiopia</span>
+            <span className="hero-dot">•</span>
+            {/* Duplicated for seamless looping */}
+            <span className="hero-text">የኛ ገበያ</span>
+            <span className="hero-dot">•</span>
+            <span className="hero-text">Buy • Sell • Rent Across Ethiopia</span>
+            <span className="hero-dot">•</span>
+          </div>
+        </div>
+      </section>
+
+      {/* ✅ ANIMATED CAR */}
+      <AnimatedCar />
+
+      {/* ✅ SEARCH BAR */}
+      <div className="home-search-wrapper">
+        <div className="home-search">
+          <input
+            type="text"
+            placeholder="🔎 Search cars, houses, furniture, labor and more..."
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                const value = e.target.value.trim();
+                if (value) window.location.hash = `/search?search=${encodeURIComponent(value)}`;
+                else window.location.hash = "/search";
+              }
+            }}
+          />
+          <button
+            type="button"
+            className="home-search-icon"
+            onClick={() => {
+              const input = document.querySelector(".home-search input");
+              const value = input?.value.trim();
+              if (value) {
+                window.location.hash = `/search?search=${encodeURIComponent(value)}`;
+              } else {
+                window.location.hash = "/search";
+              }
+            }}
+            aria-label="Search"
+          >
+            🔎
+          </button>
+        </div>
+      </div>
+
+      {/* ✅ CIRCULAR CATEGORIES */}
+      <section className="home-categories">
+        <h2 className="home-section-title">All Categories</h2>
+        <div className="home-category-scroll">
+          {categories
+            .filter((c) => ["cars", "houses", "rentals", "electronics", "furniture", "clothes", "labor", "min-alish-tera"].includes(c.id))
+            .map((category) => (
+              <button
+                key={category.id}
+                type="button"
+                className={`home-category-circle-item ${openCategory === category.id ? "active" : ""}`}
+                onClick={() => toggleCategory(category.id)}
+              >
+                <div className="home-main-circle">{category.icon}</div>
+                <div className="home-main-category-name">{category.title}</div>
+              </button>
+            ))}
+        </div>
+
+        {openCategory && (
+          <div className="home-selected-options">
+            {categories.filter((c) => c.id === openCategory).map((category) => (
+              <div key={category.id} className="home-options-box">
+                <h3>{category.title}</h3>
+                <div className="home-options-list">
+                  {category.options.map((option) => (
+                    <Link key={option.name} to={option.link} className="home-option-button">{option.name}</Link>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* ✅ LATEST ADS */}
+      <section className="latest-ads-section" style={{ marginTop: "20px" }}>
+        <div 
+          className="latest-ads-header" 
+          style={{ 
+            display: "flex", 
+            justifyContent: "space-between", 
+            alignItems: "center", 
+            marginBottom: "20px",
+            paddingBottom: "10px"
+          }}
+        >
+          <h2 style={{ margin: 0, fontSize: "26px" }}>🆕 Latest Advertisements</h2>
+          <Link to="/search" className="view-all-ads" style={{ margin: 0, fontWeight: "bold" }}>View All →</Link>
+        </div>
+
+        {adsLoading ? (
+          <div className="latest-ads-grid">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+              <div className="skeleton-card" key={i}>
+                <div className="skeleton-img" />
+                <div className="skeleton-info">
+                  <div className="skeleton-line short" />
+                  <div className="skeleton-line long" />
+                  <div className="skeleton-line medium" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : latestAds.length === 0 ? (
+          <div className="latest-ads-empty">
+            <h3>No advertisements yet.</h3>
+            <p>Be the first person to post an advertisement.</p>
+            <Link to="/post-ad">📢 Post Advertisement</Link>
+          </div>
+        ) : (
+          <div className="latest-ads-grid">
+            {latestAds.map((ad) => {
+              const adImage = Array.isArray(ad.images) && ad.images.length > 0 ? ad.images[0] : ad.image;
+              const shortDescription = ad.description
+                ? ad.description.length > 100
+                  ? `${ad.description.substring(0, 100)}...`
+                  : ad.description
+                : "No description available.";
+              const postedTime = getPostedTime(ad.createdAt);
+              const isSold = ad.status === "sold";
+              const isFeatured = ad.featured === true;
+
+              return (
+                <div className="latest-ad-card" key={ad.id}>
+                  <Link to={`/ad/${ad.id}`} className="latest-ad-image-link">
+                    <div className="latest-ad-image">
+                      {isFeatured && <div className="card-featured-badge">⭐ FEATURED</div>}
+                      {isSold && <div className="card-sold-badge">SOLD</div>}
+                      {adImage ? (
+                        <img
+                          src={adImage}
+                          alt={ad.title || "Advertisement"}
+                          loading="lazy"
+                          className={`latest-ad-photo ${isSold ? "sold-card-image" : ""}`}
+                          onError={(e) => { e.currentTarget.style.display = "none"; }}
+                        />
+                      ) : (
+                        <div className="latest-no-image">📷 No Image</div>
+                      )}
+                    </div>
+                  </Link>
+
+                  <div className="latest-ad-info">
+                    <span className="latest-ad-category">{ad.category || "Advertisement"}</span>
+                    <h3>{ad.title || "Untitled Advertisement"}</h3>
+                    <h4>ETB {ad.price}</h4>
+
+                    {postedTime && <p className="latest-ad-posted-time">🕒 Posted {postedTime}</p>}
+                    {ad.city && <p>📍 {ad.city}</p>}
+                    {ad.condition && <p>🔄 {ad.condition}</p>}
+                    {ad.subcategory && <p>📂 {ad.subcategory}</p>}
+
+                    <p className="latest-ad-views">👁 {ad.views || 0} views</p>
+
+                    <p className="latest-ad-description">{shortDescription}</p>
+
+                    {Array.isArray(ad.images) && ad.images.length > 1 && (
+                      <p className="image-count">🖼️ {ad.images.length} images</p>
+                    )}
+                    <Link to={`/ad/${ad.id}`} className="latest-view-button">👁 View Details</Link>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </section>
+    </main>
+  );
 }
 
-.hero-marquee {
-  display: flex;
-  white-space: nowrap;
-  overflow: hidden;
-  width: 100%;
-}
-
-.hero-marquee-content {
-  display: inline-flex;
-  align-items: center;
-  /* Animation forces it to start right and go left */
-  animation: scrollRightToLeft 25s linear infinite;
-  padding-left: 100%;
-}
-
-.hero-text {
-  font-size: 18px;
-  font-weight: 700;
-  color: white;
-  margin: 0 10px;
-}
-
-.hero-dot {
-  color: #ff9800; /* Orange dot separator */
-  font-size: 20px;
-  margin: 0 10px;
-}
-
-@keyframes scrollRightToLeft {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-100%); }
-}
-
-/* =========================================================
-   MOBILE HEADER ICONS (No Hamburger)
-========================================================= */
-.mobile-quick-actions {
-  display: none;
-}
-
-@media (max-width: 850px) {
-  .navbar-nav, .navbar-actions {
-    display: none !important;
-  }
-
-  .mobile-quick-actions {
-    display: flex !important;
-    align-items: center;
-    gap: 8px;
-    margin-left: auto; 
-  }
-
-  .mobile-icon-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 42px;
-    height: 42px;
-    background: #f1f5f9;
-    border-radius: 50%;
-    text-decoration: none;
-    font-size: 20px;
-    border: none;
-    cursor: pointer;
-    color: #333;
-    position: relative;
-    padding: 0;
-  }
-
-  .mobile-icon-btn:hover {
-    background: #e2e8f0;
-  }
-
-  .notification-badge {
-    position: absolute;
-    top: -4px;
-    right: -4px;
-    background: #ef4444;
-    color: white;
-    font-size: 10px;
-    padding: 2px 5px;
-    border-radius: 10px;
-    font-weight: bold;
-    border: 2px solid #ffffff;
-  }
-
-  .guest-login-btn, .guest-register-btn {
-    text-decoration: none;
-    font-weight: 700;
-    font-size: 14px;
-    padding: 8px 12px;
-    border-radius: 8px;
-  }
-  .guest-login-btn { color: #1976d2; }
-  .guest-register-btn { background: #1976d2; color: white; }
-
-  /* Mobile Second Row */
-  .mobile-second-row {
-    display: flex;
-    gap: 10px;
-    padding: 10px 15px;
-    background: #ffffff;
-    border-bottom: 1px solid #e5e7eb;
-  }
-
-  .mobile-row-btn {
-    flex: 1;
-    text-align: center;
-    padding: 12px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 700;
-    font-size: 15px;
-  }
-
-  .mobile-dashboard-btn { background: #e0f2fe; color: #0369a1; }
-  .mobile-postad-btn { background: #16a34a; color: white; }
-}
+export default Home;
