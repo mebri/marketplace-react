@@ -6055,3 +6055,32 @@ img {
 .home-search {
   margin-top: 0px !important;
 }
+
+/* =========================================================
+   MAKE CAR TOUCH THE SEARCH BAR
+========================================================= */
+
+/* 1. Remove bottom spacing from the car's container */
+.car-animation-container {
+  margin-bottom: 0px !important;
+  padding-bottom: 0px !important;
+  height: 80px !important; /* Adjust this if your car image is taller */
+}
+
+/* 2. Remove top spacing from the search bar wrapper */
+.home-search-wrapper {
+  margin-top: 0px !important;
+  padding-top: 0px !important;
+  margin-bottom: 20px !important;
+}
+
+/* 3. Ensure the search input itself has no top margin */
+.home-search {
+  margin-top: 0px !important;
+}
+
+/* 4. Remove spacing from the blue hero section so it doesn't push down */
+.home-hero {
+  margin-bottom: 0px !important;
+  padding-bottom: 0px !important;
+}
