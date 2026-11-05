@@ -3,7 +3,7 @@ import {
   Link,
   useNavigate,
   useParams,
-  Navigate, // ✅ Added Navigate for auto-redirect
+  Navigate,
 } from "react-router-dom";
 
 import {
@@ -23,10 +23,7 @@ import {
 } from "firebase/firestore";
 
 import { db, auth } from "../firebase/firebase";
-import ShareButtons from "../components/ShareButtons";
-import ImageLightbox from "../components/ImageLightbox";
 
-// ✅ YOUR EXACT EMAIL
 const ADMIN_EMAIL = "marbat1@gmail.com"; 
 
 function AdDetails() {
@@ -40,7 +37,6 @@ function AdDetails() {
   const [favoriteLoading, setFavoriteLoading] = useState(false);
   const [chatLoading, setChatLoading] = useState(false);
   const [currentImage, setCurrentImage] = useState(0);
-  const [lightboxOpen, setLightboxOpen] = useState(false);
   const [statusLoading, setStatusLoading] = useState(false);
   const [reportLoading, setReportLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
@@ -48,9 +44,6 @@ function AdDetails() {
   const [similarAds, setSimilarAds] = useState([]);
   const [loadingSimilar, setLoadingSimilar] = useState(false);
 
-  // =========================
-  // LOAD ADVERTISEMENT
-  // =========================
   useEffect(() => {
     loadAd();
   }, [id]);
@@ -116,9 +109,6 @@ function AdDetails() {
     }
   };
 
-  // =========================
-  // DELETE AD (Owner or Admin)
-  // =========================
   const handleDeleteAd = async () => {
     if (!ad || !auth.currentUser) return;
     
@@ -147,9 +137,6 @@ function AdDetails() {
     }
   };
 
-  // =========================
-  // FETCH TIERED SIMILAR ADS
-  // =========================
   useEffect(() => {
     const fetchSimilarAds = async () => {
       if (!ad || !ad.category) return;
@@ -243,9 +230,6 @@ function AdDetails() {
     fetchSimilarAds();
   }, [ad]);
 
-  // =========================
-  // REPORT AD
-  // =========================
   const reportAd = async () => {
     if (!auth.currentUser) {
       alert("Please log in to report an advertisement.");
@@ -292,9 +276,6 @@ function AdDetails() {
     }
   };
 
-  // =========================
-  // TOGGLE SOLD STATUS
-  // =========================
   const toggleSoldStatus = async () => {
     if (!ad || !auth.currentUser) return;
     
@@ -326,9 +307,6 @@ function AdDetails() {
     }
   };
 
-  // =========================
-  // FAVORITE
-  // =========================
   const toggleFavorite = async () => {
     if (!auth.currentUser) {
       alert("Please log in to save advertisements.");
@@ -367,9 +345,6 @@ function AdDetails() {
     }
   };
 
-  // =========================
-  // CHAT WITH SELLER
-  // =========================
   const startChat = async () => {
     if (!auth.currentUser) {
       alert("Please log in to chat with the seller.");
@@ -449,7 +424,6 @@ function AdDetails() {
 
   if (loading) return <div className="details-page"><h2>Loading...</h2></div>;
   
-  // ✅ Automatically redirect to Home if the ad doesn't exist
   if (!ad) return <Navigate to="/" replace />;
 
   const imageList = Array.isArray(ad.images) && ad.images.length > 0 ? ad.images : ad.image ? [ad.image] : [];
@@ -470,8 +444,7 @@ function AdDetails() {
             src={imageList[currentImage]}
             alt={ad.title || "Advertisement"}
             className="details-photo"
-            onClick={() => setLightboxOpen(true)}
-            style={{ cursor: "zoom-in" }}
+            style={{ cursor: "pointer" }}
           />
         ) : (
           <div className="no-details-image">📷 No Image Available</div>
@@ -558,8 +531,6 @@ function AdDetails() {
           <p>{ad.description || "No description available."}</p>
         </div>
 
-        <ShareButtons adId={id} title={ad.title || "Advertisement"} price={ad.price} city={ad.city} />
-
         <hr />
 
         <div className="seller-information">
@@ -593,7 +564,6 @@ function AdDetails() {
             </a>
           )}
 
-          {/* ✅ VIDEO CALL BUTTON (ALWAYS SHOWS) */}
           <button
             type="button"
             onClick={() => {
@@ -631,7 +601,6 @@ function AdDetails() {
         )}
       </div>
 
-      {/* SIMILAR ADS SECTION */}
       {similarAds.length > 0 && (
         <section className="similar-ads-section">
           <div className="similar-ads-header">
@@ -659,10 +628,6 @@ function AdDetails() {
             })}
           </div>
         </section>
-      )}
-
-      {lightboxOpen && imageList.length > 0 && (
-        <ImageLightbox images={imageList} startIndex={currentImage} onClose={() => setLightboxOpen(false)} />
       )}
     </div>
   );
