@@ -58,17 +58,9 @@ function Navbar() {
           />
         </Link>
 
-        {/* ✅ ADDED SCROLLING TEXT HERE */}
-        <div className="navbar-marquee">
-          <span className="marquee-text">
-            እንኳን ወደ የኛ ገበያ በደህና መጡ! 🇪🇹 Buy and sell cars, houses, electronics and more easily.
-          </span>
-        </div>
-
-        {/* MOBILE QUICK ACTIONS */}
+        {/* MOBILE QUICK ACTIONS (Chat, Notification, My Ads, Hamburger) */}
         <div className="mobile-quick-actions">
 
-          {/* If logged in: My Ads + Bell + Chat + Hamburger */}
           {user ? (
             <>
               <Link
