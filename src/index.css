@@ -5689,38 +5689,148 @@ img {
   }
 }
 
-/* ✅ NAVBAR SCROLLING TEXT */
-.navbar-marquee {
-  flex: 1;
-  overflow: hidden;
-  white-space: nowrap;
-  display: flex;
-  align-items: center;
-  margin: 0 15px;
-  position: relative;
+/* =========================================================
+   NEW MOBILE HEADER ICONS
+========================================================= */
+
+/* Hide mobile actions on desktop */
+.mobile-quick-actions {
+  display: none;
 }
 
-.marquee-text {
-  display: inline-block;
-  padding-left: 100%;
-  animation: marquee-scroll 20s linear infinite;
-  font-weight: 700;
-  color: #1976d2; /* Blue text matching your theme */
-  font-size: 15px;
-}
-
-@keyframes marquee-scroll {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-100%);
-  }
-}
-
-/* Hide the scrolling text on small mobile screens so it doesn't push the menu buttons */
 @media (max-width: 850px) {
-  .navbar-marquee {
-    display: none;
+  /* Hide desktop menu on mobile */
+  .navbar-nav, .navbar-actions {
+    display: none !important;
+  }
+
+  /* Show and align the new mobile icons */
+  .mobile-quick-actions {
+    display: flex !important;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto; /* Pushes icons to the right */
+  }
+
+  /* Style the circular icon buttons */
+  .mobile-icon-btn, .menu-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    background: #f1f5f9;
+    border-radius: 50%;
+    text-decoration: none;
+    font-size: 20px;
+    border: none;
+    cursor: pointer;
+    color: #333;
+    position: relative;
+    padding: 0;
+  }
+
+  .mobile-icon-btn:hover, .menu-toggle:hover {
+    background: #e2e8f0;
+  }
+
+  .notification-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: #ef4444;
+    color: white;
+    font-size: 10px;
+    padding: 2px 5px;
+    border-radius: 10px;
+    font-weight: bold;
+    border: 2px solid #ffffff;
+  }
+
+  /* Guest login/register buttons */
+  .guest-login-btn, .guest-register-btn {
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 8px 12px;
+    border-radius: 8px;
+  }
+  .guest-login-btn {
+    color: #1976d2;
+  }
+  .guest-register-btn {
+    background: #1976d2;
+    color: white;
+  }
+
+  /* Mobile Second Row (Dashboard & Post Ad) */
+  .mobile-second-row {
+    display: flex;
+    gap: 10px;
+    padding: 10px 15px;
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .mobile-row-btn {
+    flex: 1;
+    text-align: center;
+    padding: 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 15px;
+  }
+
+  .mobile-dashboard-btn {
+    background: #e0f2fe;
+    color: #0369a1;
+  }
+
+  .mobile-postad-btn {
+    background: #16a34a;
+    color: white;
+  }
+
+  /* Mobile Dropdown Menu */
+  .mobile-menu-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    border-bottom: 1px solid #ddd;
+    z-index: 1000;
+  }
+
+  .mobile-menu-dropdown a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 700;
+    padding: 10px;
+    border-radius: 8px;
+    background: #f8fafc;
+  }
+
+  .mobile-menu-footer {
+    margin-top: 10px;
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+  }
+
+  .mobile-menu-logout {
+    width: 100%;
+    padding: 12px;
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 15px;
   }
 }
