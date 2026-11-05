@@ -6084,3 +6084,23 @@ img {
   margin-bottom: 0px !important;
   padding-bottom: 0px !important;
 }
+
+/* =========================================================
+   FORCE CAR AND SEARCH BAR TO TOUCH
+========================================================= */
+
+.home-search-wrapper {
+  margin-top: -10px !important; /* 👈 Pulls the search bar UP */
+  padding-top: 0px !important;
+  margin-bottom: 20px !important;
+}
+
+.home-search {
+  margin-top: 0px !important;
+}
+
+/* Just in case the blue text is pushing down */
+.home-hero {
+  margin-bottom: 0px !important;
+  padding-bottom: 0px !important;
+}
