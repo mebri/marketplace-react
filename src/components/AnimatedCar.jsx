@@ -4,55 +4,68 @@ export default function AnimatedCar() {
   return (
     <>
       <style>{`
+        /* Container allows the car to move without making the page scroll horizontally */
         .car-animation-container {
           position: relative;
           width: 100%;
-          height: 40px; /* Very short height */
-          overflow: visible; /* Allows the car to show even if it's taller than the container */
+          height: 100px; /* Adjust this height if your car image is very tall */
+          overflow: hidden;
           background: transparent;
-          margin-top: -20px; /* Pulls the car up into the blue hero */
-          margin-bottom: -20px; /* Pulls the search bar up so there's no gap */
-          pointer-events: none;
+          margin-top: 10px;
+          margin-bottom: 10px;
+          pointer-events: none; /* Prevents the car from blocking clicks */
         }
 
         .car-wrapper {
           position: absolute;
-          bottom: 0px;
-          left: -300px; /* Start from left */
-          width: 200px; /* Size of the car */
-          animation: driveAcross 5s linear infinite;
+          bottom: 0;
+          left: 100%; /* Start from the right */
+          width: 180px; /* 👈 CHANGE THIS to make your car bigger or smaller */
+          animation: driveAcross 6s linear infinite;
         }
 
         .car-image {
           width: 100%;
           height: auto;
           display: block;
-          filter: drop-shadow(0 8px 8px rgba(0, 0, 0, 0.4));
+          /* Flip the car horizontally so it faces left. 
+             If your image is already facing left, remove this line. */
+          transform: scaleX(-1);
+          filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3)); /* Optional shadow */
         }
 
+        /* Drive from Right to Left */
         @keyframes driveAcross {
-          0% { left: -300px; }
-          100% { left: 100%; }
+          0% { 
+            left: 100%; 
+          }
+          100% { 
+            left: -200px; /* Adjust based on car width to go completely off-screen */
+          }
         }
 
+        /* Mobile adjustments */
         @media (max-width: 600px) {
           .car-animation-container {
-            height: 30px;
-            margin-top: -15px;
-            margin-bottom: -15px;
+            height: 70px;
           }
           .car-wrapper {
-            width: 150px;
+            width: 120px; /* Smaller car on mobile */
+          }
+          @keyframes driveAcross {
+            0% { left: 100%; }
+            100% { left: -150px; }
           }
         }
       `}</style>
 
       <div className="car-animation-container">
+        {/* 🚙 Your SUV Image */}
         <div className="car-wrapper">
           <img 
-            src="/mycar.png" 
-            alt="Toyota SUV" 
-            className="car-image" 
+            src={`${import.meta.env.BASE_URL}suv.png`} 
+            alt="SUV" 
+            className="car-image"
           />
         </div>
       </div>
