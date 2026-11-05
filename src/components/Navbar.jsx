@@ -8,7 +8,6 @@ import "./Navbar.css";
 
 function Navbar() {
   const [user, setUser] = useState(null);
-  const [menuOpen, setMenuOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
@@ -34,21 +33,18 @@ function Navbar() {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      setMenuOpen(false);
       alert("Logged out successfully!");
     } catch (error) {
       alert(error.message);
     }
   };
 
-  const closeMenu = () => setMenuOpen(false);
-
   return (
     <nav className="navbar">
       <div className="navbar-container">
         
         {/* LOGO */}
-        <Link to="/" className="navbar-brand" onClick={closeMenu}>
+        <Link to="/" className="navbar-brand">
           <img
             src={`${import.meta.env.BASE_URL}logo.png`}
             alt="የኛ ገበያ"
@@ -56,14 +52,14 @@ function Navbar() {
           />
         </Link>
 
-        {/* MOBILE ICONS (Chat, Notifications, My Ads, Hamburger) */}
+        {/* MOBILE ICONS (No hamburger) */}
         <div className="mobile-quick-actions">
           {user ? (
             <>
-              <Link to="/my-ads" className="mobile-icon-btn" onClick={closeMenu} title="My Ads">
+              <Link to="/my-ads" className="mobile-icon-btn" title="My Ads">
                 📢
               </Link>
-              <Link to="/notifications" className="mobile-icon-btn" onClick={closeMenu} title="Notifications">
+              <Link to="/notifications" className="mobile-icon-btn" title="Notifications">
                 🔔
                 {unreadCount > 0 && (
                   <span className="notification-badge">
@@ -71,42 +67,32 @@ function Navbar() {
                   </span>
                 )}
               </Link>
-              <Link to="/chats" className="mobile-icon-btn" onClick={closeMenu} title="Chats">
+              <Link to="/chats" className="mobile-icon-btn" title="Chats">
                 💬
               </Link>
-              <button
-                className="menu-toggle"
-                onClick={() => setMenuOpen(!menuOpen)}
-                aria-label="Open menu"
-              >
-                {menuOpen ? "✕" : "☰"}
+              {/* Logout button replacing hamburger */}
+              <button onClick={handleLogout} className="mobile-icon-btn" title="Logout" style={{ color: 'red' }}>
+                🚪
               </button>
             </>
           ) : (
             <>
-              <Link to="/login" className="guest-login-btn" onClick={closeMenu}>Login</Link>
-              <Link to="/register" className="guest-register-btn" onClick={closeMenu}>Register</Link>
-              <button
-                className="menu-toggle"
-                onClick={() => setMenuOpen(!menuOpen)}
-                aria-label="Open menu"
-              >
-                {menuOpen ? "✕" : "☰"}
-              </button>
+              <Link to="/login" className="guest-login-btn">Login</Link>
+              <Link to="/register" className="guest-register-btn">Register</Link>
             </>
           )}
         </div>
 
         {/* DESKTOP MAIN NAVIGATION */}
         <div className="navbar-nav">
-          <Link to="/" onClick={closeMenu}>Home</Link>
-          <Link to="/cars" onClick={closeMenu}>Cars</Link>
-          <Link to="/houses" onClick={closeMenu}>Houses</Link>
-          <Link to="/rentals" onClick={closeMenu}>Rentals</Link>
-          <Link to="/spare-parts" onClick={closeMenu}>Spare Parts</Link>
-          <Link to="/building-materials" onClick={closeMenu}>Building Materials</Link>
-          <Link to="/search?category=Electronics" onClick={closeMenu}>Electronics</Link>
-          <Link to="/search?category=ምንአለሽ%20ተራ" onClick={closeMenu}>ምንአለሽ ተራ</Link>
+          <Link to="/">Home</Link>
+          <Link to="/cars">Cars</Link>
+          <Link to="/houses">Houses</Link>
+          <Link to="/rentals">Rentals</Link>
+          <Link to="/spare-parts">Spare Parts</Link>
+          <Link to="/building-materials">Building Materials</Link>
+          <Link to="/search?category=Electronics">Electronics</Link>
+          <Link to="/search?category=ምንአለሽ%20ተራ">ምንአለሽ ተራ</Link>
         </div>
 
         {/* DESKTOP USER AREA */}
@@ -139,34 +125,12 @@ function Navbar() {
       {/* MOBILE SECOND ROW */}
       {user && (
         <div className="mobile-second-row">
-          <Link to="/dashboard" className="mobile-row-btn mobile-dashboard-btn" onClick={closeMenu}>
+          <Link to="/dashboard" className="mobile-row-btn mobile-dashboard-btn">
             📊 Dashboard
           </Link>
-          <Link to="/post-ad" className="mobile-row-btn mobile-postad-btn" onClick={closeMenu}>
+          <Link to="/post-ad" className="mobile-row-btn mobile-postad-btn">
             + Post Ad
           </Link>
-        </div>
-      )}
-
-      {/* MOBILE HAMBURGER MENU DROPDOWN */}
-      {menuOpen && (
-        <div className="mobile-menu-dropdown">
-          <Link to="/" onClick={closeMenu}>Home</Link>
-          <Link to="/cars" onClick={closeMenu}>Cars</Link>
-          <Link to="/houses" onClick={closeMenu}>Houses</Link>
-          <Link to="/rentals" onClick={closeMenu}>Rentals</Link>
-          <Link to="/spare-parts" onClick={closeMenu}>Spare Parts</Link>
-          <Link to="/building-materials" onClick={closeMenu}>Building Materials</Link>
-          <Link to="/search?category=Electronics" onClick={closeMenu}>Electronics</Link>
-          <Link to="/search?category=ምንአለሽ%20ተራ" onClick={closeMenu}>ምንአለሽ ተራ</Link>
-
-          {user && (
-            <div className="mobile-menu-footer">
-              <button onClick={handleLogout} className="mobile-menu-logout">
-                Logout
-              </button>
-            </div>
-          )}
         </div>
       )}
     </nav>
