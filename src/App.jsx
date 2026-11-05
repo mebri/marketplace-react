@@ -9,7 +9,6 @@ import {
 // =========================
 
 import Navbar from "./components/Navbar";
-import ScrollingText from "./components/ScrollingText"; // 👈 Added ScrollingText
 
 // =========================
 // PAGES
@@ -44,173 +43,27 @@ function App() {
       {/* =========================
           NAVBAR
       ========================= */}
-
       <Navbar />
-
-      {/* 👈 Added Scrolling Text right below Navbar */}
-      <ScrollingText 
-        text="🚗 Welcome to Yegna Gebeya! • Best Cars, Houses & Properties in Ethiopia • Post your ad today! • " 
-        speed={25} 
-      />
 
       {/* =========================
           ROUTES
       ========================= */}
-
       <Routes>
-
-        {/* HOME */}
-
-        <Route
-          path="/"
-          element={<Home />}
-        />
-
-
-        {/* =========================
-            CARS
-        ========================= */}
-
-        <Route
-          path="/cars"
-          element={<Cars />}
-        />
-
-
-        {/* =========================
-            HOUSES
-        ========================= */}
-
-        <Route
-          path="/houses"
-          element={<Houses />}
-        />
-
-
-        {/* =========================
-            RENTALS
-        ========================= */}
-
-        <Route
-          path="/rentals"
-          element={<Rentals />}
-        />
-
-
-        {/* =========================
-            SEARCH
-            Used for:
-            Electronics
-            Furniture
-            Labor & Services
-            ምንአለሽ ተራ
-        ========================= */}
-
-        <Route
-          path="/search"
-          element={<Search />}
-        />
-
-
-        {/* =========================
-            AD DETAILS
-        ========================= */}
-
-        <Route
-          path="/ad/:id"
-          element={<AdDetails />}
-        />
-
-
-        {/* =========================
-            POST AD
-        ========================= */}
-
-        <Route
-          path="/post-ad"
-          element={<PostAd />}
-        />
-
-
-        {/* =========================
-            EDIT AD
-        ========================= */}
-
-        <Route
-          path="/edit-ad/:id"
-          element={<EditAd />}
-        />
-
-
-        {/* =========================
-            DASHBOARD
-        ========================= */}
-
-        <Route
-          path="/dashboard"
-          element={<Dashboard />}
-        />
-
-
-        {/* =========================
-            MY ADS
-        ========================= */}
-
-        <Route
-          path="/my-ads"
-          element={<MyAds />}
-        />
-
-
-        {/* =========================
-            LOGIN
-        ========================= */}
-
-        <Route
-          path="/login"
-          element={<Login />}
-        />
-
-
-        {/* =========================
-            REGISTER
-        ========================= */}
-
-        <Route
-          path="/register"
-          element={<Register />}
-        />
-
-
-        {/* =========================
-            PROFILE
-        ========================= */}
-
-        <Route
-          path="/profile"
-          element={<Profile />}
-        />
-
-
-        {/* =========================
-            PUBLIC USER PROFILE
-        ========================= */}
-
-        <Route
-          path="/user/:uid"
-          element={<UserProfile />}
-        />
-
-
-        {/* =========================
-            CONTACT
-        ========================= */}
-
-        <Route
-          path="/contact"
-          element={<Contact />}
-        />
-
+        <Route path="/" element={<Home />} />
+        <Route path="/cars" element={<Cars />} />
+        <Route path="/houses" element={<Houses />} />
+        <Route path="/rentals" element={<Rentals />} />
+        <Route path="/search" element={<Search />} />
+        <Route path="/ad/:id" element={<AdDetails />} />
+        <Route path="/post-ad" element={<PostAd />} />
+        <Route path="/edit-ad/:id" element={<EditAd />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/my-ads" element={<MyAds />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/user/:uid" element={<UserProfile />} />
+        <Route path="/contact" element={<Contact />} />
       </Routes>
 
     </HashRouter>
