@@ -5688,3 +5688,39 @@ img {
     font-size: 12px;
   }
 }
+
+/* ✅ NAVBAR SCROLLING TEXT */
+.navbar-marquee {
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  margin: 0 15px;
+  position: relative;
+}
+
+.marquee-text {
+  display: inline-block;
+  padding-left: 100%;
+  animation: marquee-scroll 20s linear infinite;
+  font-weight: 700;
+  color: #1976d2; /* Blue text matching your theme */
+  font-size: 15px;
+}
+
+@keyframes marquee-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+/* Hide the scrolling text on small mobile screens so it doesn't push the menu buttons */
+@media (max-width: 850px) {
+  .navbar-marquee {
+    display: none;
+  }
+}
