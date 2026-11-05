@@ -11,7 +11,6 @@ function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
 
-  // AUTH LISTENER
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -19,7 +18,6 @@ function Navbar() {
     return () => unsubscribe();
   }, []);
 
-  // NOTIFICATIONS LISTENER
   useEffect(() => {
     if (!user) {
       setUnreadCount(0);
@@ -48,7 +46,7 @@ function Navbar() {
   return (
     <nav className="navbar">
       <div className="navbar-container">
-
+        
         {/* LOGO */}
         <Link to="/" className="navbar-brand" onClick={closeMenu}>
           <img
@@ -58,20 +56,14 @@ function Navbar() {
           />
         </Link>
 
-        {/* MOBILE QUICK ACTIONS (Chat, Notification, My Ads, Hamburger) */}
+        {/* MOBILE ICONS (Chat, Notifications, My Ads, Hamburger) */}
         <div className="mobile-quick-actions">
-
           {user ? (
             <>
-              <Link
-                to="/my-ads"
-                className="mobile-my-ads-btn"
-                onClick={closeMenu}
-              >
+              <Link to="/my-ads" className="mobile-icon-btn" onClick={closeMenu} title="My Ads">
                 📢
               </Link>
-
-              <Link to="/notifications" className="icon-btn" onClick={closeMenu}>
+              <Link to="/notifications" className="mobile-icon-btn" onClick={closeMenu} title="Notifications">
                 🔔
                 {unreadCount > 0 && (
                   <span className="notification-badge">
@@ -79,11 +71,9 @@ function Navbar() {
                   </span>
                 )}
               </Link>
-
-              <Link to="/chats" className="icon-btn" onClick={closeMenu}>
+              <Link to="/chats" className="mobile-icon-btn" onClick={closeMenu} title="Chats">
                 💬
               </Link>
-
               <button
                 className="menu-toggle"
                 onClick={() => setMenuOpen(!menuOpen)}
@@ -93,14 +83,9 @@ function Navbar() {
               </button>
             </>
           ) : (
-            /* If not logged in: Login + Register + Hamburger */
             <>
-              <Link to="/login" className="guest-login-btn" onClick={closeMenu}>
-                Login
-              </Link>
-              <Link to="/register" className="guest-register-btn" onClick={closeMenu}>
-                Register
-              </Link>
+              <Link to="/login" className="guest-login-btn" onClick={closeMenu}>Login</Link>
+              <Link to="/register" className="guest-register-btn" onClick={closeMenu}>Register</Link>
               <button
                 className="menu-toggle"
                 onClick={() => setMenuOpen(!menuOpen)}
@@ -149,22 +134,21 @@ function Navbar() {
             </>
           )}
         </div>
-
       </div>
 
-      {/* MOBILE SECOND ROW - DASHBOARD + POST AD */}
+      {/* MOBILE SECOND ROW */}
       {user && (
         <div className="mobile-second-row">
-          <Link to="/dashboard" className="mobile-row-btn mobile-dashboard-btn">
+          <Link to="/dashboard" className="mobile-row-btn mobile-dashboard-btn" onClick={closeMenu}>
             📊 Dashboard
           </Link>
-          <Link to="/post-ad" className="mobile-row-btn mobile-postad-btn">
+          <Link to="/post-ad" className="mobile-row-btn mobile-postad-btn" onClick={closeMenu}>
             + Post Ad
           </Link>
         </div>
       )}
 
-      {/* MOBILE HAMBURGER MENU */}
+      {/* MOBILE HAMBURGER MENU DROPDOWN */}
       {menuOpen && (
         <div className="mobile-menu-dropdown">
           <Link to="/" onClick={closeMenu}>Home</Link>
