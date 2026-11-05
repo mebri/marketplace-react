@@ -6025,3 +6025,33 @@ img {
     margin-top: 8px !important;
   }
 }
+
+/* =========================================================
+   SHRINK SPACE: Blue Hero -> Car -> Search Bar
+========================================================= */
+
+/* 1. Reduce padding on the blue scrolling section */
+.home-hero {
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+  margin-bottom: 0px !important;
+}
+
+/* 2. Shrink the animated car area and remove its margins */
+.car-animation-container {
+  margin-top: 0px !important;
+  margin-bottom: 0px !important;
+  height: 80px !important; /* Makes the car section shorter */
+}
+
+/* 3. Pull the search bar up closer to the car */
+.home-search-wrapper {
+  margin-top: 5px !important;
+  padding-top: 0px !important;
+  margin-bottom: 20px !important;
+}
+
+/* 4. Remove any default spacing on the search bar itself */
+.home-search {
+  margin-top: 0px !important;
+}
