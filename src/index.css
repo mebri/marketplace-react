@@ -6336,3 +6336,41 @@ img {
     padding: 15px !important;
   }
 }
+
+/* =========================================================
+   FORCE ALL ACTION BUTTONS SIDE-BY-SIDE
+========================================================= */
+
+.details-actions-row {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 8px !important;
+  width: 100% !important;
+  margin-top: 15px !important;
+  margin-bottom: 20px !important;
+}
+
+/* Make all buttons share the space equally */
+.details-actions-row .action-btn {
+  flex: 1 !important;
+  padding: 10px 5px !important;
+  font-size: 13px !important;
+  white-space: nowrap !important;
+  border-radius: 8px !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+  .details-actions-row {
+    flex-wrap: wrap !important; /* Allows wrapping if the screen is too small */
+  }
+  
+  .details-actions-row .action-btn {
+    min-width: 100px !important; /* Prevents buttons from getting too squished */
+    padding: 12px 5px !important;
+    font-size: 12px !important;
+  }
+}
