@@ -6104,3 +6104,92 @@ img {
   margin-bottom: 0px !important;
   padding-bottom: 0px !important;
 }
+/* =========================================================
+   MOBILE AD DETAILS PAGE TEXT FIX
+========================================================= */
+@media (max-width: 600px) {
+  /* 1. Give the page more room by reducing the outer padding */
+  .details-page {
+    width: 100% !important;
+    padding: 10px !important;
+    margin: 10px auto !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 2. Reduce the inner padding of the text area */
+  .details-info {
+    padding: 15px 5px !important;
+  }
+
+  /* 3. Fix the main Title */
+  .details-info h1 {
+    font-size: 22px !important;
+    line-height: 1.3 !important;
+    margin: 8px 0 !important;
+    word-break: break-word !important; /* Forces long words to wrap */
+  }
+
+  /* 4. Fix the Price */
+  .details-info h2 {
+    font-size: 20px !important;
+    margin-bottom: 15px !important;
+  }
+
+  /* 5. Fix the Description Text */
+  .details-description p {
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+    white-space: pre-wrap !important; /* Keeps line breaks from the user */
+    word-break: break-word !important;
+  }
+
+  /* 6. Make the Save/Chat buttons stack neatly instead of squishing */
+  .details-actions-row {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    width: 100% !important;
+  }
+
+  .action-btn {
+    width: 100% !important;
+    padding: 12px !important;
+    font-size: 15px !important;
+  }
+
+  /* 7. Make the "Mark Sold" and "Delete" buttons stack too */
+  .details-info > div[style*="display: flex"] {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+
+  /* 8. Fix the Seller Profile Card */
+  .seller-profile-card {
+    flex-direction: row !important;
+    align-items: center !important;
+    padding: 12px !important;
+    gap: 12px !important;
+  }
+
+  .seller-avatar {
+    width: 50px !important;
+    height: 50px !important;
+    min-width: 50px !important;
+    font-size: 20px !important;
+  }
+
+  .seller-profile-details h3 {
+    font-size: 16px !important;
+    margin-bottom: 2px !important;
+  }
+
+  .seller-profile-details p {
+    font-size: 13px !important;
+  }
+
+  /* 9. Fix the "Call Seller" phone link text */
+  .phone-link {
+    font-size: 14px !important;
+    padding: 12px !important;
+  }
+}
