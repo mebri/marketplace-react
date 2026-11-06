@@ -6374,3 +6374,91 @@ img {
     font-size: 12px !important;
   }
 }
+
+/* =========================================================
+   SIMILAR ADS - SMALL & 2-COLUMN GRID
+========================================================= */
+
+/* 1. Force 2 Columns */
+.similar-ads-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 12px !important;
+  margin-top: 15px !important;
+}
+
+/* 2. Shrink the image height */
+.similar-ad-image {
+  height: 120px !important; /* 👈 Makes the image much smaller */
+  width: 100% !important;
+  overflow: hidden;
+  background: #f1f5f9;
+}
+
+.similar-ad-image img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+}
+
+/* 3. Shrink text and padding to fit the small cards */
+.similar-ad-info {
+  padding: 8px !important;
+}
+
+.similar-ad-info h3 {
+  font-size: 13px !important;
+  line-height: 1.2 !important;
+  margin: 0 0 4px 0 !important;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Cuts off long titles after 2 lines */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: #1e293b;
+}
+
+.similar-ad-info h4 {
+  font-size: 14px !important;
+  color: #2e7d32 !important;
+  margin: 0 0 4px 0 !important;
+}
+
+.similar-ad-info p {
+  font-size: 11px !important;
+  margin: 0 !important;
+  color: #64748b !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 4. Clean up the card look */
+.similar-ad-card {
+  border-radius: 10px !important;
+  overflow: hidden;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
+  border: 1px solid #e2e8f0 !important;
+  text-decoration: none;
+  transition: transform 0.2s ease;
+}
+
+.similar-ad-card:hover {
+  transform: translateY(-3px);
+}
+
+/* 5. For Desktop screens, show 4 columns instead of 2 */
+@media (min-width: 768px) {
+  .similar-ads-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+  .similar-ad-image {
+    height: 160px !important; /* Slightly taller on desktop */
+  }
+  .similar-ad-info h3 {
+    font-size: 15px !important;
+  }
+  .similar-ad-info h4 {
+    font-size: 16px !important;
+  }
+}
