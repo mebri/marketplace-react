@@ -64,6 +64,7 @@ function AdDetails() {
       const adData = { id: docSnap.id, ...docSnap.data() };
       setAd(adData);
 
+      // Increment Views
       try {
         const viewerId = auth.currentUser?.uid || "guest";
         const sessionKey = `viewed_${id}_${viewerId}`;
@@ -82,6 +83,7 @@ function AdDetails() {
         console.error("View count error:", viewErr);
       }
 
+      // Load Seller Info
       if (adData.userId) {
         try {
           const sellerRef = doc(db, "users", adData.userId);
@@ -100,6 +102,7 @@ function AdDetails() {
         }
       }
 
+      // Check Favorite Status
       if (auth.currentUser) {
         const favoriteRef = doc(db, "users", auth.currentUser.uid, "favorites", id);
         const favoriteSnap = await getDoc(favoriteRef);
@@ -459,7 +462,8 @@ function AdDetails() {
 
   return (
     <div className="details-page">
-      {/* IMAGE SECTION */}
+      
+      {/* 1. IMAGE SECTION */}
       <div className="details-image">
         {imageList.length > 0 ? (
           <img
@@ -474,7 +478,7 @@ function AdDetails() {
         {isSold && <div className="sold-overlay-big">SOLD</div>}
       </div>
 
-      {/* INFO SECTION */}
+      {/* 2. INFO SECTION */}
       <div className="details-info">
         <span className={`status-badge ${isSold ? "sold" : "available"}`}>
           {isSold ? "❌ SOLD OUT" : "✅ AVAILABLE"}
@@ -489,31 +493,33 @@ function AdDetails() {
         <h1>{ad.title || "Untitled Advertisement"}</h1>
         <h2>ETB {ad.price}</h2>
 
-        {/* OWNER ACTIONS (Mark Sold & Delete) */}
-        {isOwner && (
-          <div className="owner-actions-row">
-            <button
-              type="button"
-              onClick={toggleSoldStatus}
-              disabled={statusLoading}
-              className={`action-btn mark-sold-btn ${isSold ? "active" : ""}`}
-            >
-              {statusLoading ? "Updating..." : isSold ? "↩️ Mark Available" : "✅ Mark Sold"}
-            </button>
-            
-            <button
-              type="button"
-              onClick={handleDeleteAd}
-              disabled={deleteLoading}
-              className="action-btn delete-action"
-            >
-              {deleteLoading ? "Deleting..." : "🗑️ Delete Ad"}
-            </button>
-          </div>
-        )}
-
-        {/* USER ACTIONS (Save & Chat) */}
+        {/* ✅ MERGED ACTION BUTTONS ROW */}
         <div className="details-actions-row">
+          
+          {/* Owner Buttons */}
+          {isOwner && (
+            <>
+              <button
+                type="button"
+                onClick={toggleSoldStatus}
+                disabled={statusLoading}
+                className={`action-btn mark-sold-btn ${isSold ? "active" : ""}`}
+              >
+                {statusLoading ? "Updating..." : isSold ? "↩️ Mark Available" : "✅ Mark Sold"}
+              </button>
+              
+              <button
+                type="button"
+                onClick={handleDeleteAd}
+                disabled={deleteLoading}
+                className="action-btn delete-action"
+              >
+                {deleteLoading ? "Deleting..." : "🗑️ Delete Ad"}
+              </button>
+            </>
+          )}
+
+          {/* Save Button */}
           <button
             type="button"
             onClick={toggleFavorite}
@@ -523,6 +529,7 @@ function AdDetails() {
             {favoriteLoading ? "Saving..." : isFavorite ? "❤️ Saved" : "🤍 Save Ad"}
           </button>
 
+          {/* Chat Button */}
           {!isOwner && ad.userId && (
             <button
               type="button"
@@ -533,8 +540,10 @@ function AdDetails() {
               {chatLoading ? "Opening..." : isSold ? "❌ Sold" : "💬 Chat"}
             </button>
           )}
+
         </div>
 
+        {/* 3. DETAILS */}
         {ad.city && <p><strong>📍 City:</strong> {ad.city}</p>}
         {ad.condition && <p><strong>🔄 Condition:</strong> {ad.condition}</p>}
         {ad.type && <p><strong>🏷️ Type:</strong> {ad.type}</p>}
@@ -549,7 +558,7 @@ function AdDetails() {
 
         <hr />
 
-        {/* SELLER INFO */}
+        {/* 4. SELLER INFO */}
         <div className="seller-information">
           <h3>👤 Seller Information</h3>
           <div className="seller-profile-card">
@@ -618,7 +627,7 @@ function AdDetails() {
         )}
       </div>
 
-      {/* SIMILAR ADS SECTION */}
+      {/* 5. SIMILAR ADS SECTION */}
       {similarAds.length > 0 && (
         <section className="similar-ads-section">
           <div className="similar-ads-header">
