@@ -24,6 +24,7 @@ import {
 
 import { db, auth } from "../firebase/firebase";
 
+// ✅ ADMIN CONTROL: Your email gives you super-admin powers
 const ADMIN_EMAIL = "marbat1@gmail.com"; 
 
 function AdDetails() {
@@ -462,7 +463,6 @@ function AdDetails() {
 
   return (
     <div className="details-page">
-      
       {/* 1. IMAGE SECTION */}
       <div className="details-image">
         {imageList.length > 0 ? (
@@ -496,7 +496,7 @@ function AdDetails() {
         {/* ✅ MERGED ACTION BUTTONS ROW */}
         <div className="details-actions-row">
           
-          {/* Owner Buttons */}
+          {/* Owner/Admin Buttons */}
           {isOwner && (
             <>
               <button
