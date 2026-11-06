@@ -44,6 +44,9 @@ function AdDetails() {
   const [similarAds, setSimilarAds] = useState([]);
   const [loadingSimilar, setLoadingSimilar] = useState(false);
 
+  // =========================
+  // LOAD ADVERTISEMENT
+  // =========================
   useEffect(() => {
     loadAd();
   }, [id]);
@@ -109,6 +112,9 @@ function AdDetails() {
     }
   };
 
+  // =========================
+  // DELETE AD (Owner or Admin)
+  // =========================
   const handleDeleteAd = async () => {
     if (!ad || !auth.currentUser) return;
     
@@ -137,6 +143,9 @@ function AdDetails() {
     }
   };
 
+  // =========================
+  // FETCH TIERED SIMILAR ADS
+  // =========================
   useEffect(() => {
     const fetchSimilarAds = async () => {
       if (!ad || !ad.category) return;
@@ -230,6 +239,9 @@ function AdDetails() {
     fetchSimilarAds();
   }, [ad]);
 
+  // =========================
+  // REPORT AD
+  // =========================
   const reportAd = async () => {
     if (!auth.currentUser) {
       alert("Please log in to report an advertisement.");
@@ -276,6 +288,9 @@ function AdDetails() {
     }
   };
 
+  // =========================
+  // TOGGLE SOLD STATUS
+  // =========================
   const toggleSoldStatus = async () => {
     if (!ad || !auth.currentUser) return;
     
@@ -307,6 +322,9 @@ function AdDetails() {
     }
   };
 
+  // =========================
+  // FAVORITE
+  // =========================
   const toggleFavorite = async () => {
     if (!auth.currentUser) {
       alert("Please log in to save advertisements.");
@@ -345,6 +363,9 @@ function AdDetails() {
     }
   };
 
+  // =========================
+  // CHAT WITH SELLER
+  // =========================
   const startChat = async () => {
     if (!auth.currentUser) {
       alert("Please log in to chat with the seller.");
@@ -438,6 +459,7 @@ function AdDetails() {
 
   return (
     <div className="details-page">
+      {/* IMAGE SECTION */}
       <div className="details-image">
         {imageList.length > 0 ? (
           <img
@@ -452,6 +474,7 @@ function AdDetails() {
         {isSold && <div className="sold-overlay-big">SOLD</div>}
       </div>
 
+      {/* INFO SECTION */}
       <div className="details-info">
         <span className={`status-badge ${isSold ? "sold" : "available"}`}>
           {isSold ? "❌ SOLD OUT" : "✅ AVAILABLE"}
@@ -466,14 +489,14 @@ function AdDetails() {
         <h1>{ad.title || "Untitled Advertisement"}</h1>
         <h2>ETB {ad.price}</h2>
 
+        {/* OWNER ACTIONS (Mark Sold & Delete) */}
         {isOwner && (
-          <div style={{ display: "flex", gap: "10px", marginTop: "15px" }}>
+          <div className="owner-actions-row">
             <button
               type="button"
               onClick={toggleSoldStatus}
               disabled={statusLoading}
-              className={`mark-sold-btn ${isSold ? "active" : ""}`}
-              style={{ flex: 1 }}
+              className={`action-btn mark-sold-btn ${isSold ? "active" : ""}`}
             >
               {statusLoading ? "Updating..." : isSold ? "↩️ Mark Available" : "✅ Mark Sold"}
             </button>
@@ -482,21 +505,14 @@ function AdDetails() {
               type="button"
               onClick={handleDeleteAd}
               disabled={deleteLoading}
-              style={{ 
-                flex: 1, 
-                background: "#dc2626", 
-                color: "white", 
-                border: "none", 
-                borderRadius: "10px", 
-                fontWeight: "bold", 
-                cursor: "pointer" 
-              }}
+              className="action-btn delete-action"
             >
               {deleteLoading ? "Deleting..." : "🗑️ Delete Ad"}
             </button>
           </div>
         )}
 
+        {/* USER ACTIONS (Save & Chat) */}
         <div className="details-actions-row">
           <button
             type="button"
@@ -533,6 +549,7 @@ function AdDetails() {
 
         <hr />
 
+        {/* SELLER INFO */}
         <div className="seller-information">
           <h3>👤 Seller Information</h3>
           <div className="seller-profile-card">
@@ -601,6 +618,7 @@ function AdDetails() {
         )}
       </div>
 
+      {/* SIMILAR ADS SECTION */}
       {similarAds.length > 0 && (
         <section className="similar-ads-section">
           <div className="similar-ads-header">
