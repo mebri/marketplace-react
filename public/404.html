@@ -3,11 +3,16 @@
   <head>
     <meta charset="UTF-8" />
     <script>
-      sessionStorage.redirect = location.href;
+      try {
+        sessionStorage.setItem("redirect", location.href);
+      } catch (e) {}
+
+      var pathname = location.pathname;
+      var basePath = pathname.includes("/marketplace-react") ? "/marketplace-react/" : "/";
 
       location.replace(
         location.origin +
-        "/marketplace-react/" +
+        basePath +
         "?redirect=" +
         encodeURIComponent(
           location.pathname +

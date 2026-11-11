@@ -3,20 +3,27 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.jsx";
 
-const redirect = sessionStorage.redirect;
-
-if (redirect) {
-  delete sessionStorage.redirect;
-
-  window.history.replaceState(
-    null,
-    null,
-    redirect.replace(window.location.origin, "")
-  );
+try {
+  const redirect = sessionStorage.getItem("redirect");
+  if (redirect) {
+    sessionStorage.removeItem("redirect");
+    window.history.replaceState(
+      null,
+      null,
+      redirect.replace(window.location.origin, "")
+    );
+  }
+} catch (error) {
+  console.warn("Redirect handling skipped:", error);
 }
 
-createRoot(document.getElementById("root")).render(
-  <StrictMode>
-    <App />
-  </StrictMode>
-);
+const rootElement = document.getElementById("root");
+if (rootElement) {
+  createRoot(rootElement).render(
+    <StrictMode>
+      <App />
+    </StrictMode>
+  );
+} else {
+  console.error("Root element not found");
+}
