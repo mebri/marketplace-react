@@ -1680,3 +1680,104 @@ nav a:hover {
     font-size: 12px;
   }
 }
+
+.home-search {
+  position: relative;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 750px;
+  margin: 0 auto;
+  display: flex;
+}
+
+.home-search input[type="text"] {
+  color: #222;
+  background: #fff;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  outline: none;
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 52px;
+  padding: 0 18px;
+  font-size: 16px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12);
+}
+
+.home-search-camera-btn {
+  color: #1976d2;
+  cursor: pointer;
+  background: #fff;
+  border: 2px solid #dbeafe;
+  border-radius: 12px;
+  flex: none;
+  justify-content: center;
+  align-items: center;
+  width: 52px;
+  height: 52px;
+  transition: background 0.2s, border-color 0.2s, transform 0.1s;
+  display: flex;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
+}
+
+.home-search-camera-btn:hover {
+  background: #eff6ff;
+  border-color: #1976d2;
+}
+
+.home-search-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #dbe3ee;
+  border-radius: 14px;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.16);
+  z-index: 990;
+  overflow: hidden;
+  text-align: left;
+  max-height: 440px;
+  overflow-y: auto;
+}
+
+.home-search-status-toast {
+  max-width: 750px;
+  margin: 8px auto 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1e3a8a;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+.home-search-status-toast.error {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #991b1b;
+}
+
+@media (max-width: 600px) {
+  .home-search input[type="text"] {
+    border-radius: 10px;
+    height: 46px;
+    padding: 0 12px;
+    font-size: 14px;
+  }
+  .home-search-camera-btn,
+  .home-search-icon {
+    border-radius: 10px;
+    width: 46px;
+    height: 46px;
+    font-size: 18px;
+  }
+}
