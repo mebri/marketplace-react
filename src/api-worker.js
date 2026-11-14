@@ -1,257 +1,312 @@
-// src/api-worker.js — Cloudflare Worker Backend for AI Exact Image Search + React SPA
+// FILE: src/api-worker.js
+import {
+  normalizeCategory,
+  searchMarketplaceAds,
+} from "./utils/localSearchEngine.js";
 
-const JSON_HEADERS = {
-  "Content-Type": "application/json; charset=utf-8",
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type",
-};
-
-function normalizeText(str) {
-  return String(str || "")
-    .toLowerCase()
-    .replace(/[_/\\|,+&•·.-]+/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+function jsonResponse(data, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+    },
+  });
 }
 
-function scoreAdAgainstVisual(ad, analysis) {
-  const title = normalizeText(ad.title);
-  const desc = normalizeText(ad.description);
-  const cat = normalizeText(ad.category);
-  const subcat = normalizeText(ad.subcategory);
-  const full = `${title} ${cat} ${subcat} ${desc}`;
-
-  let score = 0;
-  const reasons = [];
-
-  const brand = normalizeText(analysis.brand);
-  const model = normalizeText(analysis.model);
-  const year = normalizeText(analysis.year);
-  const color = normalizeText(analysis.color);
-  const vCat = normalizeText(analysis.category);
-
-  if (brand && (title.includes(brand) || desc.includes(brand))) {
-    score += 42;
-    reasons.push(`Exact Make: ${analysis.brand}`);
+function arrayBufferToBase64(buffer) {
+  const bytes = new Uint8Array(buffer);
+  let binary = "";
+  const chunkSize = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
   }
-  if (model && (title.includes(model) || desc.includes(model))) {
-    score += 50;
-    reasons.push(`Exact Model: ${analysis.model}`);
-  }
-  if (year && (title.includes(year) || desc.includes(year))) {
-    score += 18;
-    reasons.push(`Year: ${analysis.year}`);
-  }
-  if (vCat && cat === vCat) {
-    score += 18;
-    reasons.push(`Category: ${ad.category}`);
-  }
-  if (color && full.includes(color)) {
-    score += 12;
-    reasons.push(`Color: ${analysis.color}`);
-  }
-
-  for (const kw of [...(analysis.keywords || []), ...(analysis.visualMarkers || [])]) {
-    const k = normalizeText(kw);
-    if (k.length >= 2 && full.includes(k)) score += 8;
-  }
-
-  return { score, reasons };
+  return btoa(binary);
 }
 
-async function fetchImageAsBase64(url) {
-  if (!url || !/^https?:\/\//i.test(url)) return null;
+async function fetchImageAsInlinePart(imageUrl) {
+  if (!imageUrl || typeof imageUrl !== "string") return null;
   try {
-    const res = await fetch(url);
+    if (imageUrl.startsWith("data:image/")) {
+      const m = imageUrl.match(/^data:(image\/[a-zA-Z0-9+.-]+);base64,(.+)$/);
+      if (m) return { inline_data: { mime_type: m[1], data: m[2] } };
+      return null;
+    }
+    if (!imageUrl.startsWith("http")) return null;
+    const res = await fetch(imageUrl);
     if (!res.ok) return null;
     const contentType = (res.headers.get("content-type") || "image/jpeg").split(";")[0];
     if (!contentType.startsWith("image/")) return null;
     const buf = await res.arrayBuffer();
-    if (buf.byteLength > 2.5 * 1024 * 1024) return null;
-
-    let binary = "";
-    const bytes = new Uint8Array(buf);
-    const chunk = 0x8000;
-    for (let i = 0; i < bytes.length; i += chunk) {
-      binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
-    }
-    return { mimeType: contentType, data: btoa(binary) };
+    if (buf.byteLength === 0 || buf.byteLength > 3_500_000) return null;
+    return {
+      inline_data: {
+        mime_type: contentType,
+        data: arrayBufferToBase64(buf),
+      },
+    };
   } catch {
     return null;
   }
 }
 
-async function callGemini(apiKey, parts) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-  const resp = await fetch(url, {
+async function callGeminiVision(apiKey, model, parts, responseSchema) {
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
+  const res = await fetch(endpoint, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      contents: [{ role: "user", parts }],
-      generationConfig: { responseMimeType: "application/json" },
+      contents: [{ parts }],
+      generationConfig: {
+        responseMimeType: "application/json",
+        responseSchema,
+      },
     }),
   });
-  const data = await resp.json();
-  if (!resp.ok) {
-    throw new Error(data?.error?.message || "Gemini API request failed");
+
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`Gemini API Error (${res.status}): ${errText}`);
   }
-  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
-  return JSON.parse(text);
+
+  const data = await res.json();
+  const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
+  return JSON.parse(rawText);
 }
 
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    if (request.method === "OPTIONS" && url.pathname.startsWith("/api/")) {
-      return new Response(null, { status: 204, headers: JSON_HEADERS });
+    if (request.method === "OPTIONS") {
+      return jsonResponse({ ok: true }, 200);
     }
 
-    // AI EXACT IMAGE SEARCH ENDPOINT
     if (url.pathname === "/api/image-search" && request.method === "POST") {
       try {
-        if (!env.GEMINI_API_KEY) {
-          return new Response(
-            JSON.stringify({ error: "GEMINI_API_KEY secret is not set in Cloudflare." }),
-            { status: 503, headers: JSON_HEADERS }
+        const apiKey = env.GEMINI_API_KEY;
+        if (!apiKey) {
+          return jsonResponse(
+            { error: "GEMINI_API_KEY በ Cloudflare secret ውስጥ አልተጨመረም።" },
+            503
           );
         }
 
+        const model = env.GEMINI_MODEL || "gemini-2.5-flash";
         const body = await request.json();
-        const { imageBase64, mimeType = "image/jpeg", ads = [] } = body || {};
+        const { imageBase64, mimeType = "image/jpeg", ads: clientAds = [] } = body || {};
+
         if (!imageBase64) {
-          return new Response(
-            JSON.stringify({ error: "Please select an image to search." }),
-            { status: 400, headers: JSON_HEADERS }
-          );
+          return jsonResponse({ error: "Missing imageBase64" }, 400);
         }
 
-        const cleanBase64 = String(imageBase64).replace(/^data:image\/[a-zA-Z0-9+.-]+;base64,/, "");
+        const cleanBase64 = String(imageBase64).replace(
+          /^data:image\/[a-zA-Z0-9+.-]+;base64,/,
+          ""
+        );
         const cleanMime = String(mimeType).split(";")[0] || "image/jpeg";
 
-        // STAGE 1: Identify exact item from uploaded photo
-        const stage1Prompt = `You are an exact visual product identifier for Yegna Gebeya (an Ethiopia marketplace).
-Identify the item in the image and return valid JSON with these exact keys:
-{
-  "brand": "",
-  "model": "",
-  "year": "",
-  "trim": "",
-  "bodyType": "",
-  "color": "",
-  "category": "one of: Cars, Houses, Rentals, Electronics, Furniture, Clothes, Building Materials, Spare Parts, Labor & Services, ምንአለሽ_ተራ",
-  "subcategory": "",
-  "exactQuery": "2-5 word search query",
-  "visualMarkers": ["3-5 visual details"],
-  "keywords": ["English and Amharic keywords"],
-  "confidence": "high | medium | low",
-  "summary": "1 sentence description"
-}`;
+        // ደረጃ 1: በፎቶው ላይ ያለውን እቃ በትክክል መለየት
+        const stage1Schema = {
+          type: "OBJECT",
+          properties: {
+            brand: { type: "STRING" },
+            model: { type: "STRING" },
+            year: { type: "STRING" },
+            trim: { type: "STRING" },
+            bodyType: { type: "STRING" },
+            color: { type: "STRING" },
+            category: { type: "STRING" },
+            subcategory: { type: "STRING" },
+            exactQuery: { type: "STRING" },
+            visualMarkers: { type: "ARRAY", items: { type: "STRING" } },
+            keywords: { type: "ARRAY", items: { type: "STRING" } },
+            confidence: { type: "STRING" },
+            summary: { type: "STRING" },
+          },
+        };
 
-        const analysis = await callGemini(env.GEMINI_API_KEY, [
-          { inlineData: { mimeType: cleanMime, data: cleanBase64 } },
-          { text: stage1Prompt },
-        ]);
+        const stage1Prompt = `You are an expert visual product & vehicle identifier for an Ethiopian marketplace (Yegna Gebeya).
+Analyze the uploaded photo carefully and extract exact identifying attributes:
+- brand (e.g., BYD, Toyota, Hyundai, Suzuki, Apple, Samsung, Ferrari, etc.)
+- model (e.g., Sealion 06 EV, Corolla, RAV4, Dzire, iPhone 16 Pro Max, L-Shape Sofa)
+- year (estimated year or generation)
+- trim / edition
+- bodyType (e.g., Sedan, SUV, Electric EV, Smartphone, Sofa, Granite)
+- color (exact exterior or material color)
+- category (MUST be one of: Cars, Houses, Rentals, Electronics, Furniture, Clothes, Building Materials, Spare Parts, Labor & Services)
+- subcategory
+- exactQuery (2 to 5 word concise search query for matching this exact item)
+- visualMarkers (3 to 5 visible features)
+- keywords (6 to 10 English + Amharic marketplace search keywords)
+- confidence (high, medium, low)
+- summary (1 clear sentence describing the exact item)`;
 
-        // Pre-rank client Firestore ads
-        const preScored = (Array.isArray(ads) ? ads : [])
-          .map((ad) => {
-            const { score, reasons } = scoreAdAgainstVisual(ad, analysis);
-            return { ad, score, reasons };
+        const parsed = await callGeminiVision(
+          apiKey,
+          model,
+          [
+            { inline_data: { mime_type: cleanMime, data: cleanBase64 } },
+            { text: stage1Prompt },
+          ],
+          stage1Schema
+        );
+
+        const normalizedCat = normalizeCategory(
+          parsed.category,
+          `${parsed.exactQuery || ""} ${parsed.brand || ""} ${parsed.model || ""} ${(parsed.keywords || []).join(" ")}`
+        );
+
+        const analysis = {
+          ...parsed,
+          category: normalizedCat,
+          exactQuery:
+            (parsed.exactQuery || "").trim() ||
+            [parsed.year, parsed.brand, parsed.model].filter(Boolean).join(" ") ||
+            normalizedCat,
+        };
+
+        const validAds = Array.isArray(clientAds) ? clientAds : [];
+
+        let preRanked = searchMarketplaceAds(validAds, {
+          visualAnalysis: analysis,
+          sort: "relevance",
+        });
+
+        if (preRanked.length === 0 && analysis.category) {
+          preRanked = searchMarketplaceAds(validAds, {
+            category: analysis.category,
+            sort: "relevance",
+          });
+        }
+
+        // ደረጃ 2: ከገበያው ማስታወቂያ ፎቶዎች ጋር ጎን ለጎን (Side-by-Side) ማነጻጸር
+        const candidatesWithPhotos = preRanked
+          .filter((r) => {
+            const img =
+              Array.isArray(r.ad.images) && r.ad.images.length > 0
+                ? r.ad.images[0]
+                : r.ad.image;
+            return Boolean(img);
           })
-          .filter((x) => x.score >= 16)
-          .sort((a, b) => b.score - a.score);
+          .slice(0, 5);
 
-        // STAGE 2: Side-by-side photo verification on top 4 candidates
-        const verifiedCandidates = {};
-        const topWithImages = preScored
-          .filter((x) => (Array.isArray(x.ad.images) && x.ad.images[0]) || x.ad.image)
-          .slice(0, 4);
+        if (candidatesWithPhotos.length > 0) {
+          try {
+            const resolved = await Promise.all(
+              candidatesWithPhotos.map(async (item) => {
+                const imgUrl =
+                  Array.isArray(item.ad.images) && item.ad.images.length > 0
+                    ? item.ad.images[0]
+                    : item.ad.image;
+                const part = await fetchImageAsInlinePart(imgUrl);
+                return part ? { item, part } : null;
+              })
+            );
 
-        if (topWithImages.length > 0) {
-          const loaded = await Promise.all(
-            topWithImages.map(async (item) => {
-              const imgUrl = Array.isArray(item.ad.images) ? item.ad.images[0] : item.ad.image;
-              const imgData = await fetchImageAsBase64(imgUrl);
-              return imgData ? { item, imgData } : null;
-            })
-          );
-          const valid = loaded.filter(Boolean);
+            const validCandidates = resolved.filter(Boolean);
+            if (validCandidates.length > 0) {
+              const compareParts = [
+                {
+                  text: `Compare the FIRST uploaded query image against each candidate marketplace listing photo below.
+Judge visual similarity accurately (same exact model, generation, grille/headlights, silhouette, color, or product design).
+Be strict: only mark exactSameItem=true if it is clearly the same exact product/model/item.
+Return a JSON object with a "comparisons" array containing one entry per candidate ID.`,
+                },
+                { text: "QUERY IMAGE (User uploaded photo):" },
+                { inline_data: { mime_type: cleanMime, data: cleanBase64 } },
+              ];
 
-          if (valid.length > 0) {
-            const compareParts = [
-              {
-                text: `Compare the FIRST uploaded query image against each candidate listing photo.
-Return JSON: { "comparisons": [{ "adId": "...", "exactSameItem": true/false, "similarityScore": 0-100, "visualMatchReasons": ["..."] }] }`,
-              },
-              { text: "QUERY IMAGE:" },
-              { inlineData: { mimeType: cleanMime, data: cleanBase64 } },
-            ];
-            for (const c of valid) {
-              compareParts.push({ text: `CANDIDATE ID="${c.item.ad.id}" | Title="${c.item.ad.title || ""}"` });
-              compareParts.push({ inlineData: c.imgData });
-            }
-
-            try {
-              const stage2 = await callGemini(env.GEMINI_API_KEY, compareParts);
-              for (const comp of stage2.comparisons || []) {
-                if (comp?.adId) {
-                  verifiedCandidates[comp.adId] = {
-                    adId: comp.adId,
-                    exactSameItem: Boolean(comp.exactSameItem),
-                    similarityScore: Number(comp.similarityScore) || 0,
-                    visualMatchReasons: Array.isArray(comp.visualMatchReasons)
-                      ? comp.visualMatchReasons.slice(0, 3)
-                      : [],
-                  };
-                }
+              for (const c of validCandidates) {
+                compareParts.push({
+                  text: `CANDIDATE ID="${c.item.ad.id}" | Title="${c.item.resolvedTitle}" | Category="${c.item.resolvedCategory}"`,
+                });
+                compareParts.push(c.part);
               }
-              analysis.verifiedCandidates = verifiedCandidates;
-              analysis.visualVerifiedCount = Object.keys(verifiedCandidates).length;
-            } catch {
-              // Keep Stage 1 matches if Stage 2 comparison times out
+
+              const stage2Schema = {
+                type: "OBJECT",
+                properties: {
+                  comparisons: {
+                    type: "ARRAY",
+                    items: {
+                      type: "OBJECT",
+                      properties: {
+                        adId: { type: "STRING" },
+                        exactSameItem: { type: "BOOLEAN" },
+                        similarityScore: { type: "INTEGER" },
+                        visualMatchReasons: {
+                          type: "ARRAY",
+                          items: { type: "STRING" },
+                        },
+                      },
+                    },
+                  },
+                },
+              };
+
+              const stage2Json = await callGeminiVision(
+                apiKey,
+                model,
+                compareParts,
+                stage2Schema
+              );
+
+              if (Array.isArray(stage2Json.comparisons)) {
+                const verifiedMap = {};
+                for (const comp of stage2Json.comparisons) {
+                  if (comp && comp.adId) {
+                    verifiedMap[comp.adId] = {
+                      adId: comp.adId,
+                      exactSameItem: Boolean(comp.exactSameItem),
+                      similarityScore: Number(comp.similarityScore) || 0,
+                      visualMatchReasons: Array.isArray(comp.visualMatchReasons)
+                        ? comp.visualMatchReasons.slice(0, 3)
+                        : [],
+                    };
+                  }
+                }
+                analysis.verifiedCandidates = verifiedMap;
+                analysis.visualVerifiedCount = Object.keys(verifiedMap).length;
+              }
             }
+          } catch (stage2Err) {
+            console.warn("Stage 2 visual comparison skipped:", stage2Err);
           }
         }
 
-        const matches = preScored.map((item) => {
-          const v = verifiedCandidates[item.ad.id];
-          const pct = v ? v.similarityScore : Math.min(99, Math.max(40, Math.round((item.score / 130) * 100)));
-          const reasons = v?.visualMatchReasons?.length ? [...v.visualMatchReasons, ...item.reasons] : item.reasons;
-          return {
-            ad: item.ad,
-            resolvedTitle: item.ad.title || analysis.exactQuery,
-            resolvedCategory: item.ad.category || analysis.category,
-            resolvedSubcategory: item.ad.subcategory || analysis.subcategory || "",
-            numericPrice: Number(String(item.ad.price || 0).replace(/[^0-9]/g, "")) || 0,
-            matchScore: v ? item.score + v.similarityScore : item.score,
-            matchPercentage: pct,
-            matchReasons: Array.from(new Set(reasons)).slice(0, 3),
-            exactVisualMatch: Boolean(v?.exactSameItem || pct >= 85),
-          };
+        let matches = searchMarketplaceAds(validAds, {
+          visualAnalysis: analysis,
+          sort: "relevance",
         });
 
-        matches.sort((a, b) => b.matchScore - a.matchScore);
+        if (matches.length === 0 && analysis.category) {
+          matches = searchMarketplaceAds(validAds, {
+            category: analysis.category,
+            sort: "relevance",
+          }).slice(0, 8);
+        }
 
-        return new Response(
-          JSON.stringify({
-            success: true,
-            analysis,
-            exactQuery: analysis.exactQuery || [analysis.year, analysis.brand, analysis.model].filter(Boolean).join(" "),
-            matches,
-          }),
-          { status: 200, headers: JSON_HEADERS }
-        );
+        return jsonResponse({
+          success: true,
+          analysis,
+          exactQuery: analysis.exactQuery,
+          matches,
+        });
       } catch (err) {
-        return new Response(
-          JSON.stringify({ error: err.message || "AI image search failed" }),
-          { status: 500, headers: JSON_HEADERS }
+        return jsonResponse(
+          { error: err?.message || "AI image search failed." },
+          500
         );
       }
     }
 
-    // Serve static Vite SPA assets for all other routes
-    return env.ASSETS.fetch(request);
+    // ሌሎች Request-ቶች በሙሉ ወደ React SPA ይላካሉ
+    if (env.ASSETS) {
+      return env.ASSETS.fetch(request);
+    }
+    return new Response("Not Found", { status: 404 });
   },
 };
