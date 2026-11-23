@@ -11,11 +11,6 @@ import ScrollManager from "./components/ScrollManager";
 import NotificationPrompt from "./components/NotificationPrompt";
 
 // PAGES
-<<<<<<< HEAD
-// =========================
-import Chat from "./pages/Chat";
-=======
->>>>>>> c85442526896fc48e5cb237998fcf0cc1e1daa3a
 import Home from "./pages/Home";
 import Cars from "./pages/Cars";
 import Houses from "./pages/Houses";

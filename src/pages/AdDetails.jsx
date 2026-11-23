@@ -14,16 +14,12 @@ import {
   deleteDoc,
   collection,
   addDoc,
-<<<<<<< HEAD
-  serverTimestamp,
-=======
   increment,
   query,
   where,
   getDocs,
   serverTimestamp,
   limit,
->>>>>>> c85442526896fc48e5cb237998fcf0cc1e1daa3a
 } from "firebase/firestore";
 
 import { db, auth } from "../firebase/firebase";
@@ -386,171 +382,6 @@ function AdDetails() {
       return;
     }
 
-<<<<<<< HEAD
-  const startChat = async () => {
-  if (!auth.currentUser) {
-    alert("Please log in to chat with the seller.");
-    navigate("/login");
-    return;
-  }
-
-  if (!ad) return;
-
-  // Seller cannot chat with himself/herself
-  if (ad.userId === auth.currentUser.uid) {
-    alert("This is your advertisement. You cannot chat with yourself.");
-    return;
-  }
-
-  try {
-    setChatLoading(true);
-
-    const buyerId = auth.currentUser.uid;
-    const sellerId = ad.userId;
-
-    if (!sellerId) {
-      alert("Seller information is not available.");
-      return;
-    }
-
-    // =========================================
-    // CREATE A UNIQUE CHAT ID
-    // =========================================
-
-    const chatId =
-      buyerId < sellerId
-        ? `${buyerId}_${sellerId}_${id}`
-        : `${sellerId}_${buyerId}_${id}`;
-
-    const chatRef = doc(
-      db,
-      "chats",
-      chatId
-    );
-
-    // =========================================
-    // CREATE / UPDATE CHAT
-    // =========================================
-
-    await setDoc(
-      chatRef,
-      {
-        participants: [
-          buyerId,
-          sellerId,
-        ],
-
-        buyerId,
-        sellerId,
-
-        adId: id,
-
-        adTitle:
-          ad.title || "",
-
-        adImage:
-          Array.isArray(ad.images) &&
-          ad.images.length > 0
-            ? ad.images[0]
-            : ad.image || "",
-
-        buyerName:
-          auth.currentUser.displayName ||
-          auth.currentUser.email?.split("@")[0] ||
-          "Buyer",
-
-        sellerName:
-          seller?.name ||
-          ad.userName ||
-          "Seller",
-
-        updatedAt:
-          serverTimestamp(),
-
-        lastMessage: "",
-      },
-      {
-        merge: true,
-      }
-    );
-
-    // =========================================
-    // SELLER NOTIFICATION
-    // =========================================
-
-    const notificationRef = doc(
-      db,
-      "users",
-      sellerId,
-      "notifications",
-      `chat_${chatId}`
-    );
-
-    await setDoc(
-      notificationRef,
-      {
-        type: "chat",
-
-        title:
-          "New chat request 💬",
-
-        message:
-          `Someone wants to chat with you about "${ad.title}".`,
-
-        adId: id,
-
-        chatId,
-
-        fromUserId:
-          buyerId,
-
-        fromUserName:
-          auth.currentUser.displayName ||
-          auth.currentUser.email?.split("@")[0] ||
-          "Buyer",
-
-        read: false,
-
-        createdAt:
-          serverTimestamp(),
-      },
-      {
-        merge: true,
-      }
-    );
-
-    // =========================================
-    // OPEN CHAT
-    // =========================================
-
-    navigate(`/chat/${chatId}`);
-
-  } catch (error) {
-    console.error(
-      "Chat error:",
-      error
-    );
-
-    alert(
-      error.message ||
-        "Could not start chat."
-    );
-
-  } finally {
-    setChatLoading(false);
-  }
-};
-  // =========================
-  // POSTED TIME
-  // =========================
-
-  const getPostedTime = (
-    createdAt
-  ) => {
-
-    if (!createdAt) {
-      return "";
-=======
     try {
       setChatLoading(true);
       const buyerId = auth.currentUser.uid;
@@ -591,7 +422,6 @@ function AdDetails() {
       console.error("Chat error:", error);
     } finally {
       setChatLoading(false);
->>>>>>> c85442526896fc48e5cb237998fcf0cc1e1daa3a
     }
   };
 

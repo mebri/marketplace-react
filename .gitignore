@@ -22,16 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-<<<<<<< HEAD
-
-# wrangler files
-.wrangler
-.dev.vars*
-!.dev.vars.example
-.env*
-!.env.example
-=======
 .env
->>>>>>> c85442526896fc48e5cb237998fcf0cc1e1daa3a
 
 .wrangler/
