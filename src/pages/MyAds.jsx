@@ -487,7 +487,7 @@ function MyAds() {
         </div>
 
 
-        <div>
+                <div className="my-ads-account-info">
 
           <h1>
 
@@ -509,30 +509,36 @@ function MyAds() {
           </p>
 
 
-          <Link
-            to={`/user/${user.uid}`}
-          >
+          <div className="my-ads-account-actions">
 
-            View Public Profile
+            <Link
+              to={`/user/${user.uid}`}
+              className="view-profile-btn"
+            >
 
-          </Link>
+              View Public Profile
+
+            </Link>
+
+
+            <Link
+              to="/post-ad"
+              className="post-new-btn-link"
+            >
+
+              <button
+                className="post-new-btn"
+              >
+
+                ➕ Post New Ad
+
+              </button>
+
+            </Link>
+
+          </div>
 
         </div>
-
-
-        <Link
-          to="/post-ad"
-        >
-
-          <button
-            className="post-new-btn"
-          >
-
-            ➕ Post New Ad
-
-          </button>
-
-        </Link>
 
       </div>
 

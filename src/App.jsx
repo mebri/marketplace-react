@@ -4,16 +4,18 @@ import {
   Route,
 } from "react-router-dom";
 
-// =========================
 // COMPONENTS
-// =========================
-
+import ResetPassword from "./pages/ResetPassword";
 import Navbar from "./components/Navbar";
+import ScrollManager from "./components/ScrollManager";
+import NotificationPrompt from "./components/NotificationPrompt";
 
-// =========================
 // PAGES
+<<<<<<< HEAD
 // =========================
 import Chat from "./pages/Chat";
+=======
+>>>>>>> c85442526896fc48e5cb237998fcf0cc1e1daa3a
 import Home from "./pages/Home";
 import Cars from "./pages/Cars";
 import Houses from "./pages/Houses";
@@ -34,175 +36,65 @@ import MyAds from "./pages/MyAds";
 import Contact from "./pages/Contact";
 
 import Profile from "./pages/Profile";
+// ✅ FIXED: Using UserProfile instead of PublicProfile
 import UserProfile from "./pages/UserProfile";
+
+import Admin from "./pages/Admin";
+
+// CHAT + NOTIFICATIONS
+import Chats from "./pages/Chats";
+import ChatRoom from "./pages/ChatRoom";
+import Notifications from "./pages/Notifications";
+
+// ✅ ADDED VIDEO CALL
+import VideoCall from "./pages/VideoCall"; 
 
 function App() {
   return (
     <HashRouter>
 
-      {/* =========================
-          NAVBAR
-      ========================= */}
-
+      <ScrollManager />
       <Navbar />
-
-      {/* =========================
-          ROUTES
-      ========================= */}
+      <NotificationPrompt />
 
       <Routes>
 
-        {/* HOME */}
+        <Route path="/" element={<Home />} />
 
-        <Route
-          path="/"
-          element={<Home />}
-        />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
+        <Route path="/cars" element={<Cars />} />
+        <Route path="/houses" element={<Houses />} />
+        <Route path="/rentals" element={<Rentals />} />
 
-        {/* =========================
-            CARS
-        ========================= */}
+        <Route path="/search" element={<Search />} />
+        <Route path="/ad/:id" element={<AdDetails />} />
 
-        <Route
-          path="/cars"
-          element={<Cars />}
-        />
+        <Route path="/post-ad" element={<PostAd />} />
+        <Route path="/edit-ad/:id" element={<EditAd />} />
 
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/my-ads" element={<MyAds />} />
 
-        {/* =========================
-            HOUSES
-        ========================= */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
-        <Route
-          path="/houses"
-          element={<Houses />}
-        />
+        <Route path="/profile" element={<Profile />} />
+        
+        {/* ✅ FIXED: Using UserProfile */}
+        <Route path="/user/:uid" element={<UserProfile />} />
 
+        <Route path="/contact" element={<Contact />} />
 
-        {/* =========================
-            RENTALS
-        ========================= */}
+        <Route path="/chats" element={<Chats />} />
+        <Route path="/chat/:chatId" element={<ChatRoom />} />
 
-        <Route
-          path="/rentals"
-          element={<Rentals />}
-        />
+        <Route path="/notifications" element={<Notifications />} />
 
+        <Route path="/admin" element={<Admin />} />
 
-        {/* =========================
-            SEARCH
-            Used for:
-            Electronics
-            Furniture
-            Labor & Services
-            ምንአለሽ ተራ
-        ========================= */}
-
-        <Route
-          path="/search"
-          element={<Search />}
-        />
-
-
-        {/* =========================
-            AD DETAILS
-        ========================= */}
-
-        <Route
-          path="/ad/:id"
-          element={<AdDetails />}
-        />
-
-
-        {/* =========================
-            POST AD
-        ========================= */}
-
-        <Route
-          path="/post-ad"
-          element={<PostAd />}
-        />
-
-
-        {/* =========================
-            EDIT AD
-        ========================= */}
-
-        <Route
-          path="/edit-ad/:id"
-          element={<EditAd />}
-        />
-
-
-        {/* =========================
-            DASHBOARD
-        ========================= */}
-
-        <Route
-          path="/dashboard"
-          element={<Dashboard />}
-        />
-
-
-        {/* =========================
-            MY ADS
-        ========================= */}
-
-        <Route
-          path="/my-ads"
-          element={<MyAds />}
-        />
-
-
-        {/* =========================
-            LOGIN
-        ========================= */}
-
-        <Route
-          path="/login"
-          element={<Login />}
-        />
-
-
-        {/* =========================
-            REGISTER
-        ========================= */}
-
-        <Route
-          path="/register"
-          element={<Register />}
-        />
-
-
-        {/* =========================
-            PROFILE
-        ========================= */}
-
-        <Route
-          path="/profile"
-          element={<Profile />}
-        />
-
-
-        {/* =========================
-            PUBLIC USER PROFILE
-        ========================= */}
-
-        <Route
-          path="/user/:uid"
-          element={<UserProfile />}
-        />
-
-
-        {/* =========================
-            CONTACT
-        ========================= */}
-
-        <Route
-          path="/contact"
-          element={<Contact />}
-        />
+        {/* ✅ ADDED VIDEO CALL ROUTE */}
+        <Route path="/video-call/:roomId" element={<VideoCall />} />
 
       </Routes>
 
